@@ -19,7 +19,7 @@ export interface OpcoesSorteio {
 
 export const MINIMO_JOGADORES = 10
 export const MAX_CINCO_ESTRELAS = 2
-const TENTATIVAS_PADRAO = 1000
+const TENTATIVAS_PADRAO = 300
 
 type Divisao = ParticipanteSorteio[][]
 
