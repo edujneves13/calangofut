@@ -31,26 +31,45 @@ type Divisao = ParticipanteSorteio[][]
  * decididos ao acaso, para os times não se repetirem toda semana.
  */
 export function sortearTimes(participantes: ParticipanteSorteio[], opcoes: OpcoesSorteio = {}): ResultadoSorteio {
+  return refazerSorteio(participantes, [], [], opcoes)
+}
+
+/**
+ * Refaz o sorteio mantendo os times completos escolhidos (travados) iguais e na mesma posição.
+ * Os outros jogadores presentes são sorteados de novo, equilibrando também com os travados.
+ * Índices de times incompletos são ignorados.
+ */
+export function refazerSorteio(
+  participantes: ParticipanteSorteio[],
+  timesAtuais: Time[],
+  travados: number[],
+  opcoes: OpcoesSorteio = {},
+): ResultadoSorteio {
   const rng = opcoes.rng ?? Math.random
   const tentativas = opcoes.tentativas ?? TENTATIVAS_PADRAO
 
-  const jogadores = participantes.filter((p) => !p.goleiro && p.presente)
-  if (jogadores.length < MINIMO_JOGADORES) return { ok: false, motivo: 'poucos-jogadores' }
+  const indices = [...new Set(travados)].filter((i) => timesAtuais[i]?.completo).sort((a, b) => a - b)
+  const fixos = indices.map((i) => timesAtuais[i]!)
+  const idsFixos = new Set(fixos.flatMap((t) => t.jogadorIds))
+
+  const jogadores = participantes.filter((p) => !p.goleiro && p.presente && !idsFixos.has(p.id))
+  if (jogadores.length + idsFixos.size < MINIMO_JOGADORES) return { ok: false, motivo: 'poucos-jogadores' }
 
   const tamanhos = tamanhosDosTimes(jogadores.length)
   const vagasCinco = tamanhos.reduce((s, t) => s + Math.min(MAX_CINCO_ESTRELAS, t), 0)
   if (jogadores.filter(ehCinco).length > vagasCinco) return { ok: false, motivo: 'muitos-cinco-estrelas' }
 
   const numCompletos = Math.floor(jogadores.length / TAMANHO_TIME)
-  let melhor: Divisao | null = null
+  const somasFixas = fixos.map((t) => t.somaEstrelas)
+  let melhor: Divisao = []
   let melhorNota = Infinity
   let empates = 0
 
-  for (let i = 0; i < tentativas; i++) {
+  for (let i = 0; i < tentativas && jogadores.length > 0; i++) {
     const divisao = cortar(embaralhar(jogadores, rng), tamanhos)
     consertarCincoEstrelas(divisao, rng)
-    melhorarComTrocas(divisao, numCompletos)
-    const nota = diferenca(divisao, numCompletos)
+    melhorarComTrocas(divisao, numCompletos, somasFixas)
+    const nota = diferenca(divisao, numCompletos, somasFixas)
 
     if (nota < melhorNota) {
       melhor = divisao
@@ -62,9 +81,21 @@ export function sortearTimes(participantes: ParticipanteSorteio[], opcoes: Opcoe
     }
   }
 
-  const completos = embaralhar(melhor!.slice(0, numCompletos), rng)
-  const incompleto = melhor!.slice(numCompletos)
-  return { ok: true, times: [...completos, ...incompleto].map(paraTime) }
+  const novosCompletos = embaralhar(melhor.slice(0, numCompletos).map(paraTime), rng)
+  const incompleto = melhor.slice(numCompletos).map(paraTime)
+
+  // Travados voltam para a posição deles; os times novos ocupam as vagas que sobram.
+  const totalCompletos = fixos.length + novosCompletos.length
+  const posicoes: (Time | undefined)[] = Array(totalCompletos)
+  const semPosicao: Time[] = []
+  indices.forEach((indice, k) => {
+    if (indice < totalCompletos) posicoes[indice] = fixos[k]
+    else semPosicao.push(fixos[k]!)
+  })
+  const fila = [...semPosicao, ...novosCompletos]
+  const completos = Array.from(posicoes, (t) => t ?? fila.shift()!)
+
+  return { ok: true, times: [...completos, ...incompleto] }
 }
 
 function tamanhosDosTimes(n: number): number[] {
@@ -95,9 +126,10 @@ function consertarCincoEstrelas(divisao: Divisao, rng: () => number): void {
   }
 }
 
-/** Nota principal: maior soma − menor soma entre os times completos. */
-function diferenca(divisao: Divisao, numCompletos: number): number {
-  const somas = divisao.slice(0, numCompletos).map(soma)
+/** Nota principal: maior soma − menor soma entre os times completos (incluindo os travados). */
+function diferenca(divisao: Divisao, numCompletos: number, somasFixas: number[]): number {
+  const somas = [...divisao.slice(0, numCompletos).map(soma), ...somasFixas]
+  if (somas.length === 0) return 0
   return Math.max(...somas) - Math.min(...somas)
 }
 
@@ -107,8 +139,8 @@ function espalhamento(divisao: Divisao, numCompletos: number): number {
 }
 
 /** Troca pares de jogadores entre times enquanto alguma troca melhorar o equilíbrio. */
-function melhorarComTrocas(divisao: Divisao, numCompletos: number): void {
-  let notaAtual = [diferenca(divisao, numCompletos), espalhamento(divisao, numCompletos)] as const
+function melhorarComTrocas(divisao: Divisao, numCompletos: number, somasFixas: number[]): void {
+  let notaAtual = [diferenca(divisao, numCompletos, somasFixas), espalhamento(divisao, numCompletos)] as const
   let melhorou = true
 
   while (melhorou) {
@@ -125,7 +157,7 @@ function melhorarComTrocas(divisao: Divisao, numCompletos: number): void {
             timeA[i] = pb
             timeB[j] = pa
             const valido = contarCinco(timeA) <= MAX_CINCO_ESTRELAS && contarCinco(timeB) <= MAX_CINCO_ESTRELAS
-            const nota = [diferenca(divisao, numCompletos), espalhamento(divisao, numCompletos)] as const
+            const nota = [diferenca(divisao, numCompletos, somasFixas), espalhamento(divisao, numCompletos)] as const
             if (valido && (nota[0] < notaAtual[0] || (nota[0] === notaAtual[0] && nota[1] < notaAtual[1]))) {
               notaAtual = nota
               melhorou = true

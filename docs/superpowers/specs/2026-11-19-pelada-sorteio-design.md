@@ -50,7 +50,7 @@ Um único celular opera o sorteio na quadra; não há sincronização em tempo r
 2. **Colar a lista** do WhatsApp. O app separa jogadores de linha e goleiros, ignora a lista de espera e casa cada nome com o cadastro.
 3. **Resolver nomes não reconhecidos:** escolher um jogador sugerido ou cadastrar na hora (nome completo + estrelas).
 4. **Conferir:** todos começam com Presente = sim (exceto ❌, ver Lógica). Um toque muda para não. Busca no topo; "+ adicionar jogador" para quem não está na lista.
-5. **Escolher formato** e **sortear**. Pode refazer o sorteio, com confirmação.
+5. **Escolher formato** e **sortear**. Pode refazer o sorteio, com confirmação. Ao refazer, o organizador pode travar times completos: eles continuam iguais e com o mesmo número, e só os outros jogadores são sorteados de novo, equilibrando também com os times travados.
 6. **Tela de times:** mostra os times (com soma de estrelas, só no app). O usuário pode copiar o texto ou abrir direto no WhatsApp com a mensagem pré-escrita.
 7. **Quem chega depois:** abaixo dos times fica a lista de ausentes com a ação "Presente". Marcar presente coloca a pessoa direto no último time incompleto (ex.: 3 times completos + Time 4 incompleto → atrasado vai para o Time 4). Sem mexer nos outros times. O texto pode ser copiado de novo.
 8. **Cronômetro** durante os jogos.
@@ -63,7 +63,7 @@ Pensadas para uso com uma mão, à noite, na beira da quadra: botões grandes, a
 
 | Tela | O que tem | Estados que precisam de desenho |
 | --- | --- | --- |
-| Login | E-mail + link mágico ou senha | Link enviado, erro |
+| Login | Avatar da pelada (imagem fixa em `public/`, enviada pelo Eduardo; também serve de ícone do app) + e-mail + link mágico ou senha | Link enviado, erro |
 | Início | Abas: Sorteio e Cronômetro. Na aba Sorteio, a próxima pelada em destaque e o acesso a Jogadores e Configurações | Nenhuma pelada criada |
 | Pelada do dia | 3 etapas: Colar lista → Conferir → Times (+ ausentes abaixo) | Nome não reconhecido, presentes que não fecham times de 5, menos de 10 presentes, sorteio refeito, atrasado entrando |
 | Jogadores | Lista com busca, criar/editar/desativar | Lista vazia, nome duplicado |
@@ -177,7 +177,7 @@ Escolhida: **React (Vite) + TypeScript + Supabase, publicado no Netlify**, sem s
 1. A próxima pelada já vem criada como recorrente (quarta, 20:30, Colibris); data, horário e local editáveis.
 2. Com menos de 10 jogadores de linha presentes, o app não sorteia e avisa.
 3. Quem sobra da divisão por 5 forma o último time incompleto, escolhido pelo balanceamento.
-4. O sorteio pode ser refeito com confirmação. Depois do sorteio, a tela mostra os times e, abaixo, a lista de ausentes com a ação "Presente", que coloca a pessoa direto no último time incompleto.
+4. O sorteio pode ser refeito com confirmação, travando os times completos que o organizador quiser manter. Depois do sorteio, a tela mostra os times e, abaixo, a lista de ausentes com a ação "Presente", que coloca a pessoa direto no último time incompleto.
 5. Nome parecido nunca casa sozinho.
 6. Soma de estrelas só no app.
 7. Alerta no último minuto do cronômetro.
