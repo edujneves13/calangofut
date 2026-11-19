@@ -87,4 +87,10 @@ describe('peladas', () => {
     expect(t.times?.times).toEqual([time, incompleto])
     expect(t.sorteadaEm).toBe(s.sorteadaEm)
   })
+
+  it('mudar a data para uma que já tem pelada dá erro data-duplicada', async () => {
+    await abrirPelada(db, '2026-12-02')
+    const p = await abrirPelada(db, '2026-11-25')
+    await expect(atualizarPelada(db, p.id, { data: '2026-12-02' })).rejects.toMatchObject({ codigo: 'data-duplicada' })
+  })
 })

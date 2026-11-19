@@ -3,6 +3,7 @@ import type { Tables } from './database.types'
 import { traduzirErro } from './erros'
 import type { Pelada } from './peladas'
 
+// marcado_presente_em é gravado pelo banco (trigger presencas_hora): muda só de ausente para presente.
 export interface Presenca {
   id: string
   peladaId: string
@@ -23,9 +24,6 @@ function paraPresenca(linha: Tables<'presencas'>): Presenca {
   }
 }
 
-// 'now' = hora do servidor (Postgres), igual para todos os celulares.
-const horaDaPresenca = (presente: boolean) => (presente ? 'now' : null)
-
 export async function listarPresencas(db: Db, peladaId: string): Promise<Presenca[]> {
   const { data, error } = await db.from('presencas').select('*').eq('pelada_id', peladaId)
   if (error) throw traduzirErro(error)
@@ -42,7 +40,6 @@ export async function salvarPresencasDaLista(
     pelada_id: peladaId,
     jogador_id: i.jogadorId,
     presente: i.presente,
-    marcado_presente_em: horaDaPresenca(i.presente),
     origem: 'lista',
   }))
   const { data, error } = await db.from('presencas').upsert(linhas, { onConflict: 'pelada_id,jogador_id' }).select()
@@ -55,7 +52,7 @@ export async function adicionarNaHora(db: Db, peladaId: string, jogadorId: strin
   const { data, error } = await db
     .from('presencas')
     .upsert(
-      { pelada_id: peladaId, jogador_id: jogadorId, presente: true, marcado_presente_em: 'now', origem: 'na-hora' },
+      { pelada_id: peladaId, jogador_id: jogadorId, presente: true, origem: 'na-hora' },
       { onConflict: 'pelada_id,jogador_id' },
     )
     .select()
@@ -68,7 +65,7 @@ export async function adicionarNaHora(db: Db, peladaId: string, jogadorId: strin
 export async function marcarPresenca(db: Db, peladaId: string, jogadorId: string, presente: boolean): Promise<Presenca> {
   const { data, error } = await db
     .from('presencas')
-    .update({ presente, marcado_presente_em: horaDaPresenca(presente) })
+    .update({ presente })
     .eq('pelada_id', peladaId)
     .eq('jogador_id', jogadorId)
     .select()

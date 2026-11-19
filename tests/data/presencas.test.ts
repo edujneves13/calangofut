@@ -84,4 +84,23 @@ describe('presenças', () => {
     const biaPresente = await adicionarNaHora(db, pelada.id, bia.id)
     expect(chegouDepois(biaPresente, pelada)).toBe(false)
   })
+
+  it('colar a lista de novo depois do sorteio não marca ninguém como atrasado', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    const sorteada = await salvarSorteio(db, pelada.id, sorteio)
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    expect(chegouDepois(de(await listarPresencas(db, pelada.id), ana), sorteada)).toBe(false)
+  })
+
+  it('tocar Presente em quem já estava presente não marca como atrasado', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    const sorteada = await salvarSorteio(db, pelada.id, sorteio)
+    expect(chegouDepois(await marcarPresenca(db, pelada.id, ana.id, true), sorteada)).toBe(false)
+  })
+
+  it('colar a lista de novo não muda a origem de quem entrou na hora', async () => {
+    await adicionarNaHora(db, pelada.id, caio.id)
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: caio.id, presente: true }])
+    expect(de(await listarPresencas(db, pelada.id), caio).origem).toBe('na-hora')
+  })
 })
