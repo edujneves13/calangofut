@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type { Db } from '../../src/data/cliente'
 import { lerConfiguracoes, salvarConfiguracoes } from '../../src/data/configuracoes'
 import { abrirPelada, atualizarPelada, salvarSorteio, salvarTimes } from '../../src/data/peladas'
@@ -20,6 +20,10 @@ const incompleto: Time = { jogadorIds: ['f'], somaEstrelas: 3, completo: false }
 beforeAll(async () => {
   db = await clienteDeTeste()
 })
+afterAll(async () => {
+  await limparBanco(db)
+})
+
 beforeEach(async () => {
   await limparBanco(db)
 })

@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type { Db } from '../../src/data/cliente'
 import { atualizarJogador, criarJogador, desativarJogador, listarJogadores } from '../../src/data/jogadores'
 import { clienteDeslogado, clienteDeTeste, limparBanco } from './ajuda'
@@ -7,6 +7,10 @@ let db: Db
 
 beforeAll(async () => {
   db = await clienteDeTeste()
+})
+
+afterAll(async () => {
+  await limparBanco(db)
 })
 
 beforeEach(async () => {
