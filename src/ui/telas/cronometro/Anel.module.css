@@ -2,7 +2,7 @@
 .anel {
   --cor-anel: var(--action);
   position: relative;
-  width: min(300px, 100%, 40dvh);
+  width: min(300px, 100%, 34dvh);
   aspect-ratio: 1;
   margin: 0 auto;
 }

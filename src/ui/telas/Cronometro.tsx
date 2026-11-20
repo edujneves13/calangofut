@@ -5,7 +5,7 @@ import { Button } from '../components/Button'
 import { Segmented } from '../components/Controls'
 import { Header } from '../components/Header'
 import { Icon } from '../components/Icon'
-import { Anel, type TomAnel } from './cronometro/Anel'
+import { Anel } from './cronometro/Anel'
 import { TempoSheet } from './cronometro/TempoSheet'
 import type { Cronometro as Crono } from './useCronometro'
 import s from './Cronometro.module.css'
@@ -25,7 +25,7 @@ export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
   const { estado, agora } = c
   const restante = tempoRestante(estado, agora)
   const ultimo = ehUltimoMinuto(estado, agora)
-  const tom: TomAnel = ultimo ? 'ultimo' : estado.fase === 'pausado' ? 'pausado' : 'normal'
+  const pausado = estado.fase === 'pausado'
 
   const minutos = estado.minutos
   const escolha: Escolha = minutos === 8 || minutos === 10 ? minutos : 'outro'
@@ -49,13 +49,13 @@ export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
     <main className={`${t.tela} ${t.entrar} ${s.tela}`}>
       <Header titulo="Cronômetro" />
       <div className={s.selo} aria-live="assertive">
-        {ultimo && <span className={s.seloAmbar}>Último minuto</span>}
-        {!ultimo && estado.fase === 'pausado' && <span className={s.seloPausado}>Pausado</span>}
+        {pausado && <span className={s.seloPausado}>Pausado</span>}
+        {!pausado && ultimo && <span className={s.seloAmbar}>Último minuto</span>}
       </div>
-      <Anel progresso={progresso(estado, agora)} tom={tom} imagem={estado.fase === 'pausado' ? 'pausa' : 'inicio'} />
+      <Anel progresso={progresso(estado, agora)} tom="normal" ultimo={ultimo} pausado={pausado} imagem={pausado ? 'pausa' : 'inicio'} />
       <div className={s.leitura}>
         <p
-          className={`${s.numeros} ${ultimo ? s.ambar : ''} ${estado.fase === 'pausado' ? s.piscando : ''}`}
+          className={`${s.numeros} ${ultimo ? s.ambar : ''} ${pausado ? s.piscando : ''}`}
           role="timer"
           aria-label={mmss(restante)}
         >

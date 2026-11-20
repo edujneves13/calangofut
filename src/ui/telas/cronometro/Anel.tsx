@@ -2,7 +2,7 @@ import { SoccerBall } from '@phosphor-icons/react'
 import { Icon } from '../../components/Icon'
 import s from './Anel.module.css'
 
-export type TomAnel = 'normal' | 'ultimo' | 'pausado' | 'fim'
+export type TomAnel = 'normal' | 'fim'
 
 const IMAGENS = {
   inicio: '/mascote/cronometro-inicio.webp',
@@ -28,14 +28,18 @@ interface Props {
   progresso: number
   tom: TomAnel
   imagem: ImagemAnel
+  /** Âmbar no último minuto. */
+  ultimo?: boolean
+  /** Anel parado e apagado. Vale junto com o último minuto. */
+  pausado?: boolean
 }
 
 /** Anel clássico do cronômetro (DESIGN.md 7.15, B1): ilustração no centro, anel que esvazia e bola na ponta. */
-export function Anel({ progresso, tom, imagem }: Props) {
+export function Anel({ progresso, tom, imagem, ultimo, pausado }: Props) {
   const restante = tom === 'fim' ? 1 : 1 - progresso
   const ponta = ponto(restante * 360, R_ANEL)
   return (
-    <div className={`${s.anel} ${s[tom]}`} aria-hidden="true">
+    <div className={[s.anel, tom === 'fim' && s.fim, ultimo && s.ultimo, pausado && s.pausado].filter(Boolean).join(' ')} aria-hidden="true">
       <svg viewBox="0 0 320 320" className={s.svg}>
         {MARCAS.map((i) => {
           const grande = i % 5 === 0
