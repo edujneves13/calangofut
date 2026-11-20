@@ -50,6 +50,7 @@ export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, di
           aria-checked={chegou}
           aria-label={selecao ? nome : chegou ? `Chegou: ${nome}` : `Não chegou: ${nome}`}
           className={s.check}
+          disabled={!onTrocarChegou}
           onClick={(e) => {
             e.stopPropagation()
             onTrocarChegou?.()

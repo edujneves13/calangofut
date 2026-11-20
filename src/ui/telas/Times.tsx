@@ -23,7 +23,7 @@ export function Times() {
   }, [fluxo, setFluxoAberto])
 
   if (fluxo) return <Fluxo onSair={() => setFluxo(false)} />
-  if (dados.pelada.times) return <Durante onTentarNovamente={() => setFluxo(true)} />
+  if (dados.pelada.times) return <Durante onNovoSorteio={() => setFluxo(true)} />
   return <ProximaPelada onSortear={() => setFluxo(true)} />
 }
 

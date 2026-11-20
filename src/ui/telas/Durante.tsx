@@ -27,7 +27,7 @@ import s from './Durante.module.css'
 import t from './Telas.module.css'
 
 /** Times — durante a pelada (docs/design/times-durante-v2.md). */
-export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }) {
+export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
   const { dados, atualizar, recarregar } = useApp()
   const mostrarToast = useToast()
   const { config, pelada, jogadores, presencas } = dados
@@ -176,7 +176,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
       const limpa = await recomecarPelada(db, pelada.id)
       atualizar({ pelada: limpa, presencas: [] })
       setConfirmarRecomecar(false)
-      onTentarNovamente()
+      onNovoSorteio()
     } catch (e) {
       mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
     }
@@ -314,6 +314,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
         aberto={refazerAberto}
         onFechar={() => setRefazerAberto(false)}
         times={times}
+        nomesDe={(tm) => resumoDeNomes(tm.jogadorIds.map((id) => porId.get(id)).filter((j): j is Jogador => Boolean(j)), TAMANHO_TIME)}
         onSortear={async (marcados) => {
           const travados = times.map((_, i) => i).filter((i) => !marcados.includes(i))
           const participantes = participantesDe(dados)
@@ -341,18 +342,18 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
         >
           <Icon icon={ArrowsClockwise} />
           <span>
-            <span className={t.opcaoTitulo}>Tentar novamente</span>
+            <span className={t.opcaoTitulo}>Iniciar novo sorteio</span>
+            <span className={t.opcaoSub}>Cola outra lista e sorteia do zero</span>
           </span>
         </button>
       </Sheet>
 
       <ConfirmModal
         aberto={confirmarRecomecar}
-        titulo="Começar de novo com outra lista?"
-        texto="A lista e os times de hoje serão apagados."
-        confirmar="Tentar novamente"
+        titulo="Iniciar um novo sorteio?"
+        texto="A lista e os times de hoje serão apagados. Você vai colar a lista do WhatsApp de novo."
+        confirmar="Iniciar novo sorteio"
         cancelar="Cancelar"
-        perigo
         onConfirmar={recomecar}
         onCancelar={() => setConfirmarRecomecar(false)}
       />
@@ -385,39 +386,47 @@ interface PropsRefazer {
   aberto: boolean
   onFechar: () => void
   times: Time[]
+  /** Nomes resumidos do time, para a linha de baixo. */
+  nomesDe: (time: Time) => string
   onSortear: (marcados: number[]) => Promise<void>
 }
 
-/** Sortear de novo (COPY 3.4): marcados são misturados; desmarcados ficam iguais. */
-function SortearDeNovo({ aberto, onFechar, times, onSortear }: PropsRefazer) {
+/**
+ * Sortear de novo (v2, item 5): os times marcados são sorteados de novo entre eles; os desmarcados ficam iguais.
+ * Time incompleto sempre entra: refazerSorteio só consegue travar time completo.
+ */
+function SortearDeNovo({ aberto, onFechar, times, nomesDe, onSortear }: PropsRefazer) {
   const [marcados, setMarcados] = useState<number[] | null>(null)
   const [sorteando, setSorteando] = useState(false)
   const sel = marcados ?? times.map((_, i) => i)
+  const fechar = () => {
+    setMarcados(null)
+    onFechar()
+  }
 
   return (
-    <Sheet
-      aberto={aberto}
-      onFechar={() => {
-        setMarcados(null)
-        onFechar()
-      }}
-      titulo="Sortear de novo"
-    >
+    <Sheet aberto={aberto} onFechar={fechar} titulo="Sortear de novo">
       <div className={t.coluna}>
-        <p className={t.texto2}>Marque os times que vão ser misturados. Os outros ficam iguais.</p>
+        <p className={t.texto2}>
+          Os jogadores dos times marcados são sorteados de novo entre eles. Desmarque quem já está jogando: esse time
+          não muda.
+        </p>
         <ul className={t.lista}>
           {times.map((tm, i) => {
             const marcado = sel.includes(i)
-            const trocar = () => setMarcados(marcado ? sel.filter((x) => x !== i) : [...sel, i].sort((a, b) => a - b))
+            const trocar = tm.completo
+              ? () => setMarcados(marcado ? sel.filter((x) => x !== i) : [...sel, i].sort((a, b) => a - b))
+              : undefined
             return (
               <li key={i}>
                 <PlayerRow
-                  nome={`Time ${i + 1}`}
+                  nome={`Time ${i + 1} · ${tm.completo ? `${tm.somaEstrelas}★` : `${tm.jogadorIds.length}/${TAMANHO_TIME}`}`}
                   selecao
                   chegou={marcado}
                   onTrocarChegou={trocar}
                   onClick={trocar}
-                  sub={tm.completo ? `${tm.somaEstrelas}★` : `${tm.jogadorIds.length}/5`}
+                  apagado={!marcado}
+                  sub={nomesDe(tm)}
                   direita={marcado ? undefined : <span className={t.pequeno}>fica igual</span>}
                 />
               </li>
@@ -436,15 +445,9 @@ function SortearDeNovo({ aberto, onFechar, times, onSortear }: PropsRefazer) {
             setMarcados(null)
           }}
         >
-          Sortear {sel.length} times
+          Sortear {sel.length} times de novo
         </Button>
-        <Button
-          variante="secundario"
-          onClick={() => {
-            setMarcados(null)
-            onFechar()
-          }}
-        >
+        <Button variante="secundario" onClick={fechar}>
           Cancelar
         </Button>
       </div>
