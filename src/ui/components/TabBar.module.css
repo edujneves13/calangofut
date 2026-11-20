@@ -38,3 +38,39 @@
   font-weight: 700;
   font-size: 0.875rem;
 }
+
+/* Cronômetro rodando ou pausado (times-durante-v2, item 9) */
+.anel {
+  --cor-anel: var(--action);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--cor-anel);
+}
+.anelSvg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.trilho { fill: none; stroke: var(--surface-3); stroke-width: 3; }
+.progresso {
+  fill: none;
+  stroke: var(--cor-anel);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke var(--motion-base) var(--ease-standard);
+}
+.tempo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--action);
+}
+.anel[data-tom='ultimo'] { --cor-anel: var(--warning); }
+.tempo[data-tom='ultimo'] { color: var(--warning); }
+.anel[data-tom='pausado'] { --cor-anel: var(--text-2); }
+.anel[data-tom='pausado'] .progresso { opacity: 0.6; }
+.tempo[data-tom='pausado'] { color: var(--text-2); }

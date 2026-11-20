@@ -1,6 +1,7 @@
 import { WifiSlash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { lerConfiguracoes } from '../../data/configuracoes'
+import { estadoNaBarra } from '../../logic/cronometro'
 import { listarJogadores } from '../../data/jogadores'
 import { peladaAtual } from '../../data/peladas'
 import { listarPresencas } from '../../data/presencas'
@@ -115,6 +116,7 @@ export function Shell() {
       {mostrarMenu && (
         <TabBar
           ativa={aba}
+          cronometro={estadoNaBarra(cronometro.estado, cronometro.agora)}
           onTrocar={(nova) => {
             if (nova === 'ajustes' && aba !== 'ajustes') setTelaAjustes('inicio')
             setAba(nova)
