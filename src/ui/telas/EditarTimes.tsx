@@ -263,7 +263,7 @@ function FolhaJogador({ id, times, porId, onFechar, onMover, onTrocar, onTirar }
   const parceiroJ = parceiro ? porId.get(parceiro) : undefined
 
   return (
-    <Sheet aberto={Boolean(j)} onFechar={fechar} titulo={trocando && j ? `Trocar ${j.nome} com…` : (j?.nome ?? '')}>
+    <Sheet aberto={Boolean(j)} onFechar={fechar} titulo={trocando && j ? `Trocar de time com o ${j.nome}` : (j?.nome ?? '')}>
       {j && !trocando && (
         <div className={t.coluna}>
           <div className={s.folhaTopo}>
@@ -298,7 +298,7 @@ function FolhaJogador({ id, times, porId, onFechar, onMover, onTrocar, onTirar }
           {meu !== -1 && (
             <>
               <Button variante="secundario" icone={ArrowsLeftRight} className={s.opcao} onClick={() => setTrocando(true)}>
-                Trocar com alguém
+                Trocar com outro jogador
               </Button>
               <Button variante="secundario" icone={UserMinus} className={s.opcao} onClick={() => agir(() => onTirar(j.id))}>
                 Tirar do time
@@ -353,7 +353,7 @@ function FolhaJogador({ id, times, porId, onFechar, onMover, onTrocar, onTirar }
             disabled={!parceiroJ}
             onClick={() => parceiroJ && agir(() => onTrocar(j.id, parceiroJ.id))}
           >
-            {parceiroJ ? `Trocar ${j.nome} e ${parceiroJ.nome}` : 'Trocar com alguém'}
+            {parceiroJ ? `Trocar ${j.nome} e ${parceiroJ.nome}` : 'Trocar com outro jogador'}
           </Button>
         </div>
       )}
