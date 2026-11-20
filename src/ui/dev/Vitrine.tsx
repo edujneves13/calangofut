@@ -153,7 +153,7 @@ function Conteudo() {
       <Bloco nome="Card da próxima pelada">
         <Card semPadding>
           <div className={s.ilustracao}>
-            <img src="/mascote/proxima-pelada-solta.webp" alt="Calango, mascote da Pelada dos Brabos, no gramado" />
+            <img src="/mascote/proxima-pelada-fill.webp" alt="Calango, mascote da Pelada dos Brabos, no gramado" />
           </div>
           <div className={s.conteudoCard}>
             <SectionLabel destaque>Próxima pelada</SectionLabel>

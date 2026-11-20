@@ -294,7 +294,7 @@ Medidas para o tamanho padrão. Todo componente interativo tem estados: padrão,
 ### 7.4 Card da próxima pelada
 
 - `--surface-1`, raio `--radius-xl`, borda `--border`.
-- Ilustração `proxima-pelada-solta.webp` (fundo transparente, recortada na bolha) no topo: `aspect-ratio: 1101 / 792`, `object-fit: contain`, padding 16 px nas laterais e no topo, sem fade. A bolha aparece inteira em qualquer largura (`docs/design/fluxo-sorteio-v2-20-novembro.md` §6).
+- Ilustração `proxima-pelada-fill.webp` (cena retangular, sem bolha) no topo do card, de ponta a ponta: `aspect-ratio: 1200 / 896`, `object-fit: cover`, sem padding. Degradê embaixo, de transparente (60%) até `surface-1`, para a imagem sumir no card.
 - Conteúdo com padding 22 px: `label` em `--brand-label` → data em `display-l` → horário e local (`body`, `--text-2`, ícones 18 px) → botão principal "Sortear times".
 
 ### 7.5 Card de time (carrossel)

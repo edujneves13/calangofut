@@ -1,5 +1,18 @@
-.tela { justify-content: center; align-items: center; padding-bottom: var(--space-8); }
-.imagem { width: min(70%, 260px); }
+.tela { align-items: center; padding-bottom: var(--space-8); }
+/* Ilustração sem a bolha: ocupa o topo da tela de ponta a ponta e some no fundo embaixo. */
+.ilustracao {
+  position: relative;
+  align-self: stretch;
+  margin: calc(-1 * (env(safe-area-inset-top) + var(--space-4))) calc(-1 * var(--screen-margin)) 0;
+}
+.ilustracao img { display: block; width: 100%; aspect-ratio: 1 / 1; max-height: 45dvh; object-fit: cover; object-position: top; }
+.ilustracao::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, var(--bg) 100%);
+  pointer-events: none;
+}
 .grade { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); width: 100%; }
 .time {
   background: var(--surface-1);

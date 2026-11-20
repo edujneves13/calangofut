@@ -35,7 +35,7 @@ function ProximaPelada({ onSortear }: { onSortear: () => void }) {
       <Header titulo={config.nomePelada} avatar={{ nome: config.nomePelada, src: config.avatarUrl ?? AVATAR_PADRAO }} />
       <section className={s.hero} aria-label="Próxima pelada">
         <div className={s.ilustracao}>
-          <img src="/mascote/proxima-pelada-solta.webp" alt={`Calango, mascote da ${config.nomePelada}, no gramado`} />
+          <img src="/mascote/proxima-pelada-fill.webp" alt={`Calango, mascote da ${config.nomePelada}, no gramado`} />
         </div>
         <div className={s.conteudo}>
           <p className={s.rotulo}>Próxima pelada</p>
