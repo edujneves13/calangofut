@@ -85,7 +85,14 @@
 /* Sortear de novo · Editar times */
 .acoes { display: flex; gap: var(--space-3); }
 .acoes > * { flex: 1; }
-.acao { min-height: 48px; border-radius: 16px; padding: 0 var(--space-3); }
+.acao {
+  min-height: 48px;
+  border-radius: 16px;
+  padding: 0 var(--space-2);
+  gap: 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
 
 /* Não chegaram: o "banco", sem fundo e tracejado (times-durante-v2, itens 2 e 3) */
 .banco {
