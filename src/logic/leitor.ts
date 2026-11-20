@@ -2,7 +2,6 @@ import { normalizarNome } from './normalizar'
 
 export interface LinhaLida {
   nome: string
-  presente: boolean
 }
 
 export interface ListaLida {
@@ -12,55 +11,89 @@ export interface ListaLida {
   goleiros: LinhaLida[]
 }
 
-const LINHA_NUMERADA = /^\s*\d+\s*[-–.)]\s*(.*)$/
-const DATA = /(\d{1,2})\/(\d{1,2})\/(\d{4})/
-const EMOJIS = /[\p{Extended_Pictographic}️‍]/gu
+/** dd/mm, dd/mm/aa ou dd/mm/aaaa. */
+const DATA = /(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/
+const EMOJIS = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu
 const PARENTESES = /\([^)]*\)/g
+const SEPARADORES = /[,;]+|\s+e\s+/
+const MARCADOR = /^\s*(?:\d+\s*[-–.)]|[-–•*])\s*/
+const MINUSCULAS = new Set(['da', 'de', 'do', 'das', 'dos', 'e'])
 
-/** Lê o texto da lista colado do WhatsApp. */
-export function lerLista(texto: string): ListaLida {
-  const jogadores: LinhaLida[] = []
-  const goleiros: LinhaLida[] = []
+/**
+ * Lê a lista colada (do WhatsApp ou digitada) em qualquer formato: numerada, solta, com marcador,
+ * vários nomes por linha ou texto ditado. Para em "Lista de espera"; depois de "Goleiros" é goleiro.
+ * Quem tem ❌ em alguma linha sai da lista. `hoje` (YYYY-MM-DD) dá o ano quando a data vem sem ele.
+ */
+export function lerLista(texto: string, hoje?: string): ListaLida {
+  const linhas = texto.split(/\r?\n/)
+  // A lista do WhatsApp tem um cabeçalho longo (horário, Pix, legenda) antes de "Lista de Presença".
+  const inicio = linhas.findIndex((l) => tituloDe(l).startsWith('lista de presenca'))
+  const jogadores: string[] = []
+  const goleiros: string[] = []
+  const cortados = new Set<string>()
   let secao: 'linha' | 'goleiros' = 'linha'
 
-  for (const linha of texto.split(/\r?\n/)) {
-    const titulo = normalizarNome(linha.replace(EMOJIS, ''))
+  for (const linha of linhas.slice(inicio + 1)) {
+    const titulo = tituloDe(linha)
     if (titulo.startsWith('lista de espera')) break
     if (titulo.startsWith('goleiros')) {
       secao = 'goleiros'
       continue
     }
+    if (!pareceNomes(linha)) continue
 
-    const numerada = LINHA_NUMERADA.exec(linha)
-    if (!numerada) continue
-
-    const resto = numerada[1] ?? ''
-    const nome = resto.replace(PARENTESES, ' ').replace(EMOJIS, ' ').replace(/\s+/g, ' ').trim()
-    if (!nome) continue
-
-    const lida = { nome, presente: !resto.includes('❌') }
-    if (secao === 'goleiros') goleiros.push(lida)
-    else jogadores.push(lida)
+    const nomes = linha.replace(MARCADOR, '').split(SEPARADORES).map(limparNome).filter(Boolean)
+    if (linha.includes('❌')) nomes.forEach((n) => cortados.add(normalizarNome(n)))
+    else (secao === 'goleiros' ? goleiros : jogadores).push(...nomes)
   }
 
-  return { data: lerData(texto), jogadores, goleiros }
+  const vistos = new Set(cortados)
+  const unicos = (nomes: string[]) =>
+    nomes.flatMap((nome) => {
+      const chave = normalizarNome(nome)
+      if (vistos.has(chave)) return []
+      vistos.add(chave)
+      return [{ nome }]
+    })
+
+  return { data: lerData(texto, hoje), jogadores: unicos(jogadores), goleiros: unicos(goleiros) }
 }
 
-function lerData(texto: string): string | null {
+const tituloDe = (linha: string) => normalizarNome(linha.replace(EMOJIS, '').replace(/[:\s]+$/, ''))
+
+/** Cabeçalho não vira nome: linha com data, horário, valor ou "Rótulo: valor". */
+function pareceNomes(linha: string): boolean {
+  const resto = linha.replace(MARCADOR, '').replace(PARENTESES, ' ')
+  return !resto.includes(':') && !/\d/.test(resto)
+}
+
+function lerData(texto: string, hoje?: string): string | null {
   const m = DATA.exec(texto)
   if (!m) return null
   const [, dia, mes, ano] = m
-  return `${ano}-${mes!.padStart(2, '0')}-${dia!.padStart(2, '0')}`
+  const anoCompleto = !ano
+    ? (hoje?.slice(0, 4) ?? String(new Date().getFullYear()))
+    : ano.length === 2
+      ? `20${ano}`
+      : ano
+  return `${anoCompleto}-${mes!.padStart(2, '0')}-${dia!.padStart(2, '0')}`
+}
+
+/** "9 jogadores e 1 goleiro encontrados", em tempo real abaixo da caixa. Ninguém: null. */
+export function contarEncontrados({ jogadores, goleiros }: ListaLida): string | null {
+  const partes = [
+    jogadores.length > 0 && `${jogadores.length} ${jogadores.length === 1 ? 'jogador' : 'jogadores'}`,
+    goleiros.length > 0 && `${goleiros.length} ${goleiros.length === 1 ? 'goleiro' : 'goleiros'}`,
+  ].filter(Boolean)
+  if (partes.length === 0) return null
+  const total = jogadores.length + goleiros.length
+  return `${partes.join(' e ')} ${total === 1 ? 'encontrado' : 'encontrados'}`
 }
 
 export interface NomeLido {
   nome: string
   goleiro: boolean
 }
-
-const SEPARADORES = /[\n,;]+|\s+e\s+/
-const MARCADOR = /^\s*(?:\d+\s*[-–.)]|[-–•*])\s*/
-const MINUSCULAS = new Set(['da', 'de', 'do', 'das', 'dos', 'e'])
 
 /**
  * Lê nomes para cadastrar vários jogadores de uma vez.
@@ -69,28 +102,14 @@ const MINUSCULAS = new Set(['da', 'de', 'do', 'das', 'dos', 'e'])
  */
 export function lerNomes(texto: string): NomeLido[] {
   const lista = lerLista(texto)
-  // A lista do WhatsApp sempre tem a data no cabeçalho (ou a seção de goleiros).
-  const ehListaDoWhatsApp = lista.data !== null || lista.goleiros.length > 0
-  const lidos: NomeLido[] =
-    ehListaDoWhatsApp
-      ? [
-          ...lista.jogadores.map((j) => ({ nome: j.nome, goleiro: false })),
-          ...lista.goleiros.map((g) => ({ nome: g.nome, goleiro: true })),
-        ]
-      : texto.split(SEPARADORES).map((parte) => ({ nome: limparNome(parte), goleiro: false }))
-
-  const vistos = new Set<string>()
-  return lidos.filter(({ nome }) => {
-    const chave = normalizarNome(nome)
-    if (!chave || vistos.has(chave)) return false
-    vistos.add(chave)
-    return true
-  })
+  return [
+    ...lista.jogadores.map((j) => ({ nome: j.nome, goleiro: false })),
+    ...lista.goleiros.map((g) => ({ nome: g.nome, goleiro: true })),
+  ]
 }
 
 function limparNome(parte: string): string {
   const nome = parte
-    .replace(MARCADOR, '')
     .replace(PARENTESES, ' ')
     .replace(EMOJIS, ' ')
     .replace(/[^\p{L}\p{N}'\s.-]/gu, ' ')

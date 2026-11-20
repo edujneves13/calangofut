@@ -46,11 +46,9 @@ function semRepetidos(linhas: Linha[]): Linha[] {
   })
 }
 
-/** Lista do WhatsApp → linhas. ❌ na lista entra como "não vem". Goleiros entram como chegou (não vão para o sorteio). */
+/** Lista lida → linhas. Quem tinha ❌ já saiu no leitor. Goleiros entram como chegou (não vão para o sorteio). */
 export function linhasDaLista(lista: ListaLida, ativos: Jogador[]): Linha[] {
-  const jogadores = montarConfirmacao(lista.jogadores.map((j) => j.nome), ativos).map((item, i) =>
-    deItem(item, false, lista.jogadores[i]!.presente ? 'chegou' : 'ausente'),
-  )
+  const jogadores = montarConfirmacao(lista.jogadores.map((j) => j.nome), ativos).map((item) => deItem(item, false, 'chegou'))
   const goleiros = montarConfirmacao(lista.goleiros.map((g) => g.nome), ativos).map((item) => deItem(item, true, 'chegou'))
   return semRepetidos([...jogadores, ...goleiros])
 }
