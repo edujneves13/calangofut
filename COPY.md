@@ -233,7 +233,7 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Parado | Iniciar | Começar | Mais falado. |
 | Rodando | Pausar | = | |
 | **Pausado** | — | **Continuar** · Zerar | Faltava o estado inteiro. |
-| Ajuste | −1 min · +1 min | = | |
+| Ajuste | −1 min · +1 min | +1 min (rodando e pausado) | Decidido em 19/11: sem −1 min; parado só escolhe o tempo. |
 | Indicador | ☀ tela acesa | (remover) | Quando funciona, não precisa avisar. Só aparece o aviso de "sem suporte" abaixo. |
 | Último minuto | ÚLTIMO MINUTO | = | |
 | Fim — título | Fim de jogo | = | |
@@ -243,6 +243,8 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Sem suporte a tela acesa | — | Seu celular pode apagar a tela durante o jogo. O tempo continua contando. | Faltava (alguns navegadores). |
 | Tempo personalizado (sheet) | — | Título "Tempo de jogo" · número + "minutos" · atalhos 5, 6, 7, 12, 15 min · ajuda "De 1 a 30 minutos. Vale só para hoje; o padrão muda em Ajustes." · botão "Usar 12 min" | Faltava. |
 | Primeiro uso do som | — | Toque em Começar para liberar o apito. | iOS só toca som após um toque. |
+| Linha de apoio (parado) | — | Pronto para o próximo jogo | Aprovado em 19/11. Rodando, não há linha de apoio (sem contagem de jogos). |
+| Selo (pausado) | — | PAUSADO | Aprovado em 19/11. Mesmo estilo do selo de último minuto. |
 
 ### 6.1 Ajustes
 

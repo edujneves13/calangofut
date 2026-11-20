@@ -386,10 +386,13 @@ Linha de jogador novo em "Confira a lista" e na confirmação do lote: fundo `--
 
 | Estado | Número | Fundo | Extras |
 | --- | --- | --- | --- |
-| Parado | `display-xl` `--text-1` | `--bg` | Segmentado 8/10 min, botão "Começar" grande (76 px); pausado: "Continuar" e "Zerar", −1/+1 min |
-| Rodando | `display-xl` `--text-1` | `--bg` | Anel de progresso (`--action` sobre `--surface-2`) com a bola correndo na ponta; "Pausar" |
-| Último minuto | `display-xl` `--warning` | `--bg` | Rótulo "ÚLTIMO MINUTO" em `label` âmbar; vibração curta ao entrar |
-| Fim | `display-xl` `--on-action` | `--action` (tela toda) | "Fim de jogo" + botões "Zerar para o próximo" (branco) e "Parar apito" |
+| Parado | `display-xl` `--text-1` | `--bg` | Anel cheio, ilustração `cronometro-inicio`, "Pronto para o próximo jogo", segmentado 8 min · 10 min · Outro, botão "Começar" (76 px) |
+| Rodando | `display-xl` `--text-1` | `--bg` | Anel esvaziando (`--action` sobre `--surface-2`) com a bola na ponta; "Pausar" (grande), "Zerar" e "+1 min" |
+| Último minuto | `display-xl` `--warning` | `--bg` | Anel e bola âmbar; selo "ÚLTIMO MINUTO" (`--warning-bg`, borda tracejada); vibração curta ao entrar |
+| Pausado | `display-xl` `--text-1`, piscando devagar | `--bg` | Anel com opacidade 0,5, ilustração `cronometro-pausa`, selo "PAUSADO"; "Continuar" (grande), "Zerar" e "+1 min" |
+| Fim | `display-xl` `--on-action` | `--action` (tela toda) | Anel branco cheio com raios curtos para fora, ilustração `cronometro-fim` com borda branca, "Fim de jogo" + "Zerar para o próximo" (branco) e "Parar apito"; menu de baixo escondido |
+
+Troca de ilustração com crossfade de 220 ms. Com `prefers-reduced-motion`: sem crossfade, sem piscar e sem a bola.
 
 ### 7.16 Estados vazios e avisos
 

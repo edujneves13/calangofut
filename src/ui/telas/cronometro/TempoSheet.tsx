@@ -1,0 +1,55 @@
+import { Minus, Plus } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
+import { limitarMinutos, MAX_MINUTOS, MIN_MINUTOS } from '../../../logic/cronometro'
+import { Button } from '../../components/Button'
+import { IconButton } from '../../components/IconButton'
+import { Sheet } from '../../components/Sheet'
+import t from '../Telas.module.css'
+import s from './TempoSheet.module.css'
+
+const ATALHOS = [5, 6, 7, 12, 15]
+
+interface Props {
+  aberto: boolean
+  minutos: number
+  onFechar: () => void
+  onUsar: (minutos: number) => void
+}
+
+/** "Outro": tempo de jogo só para hoje (COPY.md 5, tempo personalizado). */
+export function TempoSheet({ aberto, minutos, onFechar, onUsar }: Props) {
+  const [n, setN] = useState(minutos)
+  useEffect(() => {
+    if (aberto) setN(minutos)
+  }, [aberto, minutos])
+
+  return (
+    <Sheet aberto={aberto} onFechar={onFechar} titulo="Tempo de jogo">
+      <div className={t.coluna}>
+        <div className={s.contador}>
+          <IconButton icone={Minus} rotulo="Menos" disabled={n <= MIN_MINUTOS} onClick={() => setN(limitarMinutos(n - 1))} />
+          <p className={s.numero} aria-live="polite">
+            {n}
+            <span className={s.unidade}>minutos</span>
+          </p>
+          <IconButton icone={Plus} rotulo="Mais" disabled={n >= MAX_MINUTOS} onClick={() => setN(limitarMinutos(n + 1))} />
+        </div>
+        <div className={`${t.chips} ${s.atalhos}`}>
+          {ATALHOS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={n === m}
+              className={`${t.chip} ${n === m ? t.chipAtivo : ''}`}
+              onClick={() => setN(m)}
+            >
+              {m} min
+            </button>
+          ))}
+        </div>
+        <p className={`${t.pequeno} ${t.centro}`}>De 1 a 30 minutos. Vale só para hoje; o padrão muda em Ajustes.</p>
+        <Button onClick={() => onUsar(n)}>Usar {n} min</Button>
+      </div>
+    </Sheet>
+  )
+}
