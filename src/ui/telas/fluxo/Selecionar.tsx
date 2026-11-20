@@ -9,7 +9,7 @@ import { PlayerRow } from '../../components/PlayerRow'
 import { combina, porNome } from '../../util'
 import { useApp } from '../contexto'
 import { ETAPAS } from './Colar'
-import { linhasDoCadastro, type Linha } from './linhas'
+import { linhasDoCadastro, type Linha } from '../../../logic/quemVai'
 import t from '../Telas.module.css'
 
 interface Props {

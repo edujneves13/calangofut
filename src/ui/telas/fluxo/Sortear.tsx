@@ -1,4 +1,4 @@
-import { Plus, Shuffle } from '@phosphor-icons/react'
+import { Clock, Plus, Shuffle } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { FORMATOS } from '../../../logic/formatos'
 import type { FormatoId } from '../../../logic/formatos/tipos'
@@ -7,6 +7,7 @@ import { TAMANHO_TIME, type Time } from '../../../logic/tipos'
 import { Button } from '../../components/Button'
 import { Notice, SectionLabel, Segmented, Stepper } from '../../components/Controls'
 import { Header } from '../../components/Header'
+import { Icon } from '../../components/Icon'
 import { ConfirmModal } from '../../components/Sheet'
 import { plural } from '../../util'
 import { useApp, type Dados } from '../contexto'
@@ -38,7 +39,7 @@ interface Props {
   onSortear: (times: Time[], formato: FormatoId, duracaoMin: number) => void
 }
 
-/** 3/3 Como vai ser hoje? (COPY 2.6 e 4.1) */
+/** 3/3 Regras: Como vai ser hoje? (COPY 2.6 e 4.1; resumo em fluxo-sorteio-v2-20-novembro.md §4) */
 export function Sortear({ onVoltar, onAdicionar, onSortear }: Props) {
   const { dados } = useApp()
   const { config } = dados
@@ -49,6 +50,7 @@ export function Sortear({ onVoltar, onAdicionar, onSortear }: Props) {
   const participantes = participantesDe(dados)
   const deLinha = participantes.filter((p) => !p.goleiro && p.presente)
   const n = deLinha.length
+  const naoChegaram = participantes.filter((p) => !p.goleiro && !p.presente).length
   const max = config.maxCincoEstrelas
   const maxTexto = POR_EXTENSO[max] ?? String(max)
 
@@ -90,8 +92,14 @@ export function Sortear({ onVoltar, onAdicionar, onSortear }: Props) {
       ) : (
         <>
           <div className={t.resumo}>
-            <p className={t.destaque}>{n} jogadores</p>
+            <p className={t.destaque}>{n} jogadores no sorteio</p>
             <p className={t.texto2}>{resumoTimes(n)}</p>
+            {naoChegaram > 0 && (
+              <p className={`${t.pequeno} ${t.resumoNota}`}>
+                <Icon icon={Clock} size={18} />
+                {plural(naoChegaram, 'jogador ainda não chegou', 'jogadores ainda não chegaram')}
+              </p>
+            )}
           </div>
           <SectionLabel>Formato</SectionLabel>
           <Segmented

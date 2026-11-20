@@ -117,9 +117,9 @@
   text-align: left;
   padding: 0;
 }
-.relogio { color: var(--warning); flex: none; }
+.relogio { color: var(--text-2); flex: none; }
 .bancoTitulo { font: 800 0.9375rem/1 var(--font-display); flex: none; }
-.bancoConta { color: var(--warning); font: 800 0.9375rem/1 var(--font-display); flex: none; }
+.bancoConta { color: var(--text-2); font: 800 0.9375rem/1 var(--font-display); flex: none; }
 .bancoResumo {
   flex: 1;
   min-width: 0;

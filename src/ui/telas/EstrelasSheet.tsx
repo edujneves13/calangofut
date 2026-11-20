@@ -9,12 +9,14 @@ interface Props {
   nome: string
   estrelas: number
   onMudar: (estrelas: number) => void
+  /** Linha de rodapé, ex.: "Muda também no cadastro" (jogador já cadastrado). */
+  nota?: string
   /** Só na confirmação do lote: marcar como goleiro. */
   goleiro?: { valor: boolean; onMudar: (goleiro: boolean) => void }
 }
 
 /** Sheet pequena com o seletor de estrelas, aberta pelo selo tocável (DESIGN.md 7.7). */
-export function EstrelasSheet({ aberto, onFechar, nome, estrelas, onMudar, goleiro }: Props) {
+export function EstrelasSheet({ aberto, onFechar, nome, estrelas, onMudar, nota, goleiro }: Props) {
   return (
     <Sheet aberto={aberto} onFechar={onFechar} titulo={nome}>
       <div className={t.coluna}>
@@ -28,6 +30,7 @@ export function EstrelasSheet({ aberto, onFechar, nome, estrelas, onMudar, golei
             }}
           />
         )}
+        {nota && <p className={t.pequeno}>{nota}</p>}
         {goleiro && <Toggle rotulo="Goleiro" ligado={goleiro.valor} onMudar={goleiro.onMudar} />}
         {goleiro && (
           <Button variante="secundario" onClick={onFechar}>

@@ -83,12 +83,14 @@ Design system do app de sorteio da pelada. Fonte da verdade para tudo que é vis
 
 ### 2.3 Regras de uso
 
+Revisado em 20/11/2026 (`docs/design/fluxo-sorteio-v2-20-novembro.md` §0): **verde** = está dentro (No sorteio) · **âmbar** = precisa de ação do admin (Faltam estrelas, Confirmar nome, Time incompleto) · **cinza** `--text-2` = só informação (Chegam depois, Goleiros, banco Não chegaram) · **laranja** = botão.
+
 - **Laranja é só ação.** Nunca em título, ícone decorativo ou fundo de seção. Uma ação laranja por tela.
 - **Verde é identidade e confirmação.** Nunca em botão principal. Nunca para indicar erro ou atenção.
 - **Âmbar é atenção, não erro.** "Incompleto", "último minuto". Sempre acompanhado de texto ou tracejado (não depender só da cor).
 - **Vermelho só para erro e destruição** (login falhou, desativar jogador).
 - **Gramado só em ilustração.** Nunca em texto, borda ou botão.
-- **Sem gradientes na interface.** Exceção: o fade do rodapé da ilustração no card da próxima pelada (ilustração → `--surface-1`).
+- **Sem gradientes na interface.** (O fade do card da próxima pelada saiu em 20/11: a ilustração nova já tem fundo transparente.)
 - **Contraste medido** (sobre `--bg`): text-1 15,9:1 · text-2 7,6:1 · text-3 4,1:1 · green-500 7,4:1 · amber 10:1 · red 5,5:1 · branco sobre action 4,9:1. Qualquer cor nova precisa passar 4,5:1 para texto até 18 px e 3:1 para texto grande e ícones.
 
 ### 2.4 Modo claro
@@ -292,7 +294,7 @@ Medidas para o tamanho padrão. Todo componente interativo tem estados: padrão,
 ### 7.4 Card da próxima pelada
 
 - `--surface-1`, raio `--radius-xl`, borda `--border`.
-- Ilustração do mascote no topo, 300 px de altura, `object-fit: cover`, com fade de 90 px no rodapé até `--surface-1`.
+- Ilustração `proxima-pelada-solta.webp` (fundo transparente, recortada na bolha) no topo: `aspect-ratio: 1101 / 792`, `object-fit: contain`, padding 16 px nas laterais e no topo, sem fade. A bolha aparece inteira em qualquer largura (`docs/design/fluxo-sorteio-v2-20-novembro.md` §6).
 - Conteúdo com padding 22 px: `label` em `--brand-label` → data em `display-l` → horário e local (`body`, `--text-2`, ícones 18 px) → botão principal "Sortear times".
 
 ### 7.5 Card de time (carrossel)
@@ -312,6 +314,8 @@ Revisado em 20/11/2026: vale `docs/design/times-durante-v2.md` (itens 1 e 2). Re
 - **Editar times** (tela cheia): ✕ · título · **Concluir**; busca; linha de equilíbrio; times em cards compactos `surface-1`; folha do jogador com Mover para / Trocar com alguém / Tirar do time.
 
 ### 7.6 Linha de jogador
+
+Revisado em 20/11/2026: na seção Chegam depois, a linha usa `apagado` (nome `--text-2`, ícone `--text-3`) e nunca o riscado. Título de seção (`SectionLabel`) aceita ícone de 18 px, tom `aviso` (âmbar) ou `dentro` (ícone verde preenchido) e ação à direita (`docs/design/fluxo-sorteio-v2-20-novembro.md` §9).
 
 | Contexto | Esquerda | Centro | Direita |
 | --- | --- | --- | --- |
@@ -340,10 +344,10 @@ Selos de nível nunca parecem editáveis: sem estrelas grandes, sem cor de açã
 | --- | --- | --- | --- |
 | Novo (jogador fora do cadastro) | `--action-soft` | `--link`, `badge` | — |
 | Já cadastrado | `--surface-2` | `--text-3`, `badge` | — |
-| Nível editável ("4★", só em "Confira a lista") | `--surface-2` | `--text-2`, `badge` + ícone `CaretDown` 12 px | 1 px `--border-strong` |
+| Nível editável ("4★", só em "Quem vai pro sorteio?") | `--surface-2` | `--text-2`, `badge` + ícone `CaretDown` 12 px | 1 px `--border-strong` |
 | Dar estrelas (novo sem estrelas) | transparente | `--link`, `badge` | 1 px tracejada `--border-strong` |
 
-Linha de jogador novo em "Confira a lista" e na confirmação do lote: fundo `--action-soft` a 40% e o selo "Novo". Tocar no selo de nível abre o seletor de estrelas (7.9) numa sheet pequena.
+Linha de jogador novo em "Quem vai pro sorteio?" e na confirmação do lote: fundo `--action-soft` a 40% e o selo "Novo". Tocar no selo de nível abre o seletor de estrelas (7.9) numa sheet pequena.
 
 ### 7.8 Inputs e busca
 
@@ -385,6 +389,8 @@ Linha de jogador novo em "Confira a lista" e na confirmação do lote: fundo `--
 - Dura 4 s (6 s se tiver "Desfazer"). Um por vez; o novo substitui o antigo.
 
 ### 7.14 Stepper (etapas do sorteio)
+
+Etapas: **Lista · Sorteio · Regras** (`docs/design/fluxo-sorteio-v2-20-novembro.md` §1).
 
 - 3 barras de 5 px de altura, gap 6 px, raio total. Concluída/atual: `--action`. Futura: `--surface-2`.
 - Rótulos abaixo em `body-s`; o da etapa atual em `--text-1` 700.

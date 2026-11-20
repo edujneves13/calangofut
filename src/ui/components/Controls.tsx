@@ -148,6 +148,30 @@ export function Notice({ children }: { children: ReactNode }) {
   )
 }
 
-export function SectionLabel({ children, destaque }: { children: ReactNode; destaque?: boolean }) {
-  return <h2 className={`${s.secao} ${destaque ? s.secaoDestaque : ''}`}>{children}</h2>
+interface PropsSecao {
+  children: ReactNode
+  destaque?: boolean
+  /** Ícone de 18px antes do rótulo. */
+  icone?: PhosphorIcon
+  /** aviso: rótulo e ícone âmbar (precisa de ação). dentro: ícone verde preenchido, rótulo cinza. */
+  tom?: 'aviso' | 'dentro'
+  /** Ação de texto à direita, ex.: "Ignorar tudo". */
+  acao?: ReactNode
+}
+
+export function SectionLabel({ children, destaque, icone, tom, acao }: PropsSecao) {
+  const classes = [s.secao, destaque && s.secaoDestaque, tom === 'aviso' && s.secaoAviso, tom === 'dentro' && s.secaoDentro]
+  const rotulo = (
+    <h2 className={classes.filter(Boolean).join(' ')}>
+      {icone && <Icon icon={icone} size={18} weight={tom === 'dentro' ? 'fill' : 'regular'} className={s.secaoIcone} />}
+      {children}
+    </h2>
+  )
+  if (!acao) return rotulo
+  return (
+    <div className={s.secaoLinha}>
+      {rotulo}
+      {acao}
+    </div>
+  )
 }

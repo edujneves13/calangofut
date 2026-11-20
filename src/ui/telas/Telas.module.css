@@ -62,6 +62,8 @@
   gap: var(--space-1);
 }
 
+.resumoNota { display: flex; align-items: center; justify-content: center; gap: 6px; }
+
 /* Botão de texto (Selecionar, Limpar…) */
 .botaoTexto {
   border: 0;
@@ -72,6 +74,9 @@
   min-height: 44px;
 }
 .botaoTexto:disabled { color: var(--text-3); }
+
+/* Contagem em tempo real abaixo da caixa da lista (fluxo v2 §2) */
+.encontrados { display: flex; align-items: center; gap: var(--space-2); font: var(--type-body-s); color: var(--success-fg); }
 
 /* Separador "ou" */
 .ou {
