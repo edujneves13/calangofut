@@ -20,7 +20,7 @@ import { AdicionarJogador } from '../AdicionarJogador'
 import { juntarJogadores, useApp } from '../contexto'
 import { EstrelasSheet } from '../EstrelasSheet'
 import { ETAPAS } from './Colar'
-import { ehNova, faltaEscolha, faltaEstrelas, nomeDaLinha, novaLinha, vaiGravar, type Linha } from './linhas'
+import { ehNova, faltaEscolha, faltaEstrelas, nomeDaLinha, novaLinha, type Linha } from '../../../logic/quemVai'
 import t from '../Telas.module.css'
 
 interface Props {
@@ -57,14 +57,14 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
 
   const visiveis = linhas.filter((l) => combina({ nome: nomeDaLinha(l), apelidos: [l.texto] }, busca)).sort(ordem)
   const deLinha = visiveis.filter((l) => !l.goleiro)
-  const ativos = deLinha.filter((l) => l.status !== 'ausente')
-  const naoVem = deLinha.filter((l) => l.status === 'ausente')
+  const ativos = deLinha
+  const naoVem: Linha[] = []
   const goleiros = visiveis.filter((l) => l.goleiro)
 
   const todosDeLinha = linhas.filter((l) => !l.goleiro)
   const chegaram = todosDeLinha.filter((l) => l.status === 'chegou').length
   const naoChegaram = todosDeLinha.filter((l) => l.status === 'nao-chegou').length
-  const naoVem_ = todosDeLinha.filter((l) => l.status === 'ausente').length
+  const naoVem_ = naoVem.length
   const semEstrelas = linhas.filter(faltaEstrelas).length
   const semEscolha = linhas.filter(faltaEscolha).length
 
@@ -93,7 +93,7 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
   async function continuar() {
     setSalvando(true)
     try {
-      const gravar = linhas.filter(vaiGravar)
+      const gravar = linhas
       const novas = gravar.filter((l) => !l.jogador)
       const criados = await criarJogadores(
         db,
@@ -124,7 +124,7 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
       setLinhas((ls) => ls.map((l) => (idDe.has(l.chave) ? { ...l, tipo: 'existente', jogador: idDe.get(l.chave)!, escolha: null } : l)))
       onContinuar()
     } catch (e) {
-      const nova = linhas.find((l) => !l.jogador && vaiGravar(l))
+      const nova = linhas.find((l) => !l.jogador)
       mostrarToast({ texto: mensagemDeErro(e, nova?.texto), tom: 'erro' })
     } finally {
       setSalvando(false)
@@ -277,7 +277,7 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
         <Button
           variante="secundario"
           onClick={() => {
-            if (linhaMenu) mudar(linhaMenu.chave, { status: 'ausente' })
+            if (linhaMenu) mudar(linhaMenu.chave, { status: 'nao-chegou' })
             setMenuDe(null)
           }}
         >

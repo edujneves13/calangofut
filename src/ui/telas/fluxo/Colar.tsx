@@ -7,7 +7,7 @@ import { Header } from '../../components/Header'
 import { Textarea } from '../../components/Input'
 import { ddmm } from '../../util'
 import { useApp } from '../contexto'
-import { linhasDaLista, type Linha } from './linhas'
+import { linhasDaLista, type Linha } from '../../../logic/quemVai'
 import t from '../Telas.module.css'
 
 export const ETAPAS: [string, string, string] = ['Lista', 'Conferir', 'Sortear']
