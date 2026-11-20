@@ -1,0 +1,14 @@
+.topo { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-2); }
+.botaoFoto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-l);
+  font: var(--type-body-l);
+  cursor: pointer;
+}
+.botaoFoto:active { background: var(--surface-3); }
+.botaoFoto[aria-busy='true'] { color: var(--text-3); }
+.botaoFoto:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }

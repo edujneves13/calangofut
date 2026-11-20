@@ -1,0 +1,86 @@
+.area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+.nota {
+  font: var(--type-body-s);
+  color: var(--brand-label);
+  background: var(--success-bg);
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-3);
+}
+.ultimo {
+  min-height: 1.2em;
+  font: var(--type-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--warning);
+}
+.numeros {
+  font: var(--type-display-xl);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  transition: color var(--motion-base) var(--ease-standard);
+}
+.ambar { color: var(--warning); }
+
+.trilho {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  margin: var(--space-3) 0;
+}
+.preenchido { height: 100%; border-radius: inherit; background: var(--action); }
+.bola {
+  position: absolute;
+  top: 50%;
+  display: inline-flex;
+  color: var(--text-1);
+}
+@media (prefers-reduced-motion: reduce) { .bola { display: none; } }
+
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+.grande { min-height: 76px; font-size: 1.25rem; }
+.dupla { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+
+.fim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--action);
+  color: var(--on-action);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: calc(env(safe-area-inset-top) + var(--space-6)) var(--screen-margin) calc(env(safe-area-inset-bottom) + var(--space-6));
+  animation: laranja var(--motion-slow) var(--ease-sheet);
+}
+@keyframes laranja { from { opacity: 0; } }
+.numerosFim { color: var(--on-action); animation: bump var(--motion-slow) var(--ease-sheet); }
+@keyframes bump { 50% { transform: scale(1.08); } }
+.fimTitulo { font: var(--type-display-m); }
+.fimBotoes {
+  width: 100%;
+  max-width: calc(var(--app-max-width) - 2 * var(--screen-margin));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+.branco { background: var(--on-action); color: var(--action); }
+.branco:active { background: var(--on-action); }
+.contornoBranco { border-color: var(--on-action); color: var(--on-action); }

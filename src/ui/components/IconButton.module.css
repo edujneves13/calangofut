@@ -1,0 +1,16 @@
+.botao {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: var(--radius-full);
+  background: var(--surface-1);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+.botao:active:not(:disabled) { background: var(--surface-3); }
+.botao:disabled { color: var(--text-3); cursor: not-allowed; }
+
+.semFundo { background: transparent; border-color: transparent; }

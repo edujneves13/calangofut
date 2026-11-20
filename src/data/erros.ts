@@ -1,6 +1,12 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 
-export type CodigoErro = 'nome-duplicado' | 'data-duplicada' | 'nao-encontrado' | 'sem-permissao' | 'desconhecido'
+export type CodigoErro =
+  | 'nome-duplicado'
+  | 'apelido-duplicado'
+  | 'data-duplicada'
+  | 'nao-encontrado'
+  | 'sem-permissao'
+  | 'desconhecido'
 
 /** Erro do banco já traduzido para algo que a tela sabe mostrar. */
 export class ErroDados extends Error {
@@ -21,6 +27,7 @@ const CODIGOS: Record<string, CodigoErro> = {
 // Valor único repetido (23505): o nome da restrição diz qual campo repetiu.
 const RESTRICOES_UNICAS: Record<string, CodigoErro> = {
   jogadores_nome_ativo: 'nome-duplicado',
+  apelidos_texto: 'apelido-duplicado',
   peladas_data_key: 'data-duplicada',
 }
 

@@ -23,16 +23,36 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "configuracoes": {
+            "apelidos": {
                   Row: {
-                    "duracao_quem_ganha_fica": number,"duracao_todos_contra_todos": number,"formato_5": string,"formato_ate_4": string,"horario_padrao": string,"id": boolean,"local_padrao": string
+                    "criado_em": string,"id": string,"jogador_id": string,"texto": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "duracao_quem_ganha_fica"?: number,"duracao_todos_contra_todos"?: number,"formato_5"?: string,"formato_ate_4"?: string,"horario_padrao"?: string,"id"?: boolean,"local_padrao"?: string
+                    "criado_em"?: string,"id"?: string,"jogador_id": string,"texto": string
                   }
                   Update: {
-                    "duracao_quem_ganha_fica"?: number,"duracao_todos_contra_todos"?: number,"formato_5"?: string,"formato_ate_4"?: string,"horario_padrao"?: string,"id"?: boolean,"local_padrao"?: string
+                    "criado_em"?: string,"id"?: string,"jogador_id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "apelidos_jogador_id_fkey"
+      columns: ["jogador_id"]
+isOneToOne: false
+      referencedRelation: "jogadores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"configuracoes": {
+                  Row: {
+                    "avatar_url": string | null,"dia_semana": number,"formato_padrao": string,"horario_padrao": string,"id": boolean,"local_padrao": string,"max_cinco_estrelas": number,"max_jogos_seguidos": number,"nome_pelada": string,"tempo_jogo": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "avatar_url"?: string | null,"dia_semana"?: number,"formato_padrao"?: string,"horario_padrao"?: string,"id"?: boolean,"local_padrao"?: string,"max_cinco_estrelas"?: number,"max_jogos_seguidos"?: number,"nome_pelada"?: string,"tempo_jogo"?: number
+                  }
+                  Update: {
+                    "avatar_url"?: string | null,"dia_semana"?: number,"formato_padrao"?: string,"horario_padrao"?: string,"id"?: boolean,"local_padrao"?: string,"max_cinco_estrelas"?: number,"max_jogos_seguidos"?: number,"nome_pelada"?: string,"tempo_jogo"?: number
                   }
                   Relationships: [
                     
@@ -67,14 +87,14 @@ export type Database = {
                   ]
                 },"presencas": {
                   Row: {
-                    "id": string,"jogador_id": string,"marcado_presente_em": string | null,"origem": string,"pelada_id": string,"presente": boolean
+                    "id": string,"jogador_id": string,"marcado_presente_em": string | null,"origem": string,"pelada_id": string,"status": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "id"?: string,"jogador_id": string,"marcado_presente_em"?: string | null,"origem": string,"pelada_id": string,"presente"?: boolean
+                    "id"?: string,"jogador_id": string,"marcado_presente_em"?: string | null,"origem": string,"pelada_id": string,"status"?: string
                   }
                   Update: {
-                    "id"?: string,"jogador_id"?: string,"marcado_presente_em"?: string | null,"origem"?: string,"pelada_id"?: string,"presente"?: boolean
+                    "id"?: string,"jogador_id"?: string,"marcado_presente_em"?: string | null,"origem"?: string,"pelada_id"?: string,"status"?: string
                   }
                   Relationships: [
                     {
@@ -97,7 +117,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "normalizar_nome":
+            "identidade_pelada":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "avatar_url": string,"nome_pelada": string
+            }[]
+                           },
+"normalizar_nome":
 { Args: { "texto": string }; Returns: string
                            }
           }

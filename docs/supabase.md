@@ -29,8 +29,11 @@ No terminal, dentro da pasta do projeto:
 ```bash
 npx supabase login                                # abre o navegador para autorizar
 npx supabase link --project-ref SEU_PROJECT_REF   # o "ref" está na URL do painel: supabase.com/dashboard/project/SEU_PROJECT_REF
-npx supabase db push                              # cria as tabelas e liga as regras de acesso (RLS)
+npx supabase db push --remote                     # cria as tabelas e liga as regras de acesso (RLS)
+npx supabase migration list --remote              # confira: a coluna Remote deve listar todas as migrações
 ```
+
+Sem `--remote`, o `db push` vai para o banco local e não toca no projeto real.
 
 O `db push` aplica só os arquivos de `supabase/migrations/`. O `supabase/seed.sql` (admin de teste) **não** vai para o projeto real.
 

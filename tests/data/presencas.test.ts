@@ -42,39 +42,51 @@ beforeEach(async () => {
 describe('presenças', () => {
   it('salva a lista colada com origem "lista"', async () => {
     await salvarPresencasDaLista(db, pelada.id, [
-      { jogadorId: ana.id, presente: true },
-      { jogadorId: bia.id, presente: false },
+      { jogadorId: ana.id, status: 'chegou' },
+      { jogadorId: bia.id, status: 'nao-chegou' },
     ])
     const lista = await listarPresencas(db, pelada.id)
     expect(lista).toHaveLength(2)
-    expect(de(lista, ana)).toMatchObject({ peladaId: pelada.id, presente: true, origem: 'lista' })
+    expect(de(lista, ana)).toMatchObject({ peladaId: pelada.id, status: 'chegou', origem: 'lista' })
     expect(de(lista, ana).marcadoPresenteEm).not.toBeNull()
-    expect(de(lista, bia)).toMatchObject({ presente: false, marcadoPresenteEm: null })
+    expect(de(lista, bia)).toMatchObject({ status: 'nao-chegou', marcadoPresenteEm: null })
   })
 
   it('colar a lista de novo não duplica', async () => {
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
     expect(await listarPresencas(db, pelada.id)).toHaveLength(1)
   })
 
-  it('adiciona jogador na hora como presente', async () => {
-    expect(await adicionarNaHora(db, pelada.id, caio.id)).toMatchObject({ jogadorId: caio.id, presente: true, origem: 'na-hora' })
+  it('adiciona jogador na hora como chegou', async () => {
+    expect(await adicionarNaHora(db, pelada.id, caio.id)).toMatchObject({ jogadorId: caio.id, status: 'chegou', origem: 'na-hora' })
   })
 
-  it('marcar ausente limpa a hora; marcar presente grava a hora', async () => {
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
-    expect((await marcarPresenca(db, pelada.id, ana.id, false)).marcadoPresenteEm).toBeNull()
-    expect((await marcarPresenca(db, pelada.id, ana.id, true)).marcadoPresenteEm).not.toBeNull()
+  it('marcar "não chegou" limpa a hora; marcar "chegou" grava a hora', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
+    expect((await marcarPresenca(db, pelada.id, ana.id, 'nao-chegou')).marcadoPresenteEm).toBeNull()
+    expect((await marcarPresenca(db, pelada.id, ana.id, 'chegou')).marcadoPresenteEm).not.toBeNull()
+  })
+
+  it('ausente (avisou que não vem) fica sem hora e com status próprio', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'ausente' }])
+    expect(de(await listarPresencas(db, pelada.id), ana)).toMatchObject({ status: 'ausente', marcadoPresenteEm: null })
+    expect(await marcarPresenca(db, pelada.id, ana.id, 'nao-chegou')).toMatchObject({ status: 'nao-chegou' })
+  })
+
+  it('ausente que aparece depois do sorteio chegou depois', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: bia.id, status: 'ausente' }])
+    const sorteada = await salvarSorteio(db, pelada.id, sorteio)
+    expect(chegouDepois(await marcarPresenca(db, pelada.id, bia.id, 'chegou'), sorteada)).toBe(true)
   })
 
   it('quem é marcado presente depois do sorteio chegou depois', async () => {
     await salvarPresencasDaLista(db, pelada.id, [
-      { jogadorId: ana.id, presente: true },
-      { jogadorId: bia.id, presente: false },
+      { jogadorId: ana.id, status: 'chegou' },
+      { jogadorId: bia.id, status: 'nao-chegou' },
     ])
     const sorteada = await salvarSorteio(db, pelada.id, sorteio)
-    const biaChegou = await marcarPresenca(db, pelada.id, bia.id, true)
+    const biaChegou = await marcarPresenca(db, pelada.id, bia.id, 'chegou')
     const anaLista = de(await listarPresencas(db, pelada.id), ana)
     expect(chegouDepois(biaChegou, sorteada)).toBe(true)
     expect(chegouDepois(anaLista, sorteada)).toBe(false)
@@ -86,21 +98,21 @@ describe('presenças', () => {
   })
 
   it('colar a lista de novo depois do sorteio não marca ninguém como atrasado', async () => {
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
     const sorteada = await salvarSorteio(db, pelada.id, sorteio)
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
     expect(chegouDepois(de(await listarPresencas(db, pelada.id), ana), sorteada)).toBe(false)
   })
 
-  it('tocar Presente em quem já estava presente não marca como atrasado', async () => {
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, presente: true }])
+  it('tocar Chegou em quem já estava presente não marca como atrasado', async () => {
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: ana.id, status: 'chegou' }])
     const sorteada = await salvarSorteio(db, pelada.id, sorteio)
-    expect(chegouDepois(await marcarPresenca(db, pelada.id, ana.id, true), sorteada)).toBe(false)
+    expect(chegouDepois(await marcarPresenca(db, pelada.id, ana.id, 'chegou'), sorteada)).toBe(false)
   })
 
   it('colar a lista de novo não muda a origem de quem entrou na hora', async () => {
     await adicionarNaHora(db, pelada.id, caio.id)
-    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: caio.id, presente: true }])
+    await salvarPresencasDaLista(db, pelada.id, [{ jogadorId: caio.id, status: 'chegou' }])
     expect(de(await listarPresencas(db, pelada.id), caio).origem).toBe('na-hora')
   })
 })

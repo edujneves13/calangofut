@@ -18,50 +18,56 @@ O `.env.local` já aponta para o banco local. Quando o projeto real existir (vej
 | `src/logic/` | Regras puras: leitor, casamento, sorteio, formatos, texto | Não |
 | `src/data/` | Leitura e gravação no Supabase | Não |
 | `src/ui/` | Telas. `src/ui/db.ts` exporta o `db` já conectado | Sim |
-| `public/` | Arquivos fixos. Coloque aqui o avatar (`public/avatar.png`, quadrado, 512×512 ou maior) | — |
+| `public/` | Arquivos fixos. Avatar padrão da pelada: `public/mascote/avatar-circulo.webp` | — |
 
 Todas as funções de `src/data/` recebem o `db` como primeiro argumento: `listarJogadores(db)`.
 
-Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'data-duplicada'`, `'nao-encontrado'`, `'sem-permissao'`, `'desconhecido'`. Use o código para escolher a mensagem na tela.
+Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'apelido-duplicado'`, `'data-duplicada'`, `'nao-encontrado'`, `'sem-permissao'`, `'desconhecido'`. Use o código para escolher a mensagem na tela.
 
 ## Por tela
 
 ### Login
-- `db.auth.signInWithPassword({ email, password })` ou `db.auth.signInWithOtp({ email })` (link mágico).
+- `db.auth.signInWithPassword({ email, password })`. Só senha: sem link mágico e sem cadastro.
+- `lerIdentidade(db)` → `{ nomePelada, avatarUrl }`, funciona sem login (`src/data/configuracoes.ts`).
 - `db.auth.getSession()` e `db.auth.onAuthStateChange(...)` para saber se está logado.
 
-### Início
-- `proximaQuarta(new Date())` → data da próxima pelada (`src/logic/datas.ts`).
-- `abrirPelada(db, data)` → cria ou devolve a pelada dessa data (`src/data/peladas.ts`).
+### Times
+- `peladaAtual(db, new Date())` → a pelada de hoje em diante; se não houver, abre a do próximo dia da semana dos Ajustes. Vira à meia-noite e respeita "Mudar só a próxima" (`src/data/peladas.ts`).
+- "Mudar só a próxima": `atualizarPelada(db, id, { data })`.
+- "Tentar novamente": `recomecarPelada(db, id)` apaga a lista e os times.
 
 ### Jogadores
+- Vários de uma vez: `lerNomes(texto)` → `[{ nome, goleiro }]` (`src/logic/leitor.ts`); `montarConfirmacao(nomes, jogadores)` → cada item `existente | parecido | novo` (`src/logic/confirmacao.ts`); `criarJogadores(db, novos)` grava todos ou nenhum.
+- Excluir (vários ou todos): `desativarJogadores(db, ids)`.
 - `listarJogadores(db, { incluirInativos })`, `criarJogador(db, { nome, estrelas, tipo?, goleiro? })`, `atualizarJogador(db, id, mudancas)`, `desativarJogador(db, id)` (`src/data/jogadores.ts`).
-- Nome repetido → `ErroDados` com `codigo: 'nome-duplicado'`.
+- Apelidos: `adicionarApelido(db, jogadorId, texto)`, `removerApelido(db, jogadorId, texto)`. `jogador.apelidos` vem junto em `listarJogadores`.
+- Nome repetido → `ErroDados` com `codigo: 'nome-duplicado'`; apelido repetido → `'apelido-duplicado'`.
 
-### Pelada do dia — 1. Colar lista
+### Pelada do dia — 1. Colar lista e 2. Confira a lista
 - `lerLista(texto)` → `{ data, jogadores, goleiros }`, cada um com `nome` e `presente` (`src/logic/leitor.ts`).
-- Para cada nome: `casarNome(nome, jogadores)` → `{ tipo: 'exato', jogador }` ou `{ tipo: 'sugestoes', sugestoes }` (`src/logic/casamento.ts`). Sugestão sempre pede confirmação.
-- Nome não cadastrado → `criarJogador(db, { nome, estrelas })`.
-- Depois: `salvarPresencasDaLista(db, peladaId, [{ jogadorId, presente }])` (`src/data/presencas.ts`).
-
-### Pelada do dia — 2. Conferir
-- `listarPresencas(db, peladaId)`.
-- Um toque: `marcarPresenca(db, peladaId, jogadorId, presente)`.
-- "+ adicionar jogador": `adicionarNaHora(db, peladaId, jogadorId)`.
+- Aviso de outra data: compare `lista.data` com `pelada.data`.
+- "Selecionar do cadastro": `listarJogadores(db)` para a lista; os escolhidos viram itens com `confirmacaoDoCadastro(escolhidos)` (todos `existente`, status inicial `'chegou'`) e vão para a mesma "Confira a lista". Sem aviso de data.
+- Classificar os nomes: `montarConfirmacao(nomes, jogadores)` (usa `casarNome`, que casa por nome ou apelido). Parecido sempre pede escolha.
+- Status inicial: `presente` da linha lida → `'chegou'`; ❌ → `'ausente'` ("Não vem" na tela).
+- Em "Continuar": `criarJogadores(db, novos)`, `adicionarApelido(db, jogador.id, nomeDaLista)` para cada "É ele", `atualizarJogador(db, id, { estrelas })` para estrelas mudadas, e `salvarPresencasDaLista(db, peladaId, [{ jogadorId, status }])` (`src/data/presencas.ts`).
+- Status: `'chegou' | 'nao-chegou' | 'ausente'`. Mudar depois: `marcarPresenca(db, peladaId, jogadorId, status)`.
+- "Adicionar": `adicionarNaHora(db, peladaId, jogadorId)`.
 
 ### Pelada do dia — 3. Sortear e times
-- `sortearTimes(participantes)` → `{ ok: true, times }` ou `{ ok: false, motivo: 'poucos-jogadores' | 'muitos-cinco-estrelas' }` (`src/logic/sorteio.ts`). `participantes` = `{ id, estrelas, goleiro, presente }` de cada presença.
-- Refazer travando times: `refazerSorteio(participantes, timesAtuais, [índices dos travados])`.
-- Formato: `formatoPadrao(times.length)` e `FORMATOS[id].gerar(times.length, { duracaoMin })` → `{ jogos, linhas }` (`src/logic/formatos/`).
+- `sortearTimes(participantes)` → `{ ok: true, times }` ou `{ ok: false, motivo: 'poucos-jogadores' | 'muitos-cinco-estrelas' }` (`src/logic/sorteio.ts`). `participantes` = `{ id, estrelas, goleiro, presente: status === 'chegou' }` de cada presença. Passe `{ maxCincoEstrelas: config.maxCincoEstrelas }`; em "Sortear assim mesmo", `{ maxCincoEstrelas: Infinity }`.
+- Sortear de novo: `refazerSorteio(participantes, timesAtuais, [índices dos desmarcados], opcoes)`. Desmarcado = travado.
+- Formato: começa em `config.formatoPadrao` e `config.tempoJogo`. `FORMATOS[id].nome` para o rótulo; `FORMATOS[id].gerar(times.length, { duracaoMin })` → `{ jogos, linhas }` (`src/logic/formatos/`).
 - Salvar: `salvarSorteio(db, peladaId, { times: { times, jogos }, formato, duracaoMin })`.
-- Texto: `montarTextoWhatsApp({ data, horario, times: nomes, goleiros, linhasFormato: linhas })` e `linkWhatsApp(texto)` (`src/logic/texto.ts`).
+- Texto: `montarTextoWhatsApp({ nomePelada, data, horario, times: [{ nomes, completo }], goleiros, linhasFormato: linhas })` (`src/logic/texto.ts`). Use o nome do cadastro. A tela só copia (`navigator.clipboard.writeText`).
 - Soma de estrelas de cada time: `time.somaEstrelas` (só na tela, nunca no texto).
 
 ### Chegou depois
-- Ausentes abaixo dos times → toque em "Presente": `marcarPresenca(db, peladaId, jogadorId, true)`, depois `adicionarAtrasado(times, { id, estrelas })` (`src/logic/atrasados.ts`) e `salvarTimes(db, peladaId, { times: novos, jogos })`.
+- "Não chegaram" (só status `'nao-chegou'`) → toque em "Chegou": `marcarPresenca(db, peladaId, jogadorId, 'chegou')`, depois `adicionarAtrasado(times, { id, estrelas })` (`src/logic/atrasados.ts`) e `salvarTimes(db, peladaId, { times: novos, jogos })`.
+- "Desfazer" (6 s): guarde os times de antes; `salvarTimes(db, peladaId, timesDeAntes)` e `marcarPresenca(db, peladaId, jogadorId, 'nao-chegou')`.
 
 ### Configurações
-- `lerConfiguracoes(db)` e `salvarConfiguracoes(db, mudancas)` (`src/data/configuracoes.ts`).
+- `lerConfiguracoes(db)` e `salvarConfiguracoes(db, mudancas)` (`src/data/configuracoes.ts`): nome da pelada, avatar, dia da semana, horário, local, formato padrão, tempo de jogo, quem ganha fica até, craques por time.
+- Avatar: `enviarAvatar(db, arquivo)` envia ao Storage e grava a URL.
 
 ## Checagens antes de commitar
 

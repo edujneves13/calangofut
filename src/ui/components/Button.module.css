@@ -1,0 +1,86 @@
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-l);
+  transition: background var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.principal {
+  min-height: 58px;
+  padding: 0 var(--space-5);
+  background: var(--action);
+  color: var(--on-action);
+  font: var(--type-button);
+}
+.principal:active:not(:disabled) { background: var(--action-pressed); transform: scale(0.98); }
+
+.secundario {
+  min-height: 52px;
+  padding: 0 var(--space-5);
+  background: transparent;
+  color: var(--text-1);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: 1.5px solid var(--border-strong);
+}
+.secundario:active:not(:disabled) { background: var(--surface-3); }
+
+.tracejado {
+  min-height: 54px;
+  padding: 0 var(--space-5);
+  background: transparent;
+  color: var(--text-1);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border: 1.5px dashed var(--border-strong);
+}
+.tracejado:active:not(:disabled) { background: var(--surface-3); }
+
+.pequeno {
+  width: auto;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  background: var(--action);
+  color: var(--on-action);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: var(--radius-m);
+}
+.pequeno:active:not(:disabled) { background: var(--action-pressed); }
+
+.pequenoSecundario {
+  width: auto;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  background: transparent;
+  color: var(--text-1);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-m);
+}
+.pequenoSecundario:active:not(:disabled) { background: var(--surface-3); }
+
+.botao:disabled {
+  background: var(--surface-2);
+  color: var(--text-3);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: girar 0.8s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }

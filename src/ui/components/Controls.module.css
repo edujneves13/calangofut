@@ -1,0 +1,111 @@
+/* Seletor de estrelas (DESIGN.md 7.9) */
+.estrelas { display: flex; gap: var(--space-2); }
+.estrela {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--border-strong);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.estrela:active { transform: scale(0.9); }
+.cheia { color: var(--warning); }
+.compacto .estrela { width: 36px; height: 36px; }
+
+/* Toggle (DESIGN.md 7.10) */
+.toggleLinha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 52px;
+  font: var(--type-body);
+  font-weight: 500;
+}
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  flex: none;
+  border: 0;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-3);
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--on-action);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.toggle[aria-checked='true'] { background: var(--brand); }
+.toggle[aria-checked='true']::after { transform: translateX(20px); }
+
+/* Segmentado */
+.segmentado {
+  display: flex;
+  padding: 3px;
+  min-height: 44px;
+  background: var(--surface-2);
+  border-radius: var(--radius-m);
+}
+.opcao {
+  flex: 1;
+  border: 0;
+  border-radius: calc(var(--radius-m) - 3px);
+  background: transparent;
+  color: var(--text-2);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+.opcaoAtiva { background: var(--surface-1); color: var(--text-1); font-weight: 600; }
+
+/* Stepper (DESIGN.md 7.14) */
+.stepper { display: grid; gap: var(--space-2); }
+.barras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.barra { height: 5px; border-radius: var(--radius-full); background: var(--surface-2); }
+.barraFeita { background: var(--action); }
+.rotulos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font: var(--type-body-s); color: var(--text-2); }
+.rotuloAtual { color: var(--text-1); font-weight: 700; }
+
+/* Estado vazio e aviso (DESIGN.md 7.16) */
+.vazio {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-10);
+  text-align: center;
+}
+.vazioIcone { color: var(--text-2); }
+.vazioTitulo { font: var(--type-title); }
+.vazioTexto { font: var(--type-body); color: var(--text-2); max-width: 32ch; }
+
+.aviso {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1.5px dashed var(--warning);
+  border-radius: var(--radius-m);
+  font: var(--type-body);
+  color: var(--text-1);
+}
+.avisoIcone { color: var(--warning); flex: none; }
+
+/* Label de seção */
+.secao {
+  font: var(--type-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.secaoDestaque { color: var(--brand-label); }

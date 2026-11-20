@@ -1,0 +1,190 @@
+/* Estrutura comum das telas (DESIGN.md 4.2). Só tokens. */
+.tela {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--screen-margin) var(--content-bottom);
+}
+/* Telas do fluxo do sorteio e internas sem menu de baixo */
+.semMenu { padding-bottom: 0; }
+
+.entrar { animation: entrar var(--motion-base) var(--ease-standard); }
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } }
+
+.coluna { display: flex; flex-direction: column; gap: var(--space-3); }
+.linhaBotoes { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; }
+.cresce { flex: 1; }
+.lista { list-style: none; margin: 0; padding: 0; }
+
+/* Ação principal fixa embaixo (DESIGN.md 4.2) */
+.rodape {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4) 0 calc(var(--space-4) + env(safe-area-inset-bottom));
+  background: var(--bg);
+  z-index: 5;
+}
+.rodape > :last-child { flex: 1; }
+/* Rodapé fixo em tela com menu: fica acima do menu flutuante */
+.rodapeComMenu {
+  position: sticky;
+  bottom: var(--content-bottom);
+  margin: 0 calc(-1 * var(--screen-margin));
+  padding: var(--space-3) var(--screen-margin);
+  background: var(--bg);
+  display: flex;
+  gap: var(--space-2);
+  z-index: 5;
+}
+.rodapeComMenu > :last-child { flex: 1; }
+
+.texto { font: var(--type-body); }
+.texto2 { font: var(--type-body); color: var(--text-2); }
+.pequeno { font: var(--type-body-s); color: var(--text-2); }
+.forte { color: var(--text-1); font-weight: 700; }
+.titulo { font: var(--type-title); }
+.destaque { font: var(--type-display-m); letter-spacing: -0.015em; }
+.centro { text-align: center; }
+
+/* Caixa de resumo (3/3) */
+.resumo {
+  background: var(--surface-2);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  text-align: center;
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* Botão de texto (Selecionar, Limpar…) */
+.botaoTexto {
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font: var(--type-body-l);
+  padding: var(--space-2) 0;
+  min-height: 44px;
+}
+.botaoTexto:disabled { color: var(--text-3); }
+
+/* Separador "ou" */
+.ou {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-body-s);
+  color: var(--text-3);
+}
+.ou::before,
+.ou::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Linha de ajuste (Ajustes) */
+.ajuste {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  font: var(--type-body);
+  color: var(--text-1);
+}
+.ajuste:active { background: var(--surface-1); }
+.ajusteValor { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--text-2); }
+.ajusteIcone { color: var(--brand); display: inline-flex; }
+.perigo { color: var(--danger); }
+
+/* Chips de filtro e de dia */
+.chips { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.chip {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  font: var(--type-body-s);
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.chipAtivo { background: var(--surface-3); color: var(--text-1); border-color: var(--surface-3); font-weight: 700; }
+
+/* Opção grande dentro de sheet (Adicionar jogadores, Mais opções) */
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface-2);
+  text-align: left;
+  color: var(--text-1);
+}
+.opcao:active { background: var(--surface-3); }
+.opcaoTitulo { display: block; font: var(--type-body-l); }
+.opcaoSub { display: block; font: var(--type-body-s); color: var(--text-2); }
+
+/* Expansor recolhido */
+.expansor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  font: var(--type-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  padding: 0;
+}
+
+/* Link discreto no fim da aba Times */
+.linkRodape {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font: var(--type-body-l);
+}
+
+.carregando { display: grid; place-items: center; min-height: 100dvh; color: var(--text-3); }
+.esqueleto {
+  background: var(--surface-1);
+  border-radius: var(--radius-xl);
+  animation: pulsar 1.2s ease-in-out infinite alternate;
+}
+@keyframes pulsar { to { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .esqueleto { animation: none; } }
+
+.textoCopiado {
+  white-space: pre-wrap;
+  user-select: text;
+  -webkit-user-select: text;
+  background: var(--surface-2);
+  border-radius: var(--radius-m);
+  padding: var(--space-3);
+  font: var(--type-body-s);
+  color: var(--text-1);
+  max-height: 50dvh;
+  overflow: auto;
+}

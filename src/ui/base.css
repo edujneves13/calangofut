@@ -1,0 +1,27 @@
+/* Base global: reset mínimo. Fontes são importadas no main.tsx. Estilos de componente ficam nos .module.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font: var(--type-body);
+}
+
+h1, h2, h3, p { margin: 0; }
+
+button, input, textarea, select { font: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+img { display: block; max-width: 100%; }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Só para leitores de tela */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

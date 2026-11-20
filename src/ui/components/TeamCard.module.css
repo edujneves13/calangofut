@@ -1,0 +1,23 @@
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+}
+.incompleto { border: 1.5px dashed var(--border-strong); }
+
+.topo { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-2); }
+.nome { font: var(--type-display-m); letter-spacing: -0.015em; }
+
+.vaga {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+}
+.vaga:last-child { border-bottom: 0; }
+.circulo { width: 22px; height: 22px; border-radius: var(--radius-full); border: 1.5px dashed var(--border-strong); flex: none; }
+
+.aviso { margin-top: var(--space-3); font: var(--type-body-s); color: var(--text-2); }

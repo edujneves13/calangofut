@@ -36,12 +36,12 @@ function rodizio(numTimes: number): Jogo[] {
 
 export const todosContraTodos: FormatoJogo = {
   id: 'todos-contra-todos',
-  nome: 'Todos contra todos',
+  nome: 'Estilo campeonato',
   duracaoPadraoMin: 8,
   gerar(numTimes, { duracaoMin }) {
     const jogos = numTimes === 5 ? TABELA_5_TIMES : rodizio(numTimes)
     const linhas = [
-      `Jogos (todos contra todos, ${duracaoMin} min):`,
+      `Estilo campeonato · ${duracaoMin} min`,
       ...jogos.map((j, i) => `${i + 1}) Time ${j.timeA} x Time ${j.timeB}`),
     ]
     return { jogos, linhas }

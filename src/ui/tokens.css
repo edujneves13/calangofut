@@ -1,0 +1,82 @@
+/* Tokens do DESIGN.md (seção 12.1). Componentes usam só os semânticos; hex só existe aqui. */
+:root {
+  color-scheme: dark;
+
+  /* base */
+  --gray-950: #0E141B; --gray-900: #18212B; --gray-850: #222D39; --gray-800: #2C3946;
+  --gray-700: #3A4A5A; --gray-500: #6B7885; --gray-300: #9AA7B4; --gray-50: #F2F5F7;
+  --green-300: #7FD394; --green-500: #4CB86A; --green-700: #2E7D45; --green-900: #16351F;
+  --orange-300: #F08A5A; --orange-500: #C24B17; --orange-600: #A33E10; --orange-900: #3A1A0C;
+  --amber-400: #F2B441; --amber-900: #3B2D10; --red-400: #F2555A; --red-900: #3D1517;
+  --field-700: #1E5A4E; --field-500: #2A7A60;
+
+  /* semânticos */
+  --bg: var(--gray-950); --surface-1: var(--gray-900); --surface-2: var(--gray-850); --surface-3: var(--gray-800);
+  --border: var(--gray-800); --border-strong: var(--gray-700);
+  --text-1: var(--gray-50); --text-2: var(--gray-300); --text-3: var(--gray-500);
+  --action: var(--orange-500); --action-pressed: var(--orange-600); --action-soft: var(--orange-900);
+  --on-action: #FFFFFF; --link: var(--orange-300); --focus: var(--orange-300);
+  --brand: var(--green-500); --brand-label: var(--green-300);
+  --success-bg: var(--green-900); --success-fg: var(--green-300);
+  --warning: var(--amber-400); --warning-bg: var(--amber-900);
+  --danger: var(--red-400); --danger-bg: var(--red-900);
+  --scrim: rgba(6, 10, 14, 0.64);
+
+  /* tipografia */
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-text: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* escala de texto (DESIGN.md 3.2), para usar como `font: var(--type-title)` */
+  --type-display-xl: 900 6rem/1 var(--font-display);
+  --type-display-l: 900 2.125rem/1.05 var(--font-display);
+  --type-display-m: 900 1.625rem/1.1 var(--font-display);
+  --type-title: 800 1.1875rem/1.2 var(--font-display);
+  --type-button: 800 1.0625rem/1 var(--font-display);
+  --type-body-l: 600 1rem/1.4 var(--font-text);
+  --type-body: 400 0.9375rem/1.45 var(--font-text);
+  --type-body-s: 500 0.8125rem/1.4 var(--font-text);
+  --type-label: 700 0.75rem/1.2 var(--font-text);
+  --type-badge: 700 0.75rem/1 var(--font-text);
+
+  /* espaço */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --screen-margin: var(--space-5);
+
+  /* forma */
+  --radius-s: 8px; --radius-m: 14px; --radius-l: 20px; --radius-xl: 26px; --radius-full: 999px;
+  --radius-sheet: 28px 28px 0 0;
+  --shadow-tabbar: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.45);
+
+  /* motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-fast: 120ms; --motion-base: 220ms; --motion-slow: 320ms;
+
+  /* layout */
+  --tabbar-height: 64px;
+  --tabbar-offset: 28px;
+  --content-bottom: calc(var(--tabbar-height) + var(--tabbar-offset) + var(--space-4) + env(safe-area-inset-bottom));
+  --app-max-width: 480px;
+}
+
+@media (max-width: 359px) {
+  :root {
+    --screen-margin: var(--space-4);
+    --type-display-l: 900 1.875rem/1.05 var(--font-display);
+    --type-display-xl: 900 5rem/1 var(--font-display);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-base: 200ms; --motion-slow: 200ms; }
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}

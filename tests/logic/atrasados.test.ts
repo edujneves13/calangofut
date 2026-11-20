@@ -45,3 +45,13 @@ describe('adicionarAtrasado', () => {
     expect(adicionarAtrasado(uma, x)).toBe(uma)
   })
 })
+
+describe('adicionarAtrasado — desfazer', () => {
+  it('não altera a lista de times original (a tela guarda ela para o "Desfazer")', () => {
+    const incompleto = time(['c1', 'c2'])
+    const antes = [t1, t2, incompleto]
+    const copia = structuredClone(antes)
+    adicionarAtrasado(antes, x)
+    expect(antes).toEqual(copia)
+  })
+})

@@ -101,3 +101,15 @@ describe('refazerSorteio', () => {
     expect(refazerSorteio(ps, atuais, [])).toEqual({ ok: false, motivo: 'poucos-jogadores' })
   })
 })
+
+describe('refazerSorteio — limite de craques configurável', () => {
+  it('sem limite, refaz mesmo com craques demais', () => {
+    const ps = linha([5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1]) // 7 craques para 3 times
+    expect(refazerSorteio(ps, [], []).ok).toBe(false)
+    const r = sortearTimes(ps, { rng: criarRng(1), maxCincoEstrelas: Infinity })
+    if (!r.ok) throw new Error(r.motivo)
+    const novo = refazerSorteio(ps, r.times, [], { rng: criarRng(2), maxCincoEstrelas: Infinity })
+    expect(novo.ok).toBe(true)
+    if (novo.ok) expect(todosIds(novo.times)).toEqual(ps.map((p) => p.id).sort())
+  })
+})
