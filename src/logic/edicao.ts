@@ -126,3 +126,11 @@ export function previaTroca(times: Time[], a: string, b: string, estrelasDe: Est
 export function contarCincoEstrelas(time: Time, estrelasDe: EstrelasDe): number {
   return time.jogadorIds.filter((id) => estrelasDe(id) === 5).length
 }
+
+/** Até quantas pessoas em "Não chegaram" a seção começa aberta. */
+export const NAO_CHEGARAM_ABERTA_ATE = 3
+
+/** "Não chegaram" abre sozinha com até 3 pessoas; com 4 ou mais começa fechada (a escolha do admin vence depois). */
+export function naoChegaramComecaAberta(quantos: number): boolean {
+  return quantos <= NAO_CHEGARAM_ABERTA_ATE
+}

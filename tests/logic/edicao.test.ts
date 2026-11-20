@@ -5,6 +5,7 @@ import {
   colocarNoTime,
   contarCincoEstrelas,
   moverJogador,
+  naoChegaramComecaAberta,
   previaMover,
   previaTroca,
   timeDe,
@@ -193,5 +194,11 @@ describe('contarCincoEstrelas', () => {
   it('conta os craques do time', () => {
     // Juninho 5★, Fabiano 5★, Adelson 5★
     expect(contarCincoEstrelas(time(['Juninho', 'Fabiano', 'Adelson', 'Hugo', 'Yhan']), estrelasDe)).toBe(3)
+  })
+})
+
+describe('naoChegaramComecaAberta', () => {
+  it('abre sozinha com até 3 pessoas; com 4 ou mais começa fechada', () => {
+    expect([0, 1, 2, 3, 4, 8].map(naoChegaramComecaAberta)).toEqual([true, true, true, true, false, false])
   })
 })
