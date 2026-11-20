@@ -89,6 +89,9 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
 
   const dataDaRegra = proximoDia(new Date(), config.diaSemana)
 
+  /** Key única por folha que muda ao abrir: a folha volta com os valores salvos, sem rascunho velho. */
+  const chave = (nome: Exclude<Folha, null>) => (folha === nome ? `${nome}-aberta` : nome)
+
   return (
     <main className={`${t.tela} ${t.entrar}`}>
       <Header titulo="Ajustes" />
@@ -142,9 +145,9 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         <span className={t.cresce}>Sair</span>
       </button>
 
-      <FolhaHorario key={folha ?? ''} aberto={folha === 'horario'} config={config} onFechar={() => setFolha(null)} onSalvar={salvar} />
+      <FolhaHorario key={chave('horario')} aberto={folha === 'horario'} config={config} onFechar={() => setFolha(null)} onSalvar={salvar} />
       <FolhaTexto
-        key={folha ?? ''}
+        key={chave('local')}
         aberto={folha === 'local'}
         titulo="Local"
         valor={config.localPadrao}
@@ -152,7 +155,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onSalvar={(localPadrao) => salvar({ localPadrao })}
       />
       <FolhaProxima
-        key={folha ?? ''}
+        key={chave('proxima')}
         aberto={folha === 'proxima'}
         data={pelada.data}
         diaDaRegra={nomeDoDia(config.diaSemana).toLowerCase()}
@@ -161,7 +164,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onSalvar={mudarData}
       />
       <FolhaEscolha
-        key={folha ?? ''}
+        key={chave('formato')}
         aberto={folha === 'formato'}
         titulo="Formato padrão"
         opcoes={(Object.keys(FORMATOS) as FormatoId[]).map((id) => ({ valor: id, texto: FORMATOS[id].nome }))}
@@ -170,7 +173,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onSalvar={(formatoPadrao) => salvar({ formatoPadrao })}
       />
       <FolhaEscolha
-        key={folha ?? ''}
+        key={chave('tempo')}
         aberto={folha === 'tempo'}
         titulo="Tempo de jogo"
         opcoes={[...new Set([8, 10, config.tempoJogo])].sort((a, b) => a - b).map((m) => ({ valor: m, texto: `${m} min` }))}
@@ -179,7 +182,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onSalvar={(tempoJogo) => salvar({ tempoJogo })}
       />
       <FolhaNumero
-        key={folha ?? ''}
+        key={chave('jogosSeguidos')}
         aberto={folha === 'jogosSeguidos'}
         titulo="Quem ganha fica até"
         valor={config.maxJogosSeguidos}
@@ -190,7 +193,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onSalvar={(maxJogosSeguidos) => salvar({ maxJogosSeguidos })}
       />
       <FolhaNumero
-        key={folha ?? ''}
+        key={chave('craques')}
         aberto={folha === 'craques'}
         titulo="Craques (5★) por time"
         valor={config.maxCincoEstrelas}
