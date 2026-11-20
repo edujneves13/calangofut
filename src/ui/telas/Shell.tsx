@@ -32,6 +32,8 @@ export function Shell() {
   const [semInternet, setSemInternet] = useState(false)
   const [aba, setAba] = useState<Aba>('times')
   const [telaAjustes, setTelaAjustes] = useState<TelaAjustes>('inicio')
+  // Aba de onde a pessoa abriu uma tela dos Ajustes (ex.: Lista de jogadores). O voltar retorna para ela.
+  const [origem, setOrigem] = useState<Aba | null>(null)
   const [fluxoAberto, setFluxoAberto] = useState(false)
   // O fluxo do sorteio guarda rascunho na tela; não recarregar por cima dele.
   const fluxoAbertoRef = useRef(false)
@@ -74,12 +76,13 @@ export function Shell() {
         atualizar: (m) => setDados((d) => (d ? { ...d, ...m } : d)),
         recarregar,
         irParaAjustes: (tela) => {
+          setOrigem(aba === 'ajustes' ? null : aba)
           setTelaAjustes(tela)
           setAba('ajustes')
         },
         setFluxoAberto,
       },
-    [dados, recarregar],
+    [dados, recarregar, aba],
   )
 
   if (!contexto) {
@@ -112,13 +115,24 @@ export function Shell() {
     <ContextoApp.Provider value={contexto}>
       {aba === 'times' && <Times />}
       {aba === 'cronometro' && <Cronometro cronometro={cronometro} />}
-      {aba === 'ajustes' && <Ajustes tela={telaAjustes} setTela={setTelaAjustes} />}
+      {aba === 'ajustes' && (
+        <Ajustes
+          tela={telaAjustes}
+          setTela={setTelaAjustes}
+          onVoltar={() => {
+            setTelaAjustes('inicio')
+            if (origem) setAba(origem)
+            setOrigem(null)
+          }}
+        />
+      )}
       {mostrarMenu && (
         <TabBar
           ativa={aba}
           cronometro={estadoNaBarra(cronometro.estado, cronometro.agora)}
           onTrocar={(nova) => {
             if (nova === 'ajustes' && aba !== 'ajustes') setTelaAjustes('inicio')
+            setOrigem(null)
             setAba(nova)
           }}
         />
