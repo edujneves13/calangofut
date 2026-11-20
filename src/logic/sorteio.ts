@@ -15,10 +15,12 @@ export type ResultadoSorteio =
 export interface OpcoesSorteio {
   rng?: () => number
   tentativas?: number
+  /** Máximo de craques (5★) por time. Padrão 2 (Ajustes). Infinity = "Sortear assim mesmo". */
+  maxCincoEstrelas?: number
 }
 
 export const MINIMO_JOGADORES = 10
-export const MAX_CINCO_ESTRELAS = 2
+export const MAX_CINCO_ESTRELAS_PADRAO = 2
 const TENTATIVAS_PADRAO = 300
 
 type Divisao = ParticipanteSorteio[][]
@@ -47,6 +49,7 @@ export function refazerSorteio(
 ): ResultadoSorteio {
   const rng = opcoes.rng ?? Math.random
   const tentativas = opcoes.tentativas ?? TENTATIVAS_PADRAO
+  const maxCinco = opcoes.maxCincoEstrelas ?? MAX_CINCO_ESTRELAS_PADRAO
 
   const indices = [...new Set(travados)].filter((i) => timesAtuais[i]?.completo).sort((a, b) => a - b)
   const fixos = indices.map((i) => timesAtuais[i]!)
@@ -56,7 +59,7 @@ export function refazerSorteio(
   if (jogadores.length + idsFixos.size < MINIMO_JOGADORES) return { ok: false, motivo: 'poucos-jogadores' }
 
   const tamanhos = tamanhosDosTimes(jogadores.length)
-  const vagasCinco = tamanhos.reduce((s, t) => s + Math.min(MAX_CINCO_ESTRELAS, t), 0)
+  const vagasCinco = tamanhos.reduce((s, t) => s + Math.min(maxCinco, t), 0)
   if (jogadores.filter(ehCinco).length > vagasCinco) return { ok: false, motivo: 'muitos-cinco-estrelas' }
 
   const numCompletos = Math.floor(jogadores.length / TAMANHO_TIME)
@@ -67,8 +70,8 @@ export function refazerSorteio(
 
   for (let i = 0; i < tentativas && jogadores.length > 0; i++) {
     const divisao = cortar(embaralhar(jogadores, rng), tamanhos)
-    consertarCincoEstrelas(divisao, rng)
-    melhorarComTrocas(divisao, numCompletos, somasFixas)
+    consertarCincoEstrelas(divisao, maxCinco, rng)
+    melhorarComTrocas(divisao, numCompletos, somasFixas, maxCinco)
     const nota = diferenca(divisao, numCompletos, somasFixas)
 
     if (nota < melhorNota) {
@@ -113,11 +116,11 @@ const ehCinco = (p: ParticipanteSorteio) => p.estrelas === 5
 const contarCinco = (time: ParticipanteSorteio[]) => time.filter(ehCinco).length
 const soma = (time: ParticipanteSorteio[]) => time.reduce((s, p) => s + p.estrelas, 0)
 
-/** Troca 5 estrelas de times com mais de 2 por jogadores de times que ainda têm vaga. */
-function consertarCincoEstrelas(divisao: Divisao, rng: () => number): void {
+/** Troca 5 estrelas de times acima do limite por jogadores de times que ainda têm vaga. */
+function consertarCincoEstrelas(divisao: Divisao, maxCinco: number, rng: () => number): void {
   for (const time of divisao) {
-    while (contarCinco(time) > MAX_CINCO_ESTRELAS) {
-      const destinos = divisao.filter((t) => contarCinco(t) < Math.min(MAX_CINCO_ESTRELAS, t.length))
+    while (contarCinco(time) > maxCinco) {
+      const destinos = divisao.filter((t) => contarCinco(t) < Math.min(maxCinco, t.length))
       const destino = destinos[Math.floor(rng() * destinos.length)]!
       const i = time.findIndex(ehCinco)
       const j = destino.findIndex((p) => !ehCinco(p))
@@ -139,7 +142,7 @@ function espalhamento(divisao: Divisao, numCompletos: number): number {
 }
 
 /** Troca pares de jogadores entre times enquanto alguma troca melhorar o equilíbrio. */
-function melhorarComTrocas(divisao: Divisao, numCompletos: number, somasFixas: number[]): void {
+function melhorarComTrocas(divisao: Divisao, numCompletos: number, somasFixas: number[], maxCinco: number): void {
   let notaAtual = [diferenca(divisao, numCompletos, somasFixas), espalhamento(divisao, numCompletos)] as const
   let melhorou = true
 
@@ -156,7 +159,7 @@ function melhorarComTrocas(divisao: Divisao, numCompletos: number, somasFixas: n
             if (pa.estrelas === pb.estrelas) continue
             timeA[i] = pb
             timeB[j] = pa
-            const valido = contarCinco(timeA) <= MAX_CINCO_ESTRELAS && contarCinco(timeB) <= MAX_CINCO_ESTRELAS
+            const valido = contarCinco(timeA) <= maxCinco && contarCinco(timeB) <= maxCinco
             const nota = [diferenca(divisao, numCompletos, somasFixas), espalhamento(divisao, numCompletos)] as const
             if (valido && (nota[0] < notaAtual[0] || (nota[0] === notaAtual[0] && nota[1] < notaAtual[1]))) {
               notaAtual = nota

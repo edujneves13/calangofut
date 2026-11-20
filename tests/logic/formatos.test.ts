@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FORMATOS, formatoPadrao } from '../../src/logic/formatos'
+import { FORMATOS } from '../../src/logic/formatos'
 import type { Jogo } from '../../src/logic/formatos/tipos'
 
 const pares = (jogos: Jogo[]) => jogos.map((j) => [j.timeA, j.timeB].sort().join('x')).sort()
@@ -9,7 +9,7 @@ const todosOsPares = (n: number) => {
   return r.sort()
 }
 
-describe('todos contra todos', () => {
+describe('estilo campeonato (todos contra todos)', () => {
   const formato = FORMATOS['todos-contra-todos']
 
   it('duração padrão de 8 min', () => {
@@ -33,7 +33,7 @@ describe('todos contra todos', () => {
     })
 
     it('texto da ordem dos jogos', () => {
-      expect(linhas[0]).toBe('Jogos (todos contra todos, 8 min):')
+      expect(linhas[0]).toBe('Estilo campeonato · 8 min')
       expect(linhas[1]).toBe('1) Time 1 x Time 2')
       expect(linhas.some((l) => l.includes('descansa'))).toBe(false)
       expect(linhas).toHaveLength(11)
@@ -49,7 +49,7 @@ describe('todos contra todos', () => {
   })
 
   it('usa a duração do config', () => {
-    expect(formato.gerar(5, { duracaoMin: 10 }).linhas[0]).toBe('Jogos (todos contra todos, 10 min):')
+    expect(formato.gerar(5, { duracaoMin: 10 }).linhas[0]).toBe('Estilo campeonato · 10 min')
   })
 })
 
@@ -60,30 +60,17 @@ describe('quem ganha fica', () => {
     expect(formato.duracaoPadraoMin).toBe(10)
   })
 
-  it('4 times: Time 1 x Time 2 começam, depois a fila', () => {
+  it('4 times: Time 1 x Time 2 começam; o texto é uma linha só', () => {
     expect(formato.gerar(4, { duracaoMin: 10 })).toEqual({
       jogos: [{ timeA: 1, timeB: 2 }],
-      linhas: [
-        'Jogos (quem ganha fica, 10 min):',
-        'Começam Time 1 x Time 2. Próximos: Time 3, Time 4',
-        'Time ganhador joga no máximo 3 partidas seguidas. Empate: saem os dois times.',
-      ],
+      linhas: ['Quem ganha fica · 10 min'],
     })
-  })
-
-  it('2 times: sem fila', () => {
-    expect(formato.gerar(2, { duracaoMin: 10 }).linhas[1]).toBe('Começam Time 1 x Time 2.')
   })
 })
 
-describe('formatoPadrao', () => {
-  it('até 4 times: quem ganha fica', () => {
-    for (const n of [2, 3, 4]) expect(formatoPadrao(n)).toBe('quem-ganha-fica')
-  })
-  it('5 times: todos contra todos', () => {
-    expect(formatoPadrao(5)).toBe('todos-contra-todos')
-  })
-  it('6 ou mais times: quem ganha fica', () => {
-    expect(formatoPadrao(6)).toBe('quem-ganha-fica')
+describe('nomes dos formatos', () => {
+  it('o segundo formato se chama Estilo campeonato', () => {
+    expect(FORMATOS['todos-contra-todos'].nome).toBe('Estilo campeonato')
+    expect(FORMATOS['quem-ganha-fica'].nome).toBe('Quem ganha fica')
   })
 })

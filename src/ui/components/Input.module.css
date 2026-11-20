@@ -1,0 +1,58 @@
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.rotulo { font: var(--type-body-s); color: var(--text-2); }
+.ajuda { font: var(--type-body-s); color: var(--text-2); }
+.erro { font: var(--type-body-s); color: var(--danger); }
+
+.caixa {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  background: var(--surface-2);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-m);
+  transition: border-color var(--motion-fast) var(--ease-standard);
+}
+.caixa:focus-within { border-color: var(--border-strong); box-shadow: 0 0 0 2px var(--focus); }
+.caixaErro { border-color: var(--danger); }
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 1rem; /* 16 px: evita zoom do iOS */
+  color: var(--text-1);
+}
+.input::placeholder, .textarea::placeholder { color: var(--text-3); }
+
+.lupa { color: var(--text-2); display: inline-flex; }
+
+.textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-m);
+  outline: 0;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1rem; /* 16 px no celular; DESIGN.md pede 13 px, mas abaixo de 16 o iOS dá zoom */
+  line-height: 1.5;
+  color: var(--text-1);
+}
+.textarea:focus { border-color: var(--border-strong); box-shadow: 0 0 0 2px var(--focus); }
+
+.botaoInterno {
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: var(--space-2);
+  margin-right: calc(-1 * var(--space-2));
+}

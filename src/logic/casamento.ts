@@ -10,19 +10,19 @@ const NOTA_MINIMA = 0.5
 const NOTA_CONTIDO = 0.8
 
 /**
- * Procura o jogador do cadastro com esse nome.
+ * Procura o jogador do cadastro com esse nome ou apelido.
  * Só casa sozinho com igualdade exata e única; o resto vira sugestão para o admin confirmar.
  */
 export function casarNome(texto: string, jogadores: Jogador[]): ResultadoCasamento {
   const alvo = normalizarNome(texto)
   const ativos = jogadores.filter((j) => j.ativo)
 
-  const exatos = ativos.filter((j) => normalizarNome(j.nome) === alvo)
+  const exatos = ativos.filter((j) => nomesDe(j).some((n) => normalizarNome(n) === alvo))
   if (exatos.length === 1) return { tipo: 'exato', jogador: exatos[0]! }
   if (exatos.length > 1) return { tipo: 'sugestoes', sugestoes: exatos }
 
   const sugestoes = ativos
-    .map((jogador) => ({ jogador, nota: similaridade(alvo, jogador.nome) }))
+    .map((jogador) => ({ jogador, nota: Math.max(...nomesDe(jogador).map((n) => similaridade(alvo, n))) }))
     .filter((s) => s.nota >= NOTA_MINIMA)
     .sort((a, b) => b.nota - a.nota)
     .slice(0, MAX_SUGESTOES)
@@ -30,6 +30,8 @@ export function casarNome(texto: string, jogadores: Jogador[]): ResultadoCasamen
 
   return { tipo: 'sugestoes', sugestoes }
 }
+
+const nomesDe = (j: Jogador) => [j.nome, ...j.apelidos]
 
 /** Quão parecidos são dois nomes, de 0 (nada) a 1 (iguais). */
 export function similaridade(a: string, b: string): number {

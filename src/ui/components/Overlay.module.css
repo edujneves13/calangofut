@@ -1,0 +1,85 @@
+/* <dialog> nativo: o navegador cuida de foco preso, Esc e camada por cima de tudo. */
+.dialogo {
+  border: 0;
+  padding: 0;
+  color: var(--text-1);
+  background: var(--surface-1);
+  max-width: var(--app-max-width);
+}
+.dialogo::backdrop { background: var(--scrim); }
+
+/* Bottom sheet (DESIGN.md 7.11) */
+.sheet {
+  width: 100%;
+  margin: auto auto 0;
+  max-height: 92dvh;
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-sheet);
+  padding: var(--space-3) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sheet[open] { animation: subir var(--motion-slow) var(--ease-sheet); }
+.sheet[open]::backdrop { animation: aparecer var(--motion-slow) var(--ease-sheet); }
+@keyframes subir { from { transform: translateY(100%); } }
+@keyframes aparecer { from { opacity: 0; } }
+
+.alca {
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+  touch-action: none;
+  cursor: grab;
+}
+.alcaArea { padding: var(--space-2) 0; margin: calc(-1 * var(--space-2)) 0 0; touch-action: none; }
+
+.topo { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.titulo { font: var(--type-title); letter-spacing: -0.01em; }
+.corpo { display: grid; gap: var(--space-4); }
+
+/* Modal de confirmação (DESIGN.md 7.12) */
+.modal {
+  width: calc(100% - 2 * var(--screen-margin));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sheet);
+  padding: 22px;
+}
+.modal[open] { animation: aparecer var(--motion-base) var(--ease-standard); }
+.modalTexto { font: var(--type-body); color: var(--text-2); margin: var(--space-2) 0 var(--space-5); }
+.modalBotoes { display: grid; gap: var(--space-3); }
+.perigo { background: var(--danger-bg); color: var(--danger); }
+.perigo:active:not(:disabled) { background: var(--danger-bg); }
+
+/* Toast (DESIGN.md 7.13) */
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--tabbar-height) + var(--tabbar-offset) + var(--space-4) + env(safe-area-inset-bottom));
+  width: calc(min(100%, var(--app-max-width)) - 2 * var(--screen-margin));
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 14px;
+  border-radius: var(--radius-m);
+  font: var(--type-body);
+  font-weight: 600;
+  z-index: 20;
+  animation: toastEntra var(--motion-base) var(--ease-standard);
+}
+@keyframes toastEntra { from { opacity: 0; transform: translate(-50%, 8px); } }
+.sucesso { background: var(--success-bg); color: var(--success-fg); }
+.erro { background: var(--danger-bg); color: var(--danger); }
+.toastTexto { flex: 1; }
+.toastAcao {
+  border: 0;
+  background: transparent;
+  color: var(--text-1);
+  font-weight: 700;
+  text-decoration: underline;
+  padding: var(--space-2);
+  margin: calc(-1 * var(--space-2));
+}

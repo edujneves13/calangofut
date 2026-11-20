@@ -107,3 +107,40 @@ describe('sortearTimes — restrição de 5 estrelas', () => {
     expect(sortearTimes(linha([5, 5, 5, 5, 5, 1, 1, 1, 1, 1]))).toEqual({ ok: false, motivo: 'muitos-cinco-estrelas' })
   })
 })
+
+describe('sortearTimes — limite de craques configurável', () => {
+  const cincoDe = (ps: ParticipanteSorteio[]) => new Set(ps.filter((p) => p.estrelas === 5).map((p) => p.id))
+
+  it('com limite 1, nenhum time tem mais de um 5 estrelas', () => {
+    const ps = linha([5, 5, 5, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1])
+    const cinco = cincoDe(ps)
+    for (let s = 1; s <= 20; s++) {
+      const r = sortearTimes(ps, { rng: criarRng(s), maxCincoEstrelas: 1 })
+      if (!r.ok) throw new Error(r.motivo)
+      for (const t of r.times) expect(t.jogadorIds.filter((id) => cinco.has(id)).length).toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('com limite 1, avisa quando há mais craques que times', () => {
+    expect(sortearTimes(linha([5, 5, 5, 1, 1, 1, 1, 1, 1, 1]), { maxCincoEstrelas: 1 })).toEqual({
+      ok: false,
+      motivo: 'muitos-cinco-estrelas',
+    })
+  })
+
+  it('"Sortear assim mesmo": sem limite, sorteia mesmo com craques demais', () => {
+    const ps = linha([5, 5, 5, 5, 5, 1, 1, 1, 1, 1])
+    const r = sortearTimes(ps, { rng: criarRng(1), maxCincoEstrelas: Infinity })
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(todosIds(r.times)).toEqual(ps.map((p) => p.id).sort())
+      expect(r.times.map((t) => t.jogadorIds.length)).toEqual([5, 5])
+    }
+  })
+
+  it('sem limite, ainda equilibra pelas estrelas', () => {
+    const r = sortearTimes(linha([5, 5, 5, 5, 5, 1, 1, 1, 1, 1]), { rng: criarRng(1), maxCincoEstrelas: Infinity })
+    if (!r.ok) throw new Error(r.motivo)
+    expect(diferenca(r.times)).toBeLessThanOrEqual(4)
+  })
+})

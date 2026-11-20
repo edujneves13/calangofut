@@ -1,0 +1,29 @@
+.tela { justify-content: center; align-items: center; padding-bottom: var(--space-8); }
+.imagem { width: min(70%, 260px); }
+.grade { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); width: 100%; }
+.time {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+  font: var(--type-body-s);
+}
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-1);
+  animation: cair var(--motion-slow) var(--ease-sheet) both;
+}
+.chip svg { color: var(--brand); }
+@keyframes cair { from { opacity: 0; transform: translateY(-24px) scale(0.8); } }
+@media (prefers-reduced-motion: reduce) {
+  .chip { animation: aparecer 200ms ease both; animation-delay: 0ms !important; }
+  @keyframes aparecer { from { opacity: 0; } }
+}

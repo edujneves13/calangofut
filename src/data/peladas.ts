@@ -1,3 +1,4 @@
+import { hojeEmJoaoPessoa, proximoDia } from '../logic/datas'
 import type { FormatoId, Jogo } from '../logic/formatos/tipos'
 import type { Time } from '../logic/tipos'
 import type { Db } from './cliente'
@@ -50,6 +51,26 @@ export async function abrirPelada(db: Db, data: string): Promise<Pelada> {
   return paraPelada(linha)
 }
 
+/**
+ * A pelada que a aba Times mostra: a primeira com data de hoje em diante (no horário de João Pessoa).
+ * Se nenhuma estiver marcada, abre a do próximo dia da semana das configurações.
+ * Assim, "Mudar só a próxima" é respeitado e, depois da meia-noite, a pelada vira para a seguinte.
+ */
+export async function peladaAtual(db: Db, agora: Date): Promise<Pelada> {
+  const { data: linha, error } = await db
+    .from('peladas')
+    .select('*')
+    .gte('data', hojeEmJoaoPessoa(agora))
+    .order('data')
+    .limit(1)
+    .maybeSingle()
+  if (error) throw traduzirErro(error)
+  if (linha) return paraPelada(linha)
+
+  const { diaSemana } = await lerConfiguracoes(db)
+  return abrirPelada(db, proximoDia(agora, diaSemana))
+}
+
 async function atualizar(db: Db, id: string, valores: TablesUpdate<'peladas'>): Promise<Pelada> {
   const { data, error } = await db.from('peladas').update(valores).eq('id', id).select().single()
   if (error) throw traduzirErro(error)
@@ -87,4 +108,11 @@ export function salvarSorteio(
 /** Atualiza os times (ex.: atrasado entrando) sem mudar a hora do sorteio. */
 export function salvarTimes(db: Db, id: string, times: TimesSalvos): Promise<Pelada> {
   return atualizar(db, id, { times: times as unknown as Json })
+}
+
+/** "Tentar novamente": apaga a lista e os times da pelada, para colar outra lista. */
+export async function recomecarPelada(db: Db, id: string): Promise<Pelada> {
+  const { error } = await db.from('presencas').delete().eq('pelada_id', id)
+  if (error) throw traduzirErro(error)
+  return atualizar(db, id, { times: null, formato: null, duracao_min: null, sorteada_em: null })
 }

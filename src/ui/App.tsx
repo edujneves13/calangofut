@@ -1,18 +1,47 @@
-import { useEffect, useState } from 'react'
+import type { Session } from '@supabase/supabase-js'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { ToastProvider } from './components/Toast'
 import { db } from './db'
+import { Login } from './telas/Login'
+import { Shell } from './telas/Shell'
+import t from './telas/Telas.module.css'
 
-/** Tela provisória: só confirma que o app fala com o Supabase. Substitua pelas telas reais. */
+// Página de componentes: só em `npm run dev`, no endereço /dev. Não entra no app publicado.
+const Vitrine = import.meta.env.DEV ? lazy(() => import('./dev/Vitrine').then((m) => ({ default: m.Vitrine }))) : null
+
 export function App() {
-  const [logado, setLogado] = useState<boolean | null>(null)
+  if (Vitrine && window.location.pathname === '/dev') {
+    return (
+      <Suspense fallback={null}>
+        <Vitrine />
+      </Suspense>
+    )
+  }
+  return (
+    <ToastProvider>
+      <Entrada />
+    </ToastProvider>
+  )
+}
+
+/** Mostra o login ou o app, conforme a sessão do Supabase (guardada no celular). */
+function Entrada() {
+  // undefined = ainda verificando
+  const [sessao, setSessao] = useState<Session | null | undefined>(undefined)
+  const [expirou, setExpirou] = useState(false)
 
   useEffect(() => {
-    db.auth.getSession().then(({ data }) => setLogado(Boolean(data.session)))
+    db.auth.getSession().then(({ data }) => setSessao(data.session))
+    const { data } = db.auth.onAuthStateChange((evento, nova) => {
+      setSessao((antiga) => {
+        if (antiga && !nova && evento !== 'SIGNED_OUT') setExpirou(true)
+        return nova
+      })
+    })
+    return () => data.subscription.unsubscribe()
   }, [])
 
-  return (
-    <main style={{ fontFamily: 'system-ui', padding: 24 }}>
-      <h1>Pelada Sorteio</h1>
-      <p>{logado === null ? 'Conectando…' : logado ? 'Logado.' : 'Supabase conectado. Ninguém logado.'}</p>
-    </main>
-  )
+  if (sessao === undefined) return <div className={t.carregando} aria-busy="true" />
+  if (!sessao) return <Login sessaoExpirou={expirou} />
+  return <Shell />
 }

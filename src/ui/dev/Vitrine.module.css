@@ -1,0 +1,45 @@
+.pagina {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--screen-margin) var(--content-bottom);
+  display: grid;
+  gap: var(--space-8);
+}
+.bloco { display: grid; gap: var(--space-3); }
+.nomeBloco {
+  font: var(--type-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--link);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+.linha { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.nota { font: var(--type-body-s); color: var(--text-3); }
+.titulo { font: var(--type-display-m); }
+
+/* Card da próxima pelada (DESIGN.md 7.4) — aqui só como amostra */
+.ilustracao { position: relative; height: 300px; }
+.ilustracao img { width: 100%; height: 100%; object-fit: cover; }
+.ilustracao::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 90px;
+  background: linear-gradient(transparent, var(--surface-1));
+}
+.conteudoCard { padding: 22px; display: grid; gap: var(--space-2); }
+.data { font: var(--type-display-l); letter-spacing: -0.02em; }
+.meta { display: flex; align-items: center; gap: var(--space-2); color: var(--text-2); }
+.carrossel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(100% - 56px);
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin: 0 calc(-1 * var(--screen-margin));
+  padding: 0 var(--screen-margin);
+  scrollbar-width: none;
+}
+.carrossel > * { scroll-snap-align: start; }

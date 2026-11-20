@@ -3,7 +3,7 @@ import { casarNome, similaridade } from '../../src/logic/casamento'
 import type { Jogador } from '../../src/logic/tipos'
 
 function jogador(id: string, nome: string, extra: Partial<Jogador> = {}): Jogador {
-  return { id, nome, estrelas: 3, tipo: 'mensalista', goleiro: false, ativo: true, ...extra }
+  return { id, nome, apelidos: [], estrelas: 3, tipo: 'mensalista', goleiro: false, ativo: true, ...extra }
 }
 
 const juninho = jogador('1', 'Juninho')
@@ -72,5 +72,31 @@ describe('similaridade', () => {
   })
   it('nomes sem relação ficam abaixo de 0.5', () => {
     expect(similaridade('Xyzw', 'Juninho')).toBeLessThan(0.5)
+  })
+})
+
+describe('casarNome — apelidos', () => {
+  const kaua = jogador('7', 'Kauã Ferreira', { apelidos: ['Kaká', 'KF'] })
+  const comApelido = [...cadastro, kaua]
+
+  it('apelido salvo casa sozinho, ignorando acento', () => {
+    expect(casarNome('kaka', comApelido)).toEqual({ tipo: 'exato', jogador: kaua })
+  })
+
+  it('o nome do cadastro continua casando', () => {
+    expect(casarNome('Kauã Ferreira', comApelido)).toEqual({ tipo: 'exato', jogador: kaua })
+  })
+
+  it('apelido parecido vira sugestão', () => {
+    const r = casarNome('Kakà F', comApelido)
+    expect(r.tipo).toBe('sugestoes')
+    if (r.tipo === 'sugestoes') expect(r.sugestoes).toContain(kaua)
+  })
+
+  it('apelido de jogador inativo não casa', () => {
+    const inativo = jogador('8', 'Zé Carlos', { apelidos: ['Zezinho'], ativo: false })
+    const r = casarNome('Zezinho', [...cadastro, inativo])
+    expect(r.tipo).toBe('sugestoes')
+    if (r.tipo === 'sugestoes') expect(r.sugestoes).not.toContain(inativo)
   })
 })

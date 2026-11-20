@@ -1,0 +1,19 @@
+.resultado {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  color: var(--text-1);
+}
+li:last-child > .resultado,
+li.resultado:last-child { border-bottom: 0; }
+button.resultado:active { background: var(--surface-2); }
+.apagado { color: var(--text-3); }
+.icone { color: var(--brand); display: inline-flex; }
+.nome { flex: 1; min-width: 0; font: var(--type-body-l); display: flex; flex-direction: column; }

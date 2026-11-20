@@ -1,0 +1,40 @@
+.barra {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-offset) + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: calc(min(100%, var(--app-max-width)) - 2 * var(--screen-margin));
+  height: var(--tabbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-tabbar);
+  z-index: 10;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 52px;
+  height: 48px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-2);
+  transition: background var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard);
+}
+
+.ativo {
+  background: var(--action);
+  color: var(--on-action);
+  padding: 0 var(--space-5);
+  font-weight: 700;
+  font-size: 0.875rem;
+}

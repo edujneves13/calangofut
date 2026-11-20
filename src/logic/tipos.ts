@@ -3,6 +3,8 @@ export type Estrelas = 1 | 2 | 3 | 4 | 5
 export interface Jogador {
   id: string
   nome: string
+  /** Outros jeitos como o nome aparece na lista do WhatsApp. */
+  apelidos: string[]
   estrelas: Estrelas
   tipo: 'mensalista' | 'diarista'
   goleiro: boolean

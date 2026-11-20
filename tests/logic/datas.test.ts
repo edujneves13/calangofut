@@ -1,20 +1,31 @@
 import { describe, expect, it } from 'vitest'
-import { proximaQuarta } from '../../src/logic/datas'
+import { hojeEmJoaoPessoa, proximoDia } from '../../src/logic/datas'
 
-describe('proximaQuarta (horário de João Pessoa)', () => {
+const QUARTA = 3
+
+describe('proximoDia (horário de João Pessoa)', () => {
   it('segunda → quarta da mesma semana', () => {
-    expect(proximaQuarta(new Date('2026-11-23T12:00:00-03:00'))).toBe('2026-11-25')
+    expect(proximoDia(new Date('2026-11-23T12:00:00-03:00'), QUARTA)).toBe('2026-11-25')
   })
   it('quarta de manhã → a própria quarta', () => {
-    expect(proximaQuarta(new Date('2026-11-25T08:00:00-03:00'))).toBe('2026-11-25')
+    expect(proximoDia(new Date('2026-11-25T08:00:00-03:00'), QUARTA)).toBe('2026-11-25')
   })
   it('quarta 23:30 (já é quinta em UTC) → ainda a própria quarta', () => {
-    expect(proximaQuarta(new Date('2026-11-25T23:30:00-03:00'))).toBe('2026-11-25')
+    expect(proximoDia(new Date('2026-11-25T23:30:00-03:00'), QUARTA)).toBe('2026-11-25')
   })
-  it('quinta 00:10 → quarta seguinte', () => {
-    expect(proximaQuarta(new Date('2026-11-26T00:10:00-03:00'))).toBe('2026-12-02')
+  it('quinta 00:10 → quarta seguinte (virada à meia-noite)', () => {
+    expect(proximoDia(new Date('2026-11-26T00:10:00-03:00'), QUARTA)).toBe('2026-12-02')
   })
   it('vira o mês e o ano', () => {
-    expect(proximaQuarta(new Date('2026-12-31T12:00:00-03:00'))).toBe('2027-01-06')
+    expect(proximoDia(new Date('2026-12-31T12:00:00-03:00'), QUARTA)).toBe('2027-01-06')
+  })
+  it('funciona com outro dia da semana (domingo = 0)', () => {
+    expect(proximoDia(new Date('2026-11-23T12:00:00-03:00'), 0)).toBe('2026-11-29')
+  })
+})
+
+describe('hojeEmJoaoPessoa', () => {
+  it('usa o fuso de João Pessoa, não o UTC', () => {
+    expect(hojeEmJoaoPessoa(new Date('2026-11-25T23:30:00-03:00'))).toBe('2026-11-25')
   })
 })

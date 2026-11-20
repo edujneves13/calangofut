@@ -1,0 +1,53 @@
+/* Índice discreto "Time 1 · 2 · 3" (DESIGN.md 7.5) */
+.indice { display: flex; gap: var(--space-3); overflow-x: auto; scrollbar-width: none; }
+.indice::-webkit-scrollbar { display: none; }
+.indiceItem {
+  flex: none;
+  min-height: 36px;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: var(--type-body-l);
+  color: var(--text-2);
+}
+.indiceAtivo { color: var(--text-1); font-weight: 700; border-bottom-color: var(--action); }
+.indiceIncompleto.indiceAtivo { border-bottom-style: dashed; }
+
+/* Carrossel com o próximo card aparecendo (DESIGN.md 4.3) */
+.carrossel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(100% - 56px);
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin: 0 calc(-1 * var(--screen-margin));
+  padding: 0 var(--screen-margin);
+  scroll-padding: 0 var(--screen-margin);
+}
+.carrossel::-webkit-scrollbar { display: none; }
+.slide { scroll-snap-align: start; }
+
+.pontos { display: flex; justify-content: center; gap: 6px; }
+.pontos i {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: width var(--motion-base) var(--ease-standard);
+}
+.pontos i.pontoAtivo { width: 18px; background: var(--action); }
+
+.expansor { justify-content: space-between; padding: 0 var(--space-4); }
+.cinza { color: var(--text-2); font-weight: 400; }
+.caixa {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: var(--space-1) var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: stretch;
+}
