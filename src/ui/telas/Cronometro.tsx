@@ -1,44 +1,23 @@
-import { Pause, PencilSimple, Play } from '@phosphor-icons/react'
+import { Pause, Play } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { ehUltimoMinuto, formatarTempo, progresso, tempoRestante } from '../../logic/cronometro'
 import { Button } from '../components/Button'
-import { Segmented } from '../components/Controls'
 import { Header } from '../components/Header'
-import { Icon } from '../components/Icon'
 import { Anel } from './cronometro/Anel'
-import { TempoSheet } from './cronometro/TempoSheet'
+import { AJUDA_TEMPO } from './cronometro/TempoSheet'
+import { EscolhaTempo } from './cronometro/EscolhaTempo'
 import type { Cronometro as Crono } from './useCronometro'
 import s from './Cronometro.module.css'
 import t from './Telas.module.css'
 
-type Escolha = 8 | 10 | 'outro'
-
 /** Aba Cronômetro (DESIGN.md 7.15, B1 · Anel clássico). O estado fica no Shell. */
 export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
   const [somLiberado, setSomLiberado] = useState(false)
-  const [sheetAberto, setSheetAberto] = useState(false)
   const { estado, agora } = c
   const restante = tempoRestante(estado, agora)
   const ultimo = ehUltimoMinuto(estado, agora)
   const pausado = estado.fase === 'pausado'
 
-  const minutos = estado.minutos
-  const escolha: Escolha = minutos === 8 || minutos === 10 ? minutos : 'outro'
-  const opcoes: { valor: Escolha; texto: React.ReactNode; rotulo?: string }[] = [
-    { valor: 8, texto: '8 min' },
-    { valor: 10, texto: '10 min' },
-    escolha === 'outro'
-      ? {
-          valor: 'outro',
-          texto: (
-            <>
-              {minutos} min <Icon icon={PencilSimple} size={18} />
-            </>
-          ),
-          rotulo: `${minutos} min, mudar`,
-        }
-      : { valor: 'outro', texto: 'Outro' },
-  ]
 
   return (
     <main className={`${t.tela} ${t.entrar} ${s.tela}`}>
@@ -65,12 +44,7 @@ export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
       <div className={s.controles}>
         {estado.fase === 'parado' && (
           <>
-            <Segmented
-              rotulo="Tempo de jogo"
-              opcoes={opcoes}
-              valor={escolha}
-              onMudar={(v) => (v === 'outro' ? setSheetAberto(true) : c.setMinutos(v))}
-            />
+            <EscolhaTempo minutos={estado.minutos} onMudar={c.setMinutos} ajuda={AJUDA_TEMPO} />
             <Button
               icone={Play}
               className={s.grande}
@@ -107,15 +81,6 @@ export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
         )}
       </div>
 
-      <TempoSheet
-        aberto={sheetAberto}
-        minutos={minutos}
-        onFechar={() => setSheetAberto(false)}
-        onUsar={(m) => {
-          c.setMinutos(m)
-          setSheetAberto(false)
-        }}
-      />
     </main>
   )
 }

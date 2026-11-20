@@ -6,6 +6,8 @@ import { MINIMO_JOGADORES, sortearTimes, type ParticipanteSorteio } from '../../
 import { TAMANHO_TIME, type Time } from '../../../logic/tipos'
 import { Button } from '../../components/Button'
 import { Notice, SectionLabel, Segmented, Stepper } from '../../components/Controls'
+import { EscolhaTempo } from '../cronometro/EscolhaTempo'
+import { AJUDA_TEMPO } from '../cronometro/TempoSheet'
 import { Header } from '../../components/Header'
 import { Icon } from '../../components/Icon'
 import { ConfirmModal } from '../../components/Sheet'
@@ -64,8 +66,6 @@ export function Sortear({ onVoltar, onAdicionar, onSortear }: Props) {
     }
   }
 
-  const tempos = [...new Set([8, 10, config.tempoJogo])].sort((a, b) => a - b)
-
   return (
     <main className={`${t.tela} ${t.semMenu} ${t.entrar}`}>
       <Header titulo="Como vai ser hoje?" onVoltar={onVoltar} />
@@ -109,12 +109,7 @@ export function Sortear({ onVoltar, onAdicionar, onSortear }: Props) {
             onMudar={setFormato}
           />
           <SectionLabel>Tempo de jogo</SectionLabel>
-          <Segmented
-            rotulo="Tempo de jogo"
-            opcoes={tempos.map((m) => ({ valor: m, texto: `${m} min` }))}
-            valor={tempo}
-            onMudar={setTempo}
-          />
+          <EscolhaTempo minutos={tempo} onMudar={setTempo} ajuda={AJUDA_TEMPO} />
           <p className={t.pequeno}>
             Times equilibrados pelas estrelas, com no máximo {max === 1 ? 'um craque' : `${maxTexto} craques`} (5★) por time.
           </p>

@@ -10,6 +10,7 @@ import { EmptyState } from '../components/Controls'
 import { TabBar, type Aba } from '../components/TabBar'
 import { db } from '../db'
 import { Ajustes } from './ajustes/Ajustes'
+import { Jogadores } from './ajustes/Jogadores'
 import { ContextoApp, type Contexto, type Dados, type TelaAjustes } from './contexto'
 import { Cronometro, FimDeJogo } from './Cronometro'
 import { Times } from './Times'
@@ -32,8 +33,6 @@ export function Shell() {
   const [semInternet, setSemInternet] = useState(false)
   const [aba, setAba] = useState<Aba>('times')
   const [telaAjustes, setTelaAjustes] = useState<TelaAjustes>('inicio')
-  // Aba de onde a pessoa abriu uma tela dos Ajustes (ex.: Lista de jogadores). O voltar retorna para ela.
-  const [origem, setOrigem] = useState<Aba | null>(null)
   const [fluxoAberto, setFluxoAberto] = useState(false)
   // O fluxo do sorteio guarda rascunho na tela; não recarregar por cima dele.
   const fluxoAbertoRef = useRef(false)
@@ -60,11 +59,12 @@ export function Shell() {
   }, [recarregar])
 
   const cronometro = useCronometro(10)
-  const tempoJogo = dados?.config.tempoJogo
+  // Tempo escolhido no sorteio; antes do sorteio, o padrão dos Ajustes (navegacao-ajustes-v3, item 4.1).
+  const tempoJogo = dados ? (dados.pelada.duracaoMin ?? dados.config.tempoJogo) : undefined
   const { setMinutos } = cronometro
   const fase = cronometro.estado.fase
   useEffect(() => {
-    // Cronômetro parado começa no tempo de jogo dos Ajustes.
+    // Cronômetro parado começa no tempo de jogo da pelada.
     if (tempoJogo && fase === 'parado') setMinutos(tempoJogo)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempoJogo])
@@ -75,14 +75,10 @@ export function Shell() {
         dados,
         atualizar: (m) => setDados((d) => (d ? { ...d, ...m } : d)),
         recarregar,
-        irParaAjustes: (tela) => {
-          setOrigem(aba === 'ajustes' ? null : aba)
-          setTelaAjustes(tela)
-          setAba('ajustes')
-        },
+        irParaJogadores: () => setAba('jogadores'),
         setFluxoAberto,
       },
-    [dados, recarregar, aba],
+    [dados, recarregar],
   )
 
   if (!contexto) {
@@ -114,25 +110,15 @@ export function Shell() {
   return (
     <ContextoApp.Provider value={contexto}>
       {aba === 'times' && <Times />}
+      {aba === 'jogadores' && <Jogadores />}
       {aba === 'cronometro' && <Cronometro cronometro={cronometro} />}
-      {aba === 'ajustes' && (
-        <Ajustes
-          tela={telaAjustes}
-          setTela={setTelaAjustes}
-          onVoltar={() => {
-            setTelaAjustes('inicio')
-            if (origem) setAba(origem)
-            setOrigem(null)
-          }}
-        />
-      )}
+      {aba === 'ajustes' && <Ajustes tela={telaAjustes} setTela={setTelaAjustes} />}
       {mostrarMenu && (
         <TabBar
           ativa={aba}
           cronometro={estadoNaBarra(cronometro.estado, cronometro.agora)}
           onTrocar={(nova) => {
             if (nova === 'ajustes' && aba !== 'ajustes') setTelaAjustes('inicio')
-            setOrigem(null)
             setAba(nova)
           }}
         />

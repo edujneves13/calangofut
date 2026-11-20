@@ -1,6 +1,6 @@
 import { Minus, Plus } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { limitarMinutos, MAX_MINUTOS, MIN_MINUTOS } from '../../../logic/cronometro'
+import { limitarMinutos, MIN_MINUTOS } from '../../../logic/cronometro'
 import { Button } from '../../components/Button'
 import { IconButton } from '../../components/IconButton'
 import { Sheet } from '../../components/Sheet'
@@ -9,15 +9,20 @@ import s from './TempoSheet.module.css'
 
 const ATALHOS = [5, 6, 7, 12, 15]
 
+/** Ajuda da folha quando o tempo vale só para hoje (cronômetro e sorteio). COPY 5. */
+export const AJUDA_TEMPO = 'Vale só para hoje. O padrão muda em Ajustes.'
+
 interface Props {
   aberto: boolean
   minutos: number
+  /** Linha de ajuda abaixo dos atalhos. */
+  ajuda?: string
   onFechar: () => void
   onUsar: (minutos: number) => void
 }
 
 /** "Outro": tempo de jogo só para hoje (COPY.md 5, tempo personalizado). */
-export function TempoSheet({ aberto, minutos, onFechar, onUsar }: Props) {
+export function TempoSheet({ aberto, minutos, ajuda, onFechar, onUsar }: Props) {
   const [n, setN] = useState(minutos)
   useEffect(() => {
     if (aberto) setN(minutos)
@@ -32,7 +37,7 @@ export function TempoSheet({ aberto, minutos, onFechar, onUsar }: Props) {
             {n}
             <span className={s.unidade}>minutos</span>
           </p>
-          <IconButton icone={Plus} rotulo="Mais" disabled={n >= MAX_MINUTOS} onClick={() => setN(limitarMinutos(n + 1))} />
+          <IconButton icone={Plus} rotulo="Mais" onClick={() => setN(limitarMinutos(n + 1))} />
         </div>
         <div className={`${t.chips} ${s.atalhos}`}>
           {ATALHOS.map((m) => (
@@ -47,7 +52,7 @@ export function TempoSheet({ aberto, minutos, onFechar, onUsar }: Props) {
             </button>
           ))}
         </div>
-        <p className={`${t.pequeno} ${t.centro}`}>De 1 a 30 minutos. Vale só para hoje; o padrão muda em Ajustes.</p>
+        {ajuda && <p className={`${t.pequeno} ${t.centro}`}>{ajuda}</p>}
         <Button onClick={() => onUsar(n)}>Usar {n} min</Button>
       </div>
     </Sheet>

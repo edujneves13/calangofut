@@ -7,6 +7,7 @@ Tudo que foi decidido sobre a interface em 19/11/2026 (conversa de design entre 
 Quando dois arquivos discordarem, vale o que está mais acima:
 
 0. **`docs/design/fluxo-sorteio-v2-20-novembro.md`** (20/11/2026, versão final): fluxo do sorteio (etapas Lista · Sorteio · Regras, telas 1 Lista de jogadores, 2 Quem vai pro sorteio?, 3 Regras), leitor da lista em qualquer formato, regra de cores (verde dentro, âmbar ação, cinza informação, laranja botão), textos de troca no Editar times e ilustração do card Próxima pelada. Nesses pontos vale acima de todos os outros. `docs/design/fluxo-sorteio-v3.md` é rascunho substituído: não use.
+00. **`docs/design/navegacao-ajustes-v3.md`** (20/11/2026): barra de baixo com 4 abas (Times · Jogadores · Cronômetro · Ajustes), aba Jogadores com "Selecionar todos", Ajustes reorganizado em "Regras padrão", tempo de jogo com "Outro" no sorteio e sem limite de 30 min. Nesses pontos vale acima de todos os outros. Textos aprovados e já no `COPY.md`.
 0. **`docs/design/times-durante-v2.md`** (20/11/2026): revisão da tela Times durante a pelada, da tela nova Editar times, da folha Sortear de novo, do menu ⋯, do voltar e do cronômetro na barra de baixo. Nesses pontos vale acima de todos os outros.
 1. **`docs/superpowers/specs/2026-11-19-spec-adendo-wireframes.md`**: decisões tomadas depois da spec (login com senha, sortear de novo seletivo, nome e avatar da pelada etc.).
 2. **`COPY.md`**: todos os textos da interface. Use a coluna **"Final"**. Nunca invente texto de botão.

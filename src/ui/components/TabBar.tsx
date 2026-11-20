@@ -1,12 +1,13 @@
-import { Pause, SlidersHorizontal, SoccerBall, Timer } from '@phosphor-icons/react'
+import { Pause, SlidersHorizontal, SoccerBall, Timer, UsersThree } from '@phosphor-icons/react'
 import type { EstadoNaBarra } from '../../logic/cronometro'
 import { Icon } from './Icon'
 import s from './TabBar.module.css'
 
-export type Aba = 'times' | 'cronometro' | 'ajustes'
+export type Aba = 'times' | 'jogadores' | 'cronometro' | 'ajustes'
 
 const ABAS = [
   { id: 'times', rotulo: 'Times', icone: SoccerBall },
+  { id: 'jogadores', rotulo: 'Jogadores', icone: UsersThree },
   { id: 'cronometro', rotulo: 'Cronômetro', icone: Timer },
   { id: 'ajustes', rotulo: 'Ajustes', icone: SlidersHorizontal },
 ] as const

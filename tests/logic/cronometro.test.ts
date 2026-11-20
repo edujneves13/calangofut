@@ -98,16 +98,17 @@ describe('cronômetro', () => {
     expect(mudarMinutos(rodando, 5)).toBe(rodando)
   })
 
-  it('valida de 1 a 30 minutos inteiros', () => {
-    expect([1, 12, 30].every(minutosValidos)).toBe(true)
-    expect([0, 31, 2.5, Number.NaN].some(minutosValidos)).toBe(false)
+  it('valida minutos inteiros a partir de 1, sem máximo', () => {
+    expect([1, 12, 30, 45, 90].every(minutosValidos)).toBe(true)
+    expect([0, -3, 2.5, Number.NaN, Infinity].some(minutosValidos)).toBe(false)
     expect(() => criarCronometro(0)).toThrow()
-    expect(() => mudarMinutos(criarCronometro(10), 31)).toThrow()
+    expect(criarCronometro(45).duracaoMs).toBe(45 * MIN)
+    expect(tempoRestante(mudarMinutos(criarCronometro(10), 60), T0)).toBe(60 * MIN)
   })
 
-  it('limita fora da faixa', () => {
+  it('limita só embaixo e arredonda', () => {
     expect(limitarMinutos(0)).toBe(1)
-    expect(limitarMinutos(45)).toBe(30)
+    expect(limitarMinutos(45)).toBe(45)
     expect(limitarMinutos(7.6)).toBe(8)
   })
 })

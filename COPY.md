@@ -160,7 +160,7 @@ Revisado em 20/11/2026: vale `docs/design/fluxo-sorteio-v2-20-novembro.md` (seç
 | Label | Formato | Formato | = |
 | Opções | Quem ganha fica · Estilo campeonato | = | |
 | Label | Duração da partida | Tempo de jogo | Mais falado. |
-| Opções | 8 min · 10 min | = | |
+| Opções | 8 min · 10 min | 8 min · 10 min · Outro | Igual ao cronômetro (v3, 20/11). Vem marcado o padrão de Ajustes; "Outro" abre o tempo personalizado. |
 | Ajuda | Padrão: quem ganha fica, 10 min. Máx. dois 5★ por time. Goleiros fora do sorteio. | Times equilibrados pelas estrelas, com no máximo dois craques (5★) por time. | Explica o sorteio, não os padrões. |
 | Botão | Sortear times | = | |
 | Sorteio impossível (5★) | — | Tem 11 craques (5★) para 5 times: não dá para ter no máximo dois por time. Sortear sem essa regra? · [Sortear assim mesmo] [Voltar] | Faltava. Regra pode travar o sorteio. |
@@ -273,7 +273,7 @@ Nenhum time passa de 5 (decisão de 20/11): "Mover para" só lista times com vag
 | Fim — botão | Próximo jogo | **Zerar para o próximo** | Diz o que acontece. |
 | Fim — secundário | Parar apito | = | |
 | Sem suporte a tela acesa | — | Seu celular pode apagar a tela durante o jogo. O tempo continua contando. | Faltava (alguns navegadores). |
-| Tempo personalizado (sheet) | — | Título "Tempo de jogo" · número + "minutos" · atalhos 5, 6, 7, 12, 15 min · ajuda "De 1 a 30 minutos. Vale só para hoje; o padrão muda em Ajustes." · botão "Usar 12 min" | Faltava. |
+| Tempo personalizado (sheet) | — | Título "Tempo de jogo" · número + "minutos" · atalhos 5, 6, 7, 12, 15 min · ajuda "Vale só para hoje. O padrão muda em Ajustes." · botão "Usar 12 min" | Faltava. Sem limite de 30 min (v3, 20/11): mínimo 1 min, sem máximo. |
 | Primeiro uso do som | — | Toque em Começar para liberar o apito. | iOS só toca som após um toque. |
 | Linha de apoio (parado) | — | Pronto para o próximo jogo | Aprovado em 19/11. Rodando, não há linha de apoio (sem contagem de jogos). |
 | Selo (pausado) | — | PAUSADO | Aprovado em 19/11. Mesmo estilo do selo de último minuto. |
@@ -284,21 +284,22 @@ Nenhum time passa de 5 (decisão de 20/11): "Mover para" só lista times com vag
 | --- | --- | --- | --- |
 | Título | Ajustes | = | |
 | Pelada | Pelada dos Brabos · Nome e avatar | = | |
-| Jogadores | Jogadores · 48 cadastrados | Jogadores · 48 | "Cadastrados" sobra. |
 | Seção | PELADA RECORRENTE | TODA SEMANA | Linguagem do grupo. |
 | Item | Dia e horário · Qua · 20:30–22:00 | = | |
 | Item | Local · Colibris | = | |
 | Item | Próxima pelada · Editar data | Mudar só a próxima · 25/11 | Diferencia de mudar a regra semanal. |
-| Seção | JOGO | JOGO | = |
+| Seção | JOGO | REGRAS PADRÃO | v3 (20/11): junta JOGO e SORTEIO. |
 | Item | Formato padrão · Quem ganha fica | = | |
 | Item | Duração · 10 min | Tempo de jogo · 10 min | Mesmo termo da 2.6. |
 | Item | Máx. partidas seguidas · 3 | Quem ganha fica até · 3 jogos | Explica a regra. |
-| Seção | SORTEIO | = | |
 | Item | Máx. de 5★ por time · 2 | Craques (5★) por time · até 2 | Explica a regra. |
-| Item | — | Jogadores por time · 5 | (já previsto no v1; manter) |
+| Item | Tempo de jogo (folha) | 8 min · 10 min · Outro | v3: igual ao sorteio e ao cronômetro. |
+| Nota da seção | — | Dá para mudar no dia, na hora do sorteio. | v3: explica que é padrão, não regra fixa. |
 | Sair | Sair da conta | Sair | Confirmação: "Sair do app neste celular?" |
 
 ### 6.2 Jogadores
+
+v3 (20/11): virou aba da barra de baixo (Times · Jogadores · Cronômetro · Ajustes). Rótulo da aba: **Jogadores**. Sem botão voltar.
 
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
@@ -385,7 +386,7 @@ Regras:
 | Avatar no cabeçalho | Pelada dos Brabos |
 | Ilustração do card | Calango, mascote da Pelada dos Brabos, no gramado |
 | Botão ↻ | Sortear de novo |
-| Abas inativas | Times · Cronômetro · Ajustes |
+| Abas inativas | Times · Jogadores · Cronômetro · Ajustes |
 | Selo "16★" | 16 estrelas |
 | Selo "4★" | 4 estrelas |
 | Check de presença | Chegou: [nome] (marcado) / Não chegou: [nome] |
@@ -414,7 +415,7 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 
 | Elemento | Proposta | Motivo |
 | --- | --- | --- |
-| Link no fim da tela | Lista de jogadores · 48 | Atalho para Ajustes → Jogadores sem passar por Ajustes. |
+| Link no fim da tela | ~~Lista de jogadores · 48~~ (removido na v3: Jogadores virou aba) | |
 
 ### 9.2 Ajustes → Jogadores (complementa a 6.2)
 
@@ -422,14 +423,15 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 | --- | --- | --- |
 | Botão principal (topo) | Adicionar jogadores | Visível e explícito, como pedido. |
 | Botão de texto | Selecionar | Entra no modo de excluir vários. |
-| Menu ⋯ | Excluir todos | |
+| Menu ⋯ | ~~Excluir todos~~ (removido na v3, junto com o ⋯) | |
+| Modo seleção — ação de texto | Selecionar todos · Limpar | v3: mesmo texto do fluxo (9.8); vale para o que está visível (filtro e busca). |
 | Modo seleção — título | 3 selecionados | Número concreto. |
 | Modo seleção — botão | Excluir (3) | |
 | Modo seleção — secundário | Cancelar | |
 | Confirmação — título | **Excluir 3 jogadores?** | |
 | Confirmação — texto | Eles saem da lista, mas continuam nas peladas antigas. Dá para trazer de volta em Inativos. | Explica que nada se perde. |
 | Confirmação — botões | [Excluir] [Cancelar] | |
-| Excluir todos — título | **Excluir todos os 48 jogadores?** | |
+| Excluir todos — título | **Excluir todos os 48 jogadores?** | v3: aparece quando a seleção tem todos os ativos. |
 | Excluir todos — texto | = texto acima | |
 | Toast | 3 jogadores excluídos. · Desfazer | |
 

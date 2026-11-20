@@ -13,14 +13,15 @@ export interface Dados {
   presencas: Presenca[]
 }
 
-export type TelaAjustes = 'inicio' | 'jogadores' | 'pelada'
+export type TelaAjustes = 'inicio' | 'pelada'
 
 export interface Contexto {
   dados: Dados
   /** Troca partes dos dados depois de gravar no banco. */
   atualizar: (mudancas: Partial<Dados>) => void
   recarregar: () => Promise<void>
-  irParaAjustes: (tela: TelaAjustes) => void
+  /** Abre a aba Jogadores (ex.: cadastro vazio no fluxo do sorteio). */
+  irParaJogadores: () => void
   /** Esconde o menu de baixo durante o fluxo do sorteio. */
   setFluxoAberto: (aberto: boolean) => void
 }
