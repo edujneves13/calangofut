@@ -4,7 +4,8 @@ import s from './Overlay.module.css'
 interface DadosToast {
   texto: string
   tom?: 'sucesso' | 'erro'
-  acao?: { texto: string; onClick: () => void }
+  /** Até dois botões, ex.: "Desfazer" e "Copiar times". */
+  acoes?: { texto: string; onClick: () => void }[]
 }
 
 const ContextoToast = createContext<(toast: DadosToast) => void>(() => {})
@@ -12,7 +13,7 @@ const ContextoToast = createContext<(toast: DadosToast) => void>(() => {})
 /** `const mostrarToast = useToast()` em qualquer tela. */
 export const useToast = () => useContext(ContextoToast)
 
-/** Um toast por vez; o novo substitui o antigo. 4 s, ou 6 s com "Desfazer" (DESIGN.md 7.13). */
+/** Um toast por vez; o novo substitui o antigo. 4 s, ou 6 s com botão (DESIGN.md 7.13). */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [atual, setAtual] = useState<(DadosToast & { id: number }) | null>(null)
   const contador = useRef(0)
@@ -24,7 +25,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!atual) return
-    const t = setTimeout(() => setAtual(null), atual.acao ? 6000 : 4000)
+    const t = setTimeout(() => setAtual(null), atual.acoes?.length ? 6000 : 4000)
     return () => clearTimeout(t)
   }, [atual])
 
@@ -35,18 +36,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {atual && (
           <div key={atual.id} className={`${s.toast} ${atual.tom === 'erro' ? s.erro : s.sucesso}`}>
             <span className={s.toastTexto}>{atual.texto}</span>
-            {atual.acao && (
+            {atual.acoes?.map((acao) => (
               <button
+                key={acao.texto}
                 type="button"
                 className={s.toastAcao}
                 onClick={() => {
-                  atual.acao!.onClick()
                   setAtual(null)
+                  acao.onClick()
                 }}
               >
-                {atual.acao.texto}
+                {acao.texto}
               </button>
-            )}
+            ))}
           </div>
         )}
       </div>

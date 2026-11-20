@@ -98,3 +98,50 @@ export function atualizar(e: EstadoCronometro, agora: number): EstadoCronometro 
   }
   return e
 }
+
+const segundosRestantes = (ms: number) => Math.max(0, Math.ceil(ms / 1000))
+
+/** "07:12". O segundo arredonda para cima: só mostra 00:00 quando acabou. */
+export function formatarTempo(ms: number): string {
+  const total = segundosRestantes(ms)
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
+/** "7 minutos e 12 segundos", para o leitor de tela. */
+export function falarTempo(ms: number): string {
+  const total = segundosRestantes(ms)
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  const partes = [
+    m > 0 ? `${m} ${m === 1 ? 'minuto' : 'minutos'}` : '',
+    s > 0 || m === 0 ? `${s} ${s === 1 ? 'segundo' : 'segundos'}` : '',
+  ].filter(Boolean)
+  return partes.join(' e ')
+}
+
+export interface EstadoNaBarra {
+  tom: 'rodando' | 'ultimo' | 'pausado'
+  /** "07:12" ou "Pausado". */
+  texto: string
+  /** Mesmo do anel grande: 0 = cheio … 1 = vazio. */
+  progresso: number
+  /** aria-label do item Cronômetro. */
+  rotulo: string
+}
+
+/**
+ * O que o item Cronômetro da barra de baixo mostra em qualquer aba (docs/design/times-durante-v2.md, item 9).
+ * null = parado ou fim: o item normal, sem anel e sem tempo.
+ */
+export function estadoNaBarra(e: EstadoCronometro, agora: number): EstadoNaBarra | null {
+  if (e.fase !== 'rodando' && e.fase !== 'pausado') return null
+  const restante = tempoRestante(e, agora)
+  const base = { progresso: progresso(e, agora) }
+  if (e.fase === 'pausado') return { ...base, tom: 'pausado', texto: 'Pausado', rotulo: 'Cronômetro, pausado' }
+  return {
+    ...base,
+    tom: ehUltimoMinuto(e, agora) ? 'ultimo' : 'rodando',
+    texto: formatarTempo(restante),
+    rotulo: `Cronômetro, ${falarTempo(restante)} restantes`,
+  }
+}

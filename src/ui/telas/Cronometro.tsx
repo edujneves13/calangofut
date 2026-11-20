@@ -1,6 +1,6 @@
 import { Pause, PencilSimple, Play } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { ehUltimoMinuto, progresso, tempoRestante } from '../../logic/cronometro'
+import { ehUltimoMinuto, formatarTempo, progresso, tempoRestante } from '../../logic/cronometro'
 import { Button } from '../components/Button'
 import { Segmented } from '../components/Controls'
 import { Header } from '../components/Header'
@@ -10,11 +10,6 @@ import { TempoSheet } from './cronometro/TempoSheet'
 import type { Cronometro as Crono } from './useCronometro'
 import s from './Cronometro.module.css'
 import t from './Telas.module.css'
-
-function mmss(ms: number): string {
-  const total = Math.max(0, Math.ceil(ms / 1000))
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
-}
 
 type Escolha = 8 | 10 | 'outro'
 
@@ -57,9 +52,9 @@ export function Cronometro({ cronometro: c }: { cronometro: Crono }) {
         <p
           className={`${s.numeros} ${ultimo ? s.ambar : ''} ${pausado ? s.piscando : ''}`}
           role="timer"
-          aria-label={mmss(restante)}
+          aria-label={formatarTempo(restante)}
         >
-          {mmss(restante)}
+          {formatarTempo(restante)}
         </p>
         {estado.fase === 'parado' && <p className={t.pequeno}>Pronto para o próximo jogo</p>}
         {estado.fase === 'rodando' && c.telaAcesa === false && (

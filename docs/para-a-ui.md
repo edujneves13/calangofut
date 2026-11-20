@@ -34,7 +34,7 @@ Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'ap
 ### Times
 - `peladaAtual(db, new Date())` → a pelada de hoje em diante; se não houver, abre a do próximo dia da semana dos Ajustes. Vira à meia-noite e respeita "Mudar só a próxima" (`src/data/peladas.ts`).
 - "Mudar só a próxima": `atualizarPelada(db, id, { data })`.
-- "Tentar novamente": `recomecarPelada(db, id)` apaga a lista e os times.
+- "Iniciar novo sorteio" (menu ⋯): `recomecarPelada(db, id)` apaga a lista e os times.
 
 ### Jogadores
 - Vários de uma vez: `lerNomes(texto)` → `[{ nome, goleiro }]` (`src/logic/leitor.ts`); `montarConfirmacao(nomes, jogadores)` → cada item `existente | parecido | novo` (`src/logic/confirmacao.ts`); `criarJogadores(db, novos)` grava todos ou nenhum.
@@ -59,6 +59,14 @@ Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'ap
 - Salvar: `salvarSorteio(db, peladaId, { times: { times, jogos }, formato, duracaoMin })`.
 - Texto: `montarTextoWhatsApp({ nomePelada, data, horario, times: [{ nomes, completo }], goleiros, linhasFormato: linhas })` (`src/logic/texto.ts`). Use o nome do cadastro. A tela só copia (`navigator.clipboard.writeText`).
 - Soma de estrelas de cada time: `time.somaEstrelas` (só na tela, nunca no texto).
+
+### Editar times (v2)
+- Regras puras em `src/logic/edicao.ts`, todas com `estrelasDe(id)`: `moverJogador`, `trocarJogadores`, `tirarDoTime`, `colocarNoTime` (devolvem lista nova; `null` se o destino está cheio), `calcularEquilibrio`, `previaMover`, `previaTroca`, `contarCincoEstrelas`, `naoChegaramComecaAberta`.
+- Busca sem acento: `buscarJogadores(lista, busca)` e `trechoEncontrado(nome, busca)` (`src/logic/busca.ts`) devolvem o trecho para destacar.
+- Concluir: `marcarPresenca(..., 'nao-chegou')` para quem saiu do time, `'chegou'` para quem entrou vindo de Não chegaram, depois `salvarTimes`.
+
+### Cronômetro na barra de baixo (v2)
+- `estadoNaBarra(estado, agora)` (`src/logic/cronometro.ts`) → `null` (parado ou fim) ou `{ tom, texto, progresso, rotulo }`. `formatarTempo` e `falarTempo` formatam o tempo.
 
 ### Chegou depois
 - "Não chegaram" (só status `'nao-chegou'`) → toque em "Chegou": `marcarPresenca(db, peladaId, jogadorId, 'chegou')`, depois `adicionarAtrasado(times, { id, estrelas })` (`src/logic/atrasados.ts`) e `salvarTimes(db, peladaId, { times: novos, jogos })`.

@@ -1,13 +1,14 @@
-import { ArrowsClockwise, CaretDown, CaretRight, Copy, DotsThree, Shuffle, UserPlus } from '@phosphor-icons/react'
-import { useRef, useState } from 'react'
+import { ArrowsClockwise, CaretDown, Check, Clock, Copy, DotsThree, PencilSimple, Shuffle, UserPlus, WarningCircle } from '@phosphor-icons/react'
+import { useEffect, useRef, useState } from 'react'
 import { adicionarNaHora, chegouDepois, marcarPresenca } from '../../data/presencas'
 import { criarJogador } from '../../data/jogadores'
 import { recomecarPelada, salvarTimes, type TimesSalvos } from '../../data/peladas'
 import { adicionarAtrasado } from '../../logic/atrasados'
+import { contarCincoEstrelas, naoChegaramComecaAberta } from '../../logic/edicao'
 import { FORMATOS } from '../../logic/formatos'
 import { refazerSorteio } from '../../logic/sorteio'
 import { montarTextoWhatsApp } from '../../logic/texto'
-import type { Estrelas, Jogador, Time } from '../../logic/tipos'
+import { TAMANHO_TIME, type Estrelas, type Jogador, type Time } from '../../logic/tipos'
 import { Button } from '../components/Button'
 import { Header } from '../components/Header'
 import { Icon } from '../components/Icon'
@@ -17,29 +18,30 @@ import { ConfirmModal, Sheet } from '../components/Sheet'
 import { TeamCard } from '../components/TeamCard'
 import { useToast } from '../components/Toast'
 import { db } from '../db'
-import { dataCurta, listaComE, mensagemDeErro, porNome } from '../util'
+import { dataCurta, mensagemDeErro, porNome } from '../util'
 import { AdicionarJogador, type NovoNaHora } from './AdicionarJogador'
+import { EditarTimes, type ResultadoEdicao } from './EditarTimes'
 import { juntarJogadores, useApp } from './contexto'
 import { participantesDe } from './fluxo/Sortear'
-import { AVATAR_PADRAO, LinkJogadores } from './Times'
+import { AVATAR_PADRAO } from './Times'
 import s from './Durante.module.css'
 import t from './Telas.module.css'
 
-/** Times — durante a pelada (COPY 3.1 a 3.5). */
-export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }) {
-  const { dados, atualizar, recarregar } = useApp()
+/** Times — durante a pelada (docs/design/times-durante-v2.md). */
+export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
+  const { dados, atualizar, recarregar, setFluxoAberto } = useApp()
   const mostrarToast = useToast()
   const { config, pelada, jogadores, presencas } = dados
   const salvos = pelada.times!
   const times = salvos.times
 
   const [ativo, setAtivo] = useState(0)
-  const [naoChegaramAberto, setNaoChegaramAberto] = useState(false)
   const [refazerAberto, setRefazerAberto] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
   const [confirmarRecomecar, setConfirmarRecomecar] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
   const [textoManual, setTextoManual] = useState<string | null>(null)
+  const [editando, setEditando] = useState(false)
   const carrossel = useRef<HTMLDivElement>(null)
 
   const porId = new Map(jogadores.map((j) => [j.id, j]))
@@ -54,6 +56,16 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
     .map((p) => porId.get(p.jogadorId))
     .filter((j): j is Jogador => Boolean(j?.goleiro))
     .sort(porNome)
+
+  const banco = useBanco(pelada.id, naoChegaram.length)
+  // O toast guarda a função de quando foi criado; o ref garante copiar os times de agora.
+  const copiarRef = useRef<() => Promise<void>>(async () => {})
+  const copiarTimes = { texto: 'Copiar times', onClick: () => void copiarRef.current() }
+
+  /** Aviso que aparece sempre que os times mudam (v2, item 6). */
+  function avisarQueMudou() {
+    mostrarToast({ texto: 'Os times mudaram. Copie a lista nova.', acoes: [copiarTimes] })
+  }
 
   function irParaTime(i: number) {
     const el = carrossel.current
@@ -91,18 +103,21 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
     irParaTime(indice)
     mostrarToast({
       texto: abriuTime ? `${jogador.nome} começou o Time ${indice + 1}` : `${jogador.nome} entrou no Time ${indice + 1}`,
-      acao: {
-        texto: 'Desfazer',
-        onClick: async () => {
-          try {
-            await salvarTimes(db, pelada.id, antes)
-            await desfazer()
-            await recarregar()
-          } catch (e) {
-            mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
-          }
+      acoes: [
+        {
+          texto: 'Desfazer',
+          onClick: async () => {
+            try {
+              await salvarTimes(db, pelada.id, antes)
+              await desfazer()
+              await recarregar()
+            } catch (e) {
+              mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
+            }
+          },
         },
-      },
+        copiarTimes,
+      ],
     })
   }
 
@@ -150,9 +165,33 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
     })
     try {
       await navigator.clipboard.writeText(texto)
-      mostrarToast({ texto: 'Lista copiada. É só colar no grupo.' })
+      mostrarToast({ texto: 'Lista copiada' })
     } catch {
       setTextoManual(texto)
+    }
+  }
+
+  copiarRef.current = copiarLista
+
+  // Editar times é tela cheia: esconde o menu de baixo e não recarrega por cima do rascunho.
+  useEffect(() => {
+    setFluxoAberto(editando)
+  }, [editando, setFluxoAberto])
+
+  /** Concluir do Editar times: presenças de quem saiu ou entrou, depois os times. */
+  async function concluirEdicao({ times: novos, tirados, colocados }: ResultadoEdicao) {
+    try {
+      const mudancas = await Promise.all([
+        ...tirados.map((id) => marcarPresenca(db, pelada.id, id, 'nao-chegou')),
+        ...colocados.map((id) => marcarPresenca(db, pelada.id, id, 'chegou')),
+      ])
+      const porJogador = new Map(mudancas.map((p) => [p.jogadorId, p]))
+      atualizar({ presencas: presencas.map((p) => porJogador.get(p.jogadorId) ?? p) })
+      await gravarTimes(novos)
+      setEditando(false)
+      avisarQueMudou()
+    } catch (e) {
+      mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
     }
   }
 
@@ -161,7 +200,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
       const limpa = await recomecarPelada(db, pelada.id)
       atualizar({ pelada: limpa, presencas: [] })
       setConfirmarRecomecar(false)
-      onTentarNovamente()
+      onNovoSorteio()
     } catch (e) {
       mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
     }
@@ -175,6 +214,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
         const p = presencaDe.get(j.id)
         return p ? chegouDepois(p, pelada) : false
       })
+    const craques = contarCincoEstrelas(tm, (id) => porId.get(id)?.estrelas ?? 0)
     return (
       <div key={i} className={s.slide} aria-label={`Time ${i + 1} de ${times.length}`}>
         <TeamCard
@@ -183,6 +223,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
           somaEstrelas={tm.somaEstrelas}
           completo={tm.completo}
           textoVaga="Vaga"
+          alerta={craques > config.maxCincoEstrelas ? `${craques} craques neste time` : undefined}
           aviso={
             soAtrasados
               ? 'Esse time foi montado por ordem de chegada, sem equilibrar. Para equilibrar, use Sortear de novo.'
@@ -193,34 +234,62 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
     )
   })
 
+  if (editando) {
+    return (
+      <EditarTimes
+        times={times}
+        naoChegaram={naoChegaram}
+        porId={porId}
+        maxCincoEstrelas={config.maxCincoEstrelas}
+        onCancelar={() => setEditando(false)}
+        onConcluir={concluirEdicao}
+      />
+    )
+  }
+
+  const incompletos = times.flatMap((tm, i) => (tm.completo ? [] : [{ i, tamanho: tm.jogadorIds.length }]))
+
   return (
     <main className={`${t.tela} ${t.entrar}`}>
       <Header
         titulo={config.nomePelada}
         subtitulo={`${dataCurta(pelada.data)} · ${pelada.horario}`}
         avatar={{ nome: config.nomePelada, src: config.avatarUrl ?? AVATAR_PADRAO }}
-        acoes={
-          <>
-            <IconButton icone={ArrowsClockwise} rotulo="Sortear de novo" onClick={() => setRefazerAberto(true)} />
-            <IconButton icone={DotsThree} rotulo="Mais opções" semFundo onClick={() => setMenuAberto(true)} />
-          </>
-        }
+        acoes={<IconButton icone={DotsThree} rotulo="Mais opções" semFundo onClick={() => setMenuAberto(true)} />}
       />
 
-      <div className={s.indice} role="tablist" aria-label="Times">
-        {times.map((tm, i) => (
-          <button
-            key={i}
-            type="button"
-            role="tab"
-            aria-selected={i === ativo}
-            className={`${s.indiceItem} ${i === ativo ? s.indiceAtivo : ''} ${tm.completo ? '' : s.indiceIncompleto}`}
-            onClick={() => irParaTime(i)}
-          >
-            {i === ativo ? `Time ${i + 1}` : i + 1}
-          </button>
-        ))}
+      <div className={s.linhaAbas}>
+        <div className={s.indice} role="tablist" aria-label="Times">
+          {times.map((tm, i) => (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === ativo}
+              className={`${s.indiceItem} ${i === ativo ? s.indiceAtivo : ''} ${tm.completo ? '' : s.indiceIncompleto}`}
+              onClick={() => irParaTime(i)}
+            >
+              {i === ativo ? `Time ${i + 1}` : i + 1}
+            </button>
+          ))}
+        </div>
+        <button type="button" className={s.copiar} onClick={copiarLista}>
+          <Icon icon={Copy} size={18} />
+          Copiar times
+        </button>
       </div>
+
+      {incompletos.map(({ i, tamanho }) => (
+        <div key={i} className={s.avisoIncompleto}>
+          <Icon icon={WarningCircle} size={20} />
+          <span className={t.cresce}>
+            Time {i + 1} está incompleto · {tamanho}/{TAMANHO_TIME}
+          </span>
+          <button type="button" className={s.ver} onClick={() => irParaTime(i)}>
+            Ver
+          </button>
+        </div>
+      ))}
 
       <div ref={carrossel} className={s.carrossel} onScroll={aoRolar}>
         {cards}
@@ -231,56 +300,61 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
         ))}
       </div>
 
-      <div className={t.coluna}>
-        <Button
-          variante="tracejado"
-          aria-expanded={naoChegaramAberto}
-          onClick={() => setNaoChegaramAberto((a) => !a)}
-          className={s.expansor}
-        >
-          <span>
-            <b>Não chegaram</b> <span className={s.cinza}>· {naoChegaram.length}</span>
-          </span>
-          <Icon icon={naoChegaramAberto ? CaretDown : CaretRight} size={20} />
+      <div className={s.acoes}>
+        <Button variante="secundario" icone={Shuffle} className={s.acao} onClick={() => setRefazerAberto(true)}>
+          Sortear de novo
         </Button>
-        {naoChegaramAberto && (
-          <div className={s.caixa}>
-            {naoChegaram.length > 0 ? (
-              <>
-                <ul className={t.lista}>
-                  {naoChegaram.map((j) => (
-                    <li key={j.id}>
-                      <PlayerRow
-                        nome={j.nome}
-                        direita={
-                          <Button variante="pequeno" onClick={() => void chegou(j)}>
-                            Chegou
-                          </Button>
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-                <p className={t.pequeno}>Entra no último time.</p>
-              </>
-            ) : (
-              <p className={t.texto2}>Todo mundo chegou.</p>
-            )}
-            <Button variante="pequeno-secundario" icone={UserPlus} onClick={() => setAdicionando(true)}>
-              Adicionar jogador
-            </Button>
-          </div>
-        )}
-        <Button icone={Copy} onClick={copiarLista}>
-          Copiar lista dos times
+        <Button variante="secundario" icone={PencilSimple} className={s.acao} onClick={() => setEditando(true)}>
+          Editar times
         </Button>
       </div>
-      <LinkJogadores />
+
+      {banco.visivel && (
+        <section className={`${s.banco} ${naoChegaram.length === 0 ? s.bancoSaindo : ''}`} aria-label="Não chegaram">
+          <button
+            type="button"
+            className={s.bancoTopo}
+            aria-expanded={banco.aberto}
+            onClick={banco.alternar}
+          >
+            <Icon icon={Clock} size={20} className={s.relogio} />
+            <span className={s.bancoTitulo}>Não chegaram</span>
+            <span className={s.bancoConta}>{naoChegaram.length}</span>
+            {!banco.aberto && <span className={s.bancoResumo}>{resumoDeNomes(naoChegaram)}</span>}
+            <Icon icon={CaretDown} size={20} className={`${s.seta} ${banco.aberto ? s.setaAberta : ''}`} />
+          </button>
+          {banco.aberto && (
+            <ul className={s.bancoLista}>
+              {naoChegaram.map((j) => (
+                <li key={j.id} className={s.bancoLinha}>
+                  <PlayerRow
+                    nome={j.nome}
+                    apagado
+                    direita={
+                      <>
+                        <span className={s.bancoEstrelas}>{j.estrelas}★</span>
+                        <Button variante="pequeno" icone={Check} className={s.chegou} onClick={() => void chegou(j)}>
+                          Chegou
+                        </Button>
+                      </>
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      <Button variante="secundario" icone={UserPlus} className={s.adicionar} onClick={() => setAdicionando(true)}>
+        Adicionar jogador
+      </Button>
 
       <SortearDeNovo
         aberto={refazerAberto}
         onFechar={() => setRefazerAberto(false)}
         times={times}
+        nomesDe={(tm) => resumoDeNomes(tm.jogadorIds.map((id) => porId.get(id)).filter((j): j is Jogador => Boolean(j)), TAMANHO_TIME)}
         onSortear={async (marcados) => {
           const travados = times.map((_, i) => i).filter((i) => !marcados.includes(i))
           const participantes = participantesDe(dados)
@@ -290,9 +364,7 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
           try {
             await gravarTimes(r.times)
             setRefazerAberto(false)
-            mostrarToast({
-              texto: `Times ${listaComE(marcados.map((i) => String(i + 1)))} sorteados de novo. Copie a lista nova.`,
-            })
+            avisarQueMudou()
           } catch (e) {
             mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
           }
@@ -310,18 +382,18 @@ export function Durante({ onTentarNovamente }: { onTentarNovamente: () => void }
         >
           <Icon icon={ArrowsClockwise} />
           <span>
-            <span className={t.opcaoTitulo}>Tentar novamente</span>
+            <span className={t.opcaoTitulo}>Iniciar novo sorteio</span>
+            <span className={t.opcaoSub}>Cola outra lista e sorteia do zero</span>
           </span>
         </button>
       </Sheet>
 
       <ConfirmModal
         aberto={confirmarRecomecar}
-        titulo="Começar de novo com outra lista?"
-        texto="A lista e os times de hoje serão apagados."
-        confirmar="Tentar novamente"
+        titulo="Iniciar um novo sorteio?"
+        texto="A lista e os times de hoje serão apagados. Você vai colar a lista do WhatsApp de novo."
+        confirmar="Iniciar novo sorteio"
         cancelar="Cancelar"
-        perigo
         onConfirmar={recomecar}
         onCancelar={() => setConfirmarRecomecar(false)}
       />
@@ -354,39 +426,47 @@ interface PropsRefazer {
   aberto: boolean
   onFechar: () => void
   times: Time[]
+  /** Nomes resumidos do time, para a linha de baixo. */
+  nomesDe: (time: Time) => string
   onSortear: (marcados: number[]) => Promise<void>
 }
 
-/** Sortear de novo (COPY 3.4): marcados são misturados; desmarcados ficam iguais. */
-function SortearDeNovo({ aberto, onFechar, times, onSortear }: PropsRefazer) {
+/**
+ * Sortear de novo (v2, item 5): os times marcados são sorteados de novo entre eles; os desmarcados ficam iguais.
+ * Time incompleto sempre entra: refazerSorteio só consegue travar time completo.
+ */
+function SortearDeNovo({ aberto, onFechar, times, nomesDe, onSortear }: PropsRefazer) {
   const [marcados, setMarcados] = useState<number[] | null>(null)
   const [sorteando, setSorteando] = useState(false)
   const sel = marcados ?? times.map((_, i) => i)
+  const fechar = () => {
+    setMarcados(null)
+    onFechar()
+  }
 
   return (
-    <Sheet
-      aberto={aberto}
-      onFechar={() => {
-        setMarcados(null)
-        onFechar()
-      }}
-      titulo="Sortear de novo"
-    >
+    <Sheet aberto={aberto} onFechar={fechar} titulo="Sortear de novo">
       <div className={t.coluna}>
-        <p className={t.texto2}>Marque os times que vão ser misturados. Os outros ficam iguais.</p>
+        <p className={t.texto2}>
+          Os jogadores dos times marcados são sorteados de novo entre eles. Desmarque quem já está jogando: esse time
+          não muda.
+        </p>
         <ul className={t.lista}>
           {times.map((tm, i) => {
             const marcado = sel.includes(i)
-            const trocar = () => setMarcados(marcado ? sel.filter((x) => x !== i) : [...sel, i].sort((a, b) => a - b))
+            const trocar = tm.completo
+              ? () => setMarcados(marcado ? sel.filter((x) => x !== i) : [...sel, i].sort((a, b) => a - b))
+              : undefined
             return (
               <li key={i}>
                 <PlayerRow
-                  nome={`Time ${i + 1}`}
+                  nome={`Time ${i + 1} · ${tm.completo ? `${tm.somaEstrelas}★` : `${tm.jogadorIds.length}/${TAMANHO_TIME}`}`}
                   selecao
                   chegou={marcado}
                   onTrocarChegou={trocar}
                   onClick={trocar}
-                  sub={tm.completo ? `${tm.somaEstrelas}★` : `${tm.jogadorIds.length}/5`}
+                  apagado={!marcado}
+                  sub={nomesDe(tm)}
                   direita={marcado ? undefined : <span className={t.pequeno}>fica igual</span>}
                 />
               </li>
@@ -405,18 +485,61 @@ function SortearDeNovo({ aberto, onFechar, times, onSortear }: PropsRefazer) {
             setMarcados(null)
           }}
         >
-          Sortear {sel.length} times
+          Sortear {sel.length} times de novo
         </Button>
-        <Button
-          variante="secundario"
-          onClick={() => {
-            setMarcados(null)
-            onFechar()
-          }}
-        >
+        <Button variante="secundario" onClick={fechar}>
           Cancelar
         </Button>
       </div>
     </Sheet>
   )
+}
+
+/** "Matheus, João, Caio, Renan…": primeiros nomes de quem não chegou, para a seção fechada. */
+function resumoDeNomes(jogadores: Jogador[], ate = 4): string {
+  const nomes = jogadores.slice(0, ate).map((j) => j.nome.split(' ')[0])
+  return nomes.join(', ') + (jogadores.length > ate ? '…' : '')
+}
+
+/**
+ * Estado da seção "Não chegaram" (v2, item 3): abre sozinha com até 3 pessoas, fecha com 4 ou mais.
+ * Se o admin abrir ou fechar, a escolha vale até o fim da pelada (localStorage, por pelada).
+ * Quando a última pessoa chega, a seção fica um instante na tela para sumir com animação.
+ */
+function useBanco(peladaId: string, quantos: number) {
+  const chave = `calangofut:nao-chegaram:${peladaId}`
+  const [escolha, setEscolha] = useState<boolean | null>(() => {
+    try {
+      const v = localStorage.getItem(chave)
+      return v === null ? null : v === 'aberto'
+    } catch {
+      return null
+    }
+  })
+  const aberto = escolha ?? naoChegaramComecaAberta(quantos)
+
+  const anterior = useRef(quantos)
+  const [saindo, setSaindo] = useState(false)
+  useEffect(() => {
+    if (anterior.current > 0 && quantos === 0) {
+      setSaindo(true)
+      const t = setTimeout(() => setSaindo(false), 240)
+      anterior.current = quantos
+      return () => clearTimeout(t)
+    }
+    anterior.current = quantos
+  }, [quantos])
+
+  return {
+    aberto,
+    visivel: quantos > 0 || saindo,
+    alternar: () => {
+      setEscolha(!aberto)
+      try {
+        localStorage.setItem(chave, aberto ? 'fechado' : 'aberto')
+      } catch {
+        // Sem localStorage (aba anônima): vale só enquanto a tela está aberta.
+      }
+    },
+  }
 }

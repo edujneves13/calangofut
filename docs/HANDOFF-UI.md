@@ -6,6 +6,7 @@ Tudo que foi decidido sobre a interface em 19/11/2026 (conversa de design entre 
 
 Quando dois arquivos discordarem, vale o que está mais acima:
 
+0. **`docs/design/times-durante-v2.md`** (20/11/2026): revisão da tela Times durante a pelada, da tela nova Editar times, da folha Sortear de novo, do menu ⋯, do voltar e do cronômetro na barra de baixo. Nesses pontos vale acima de todos os outros.
 1. **`docs/superpowers/specs/2026-11-19-spec-adendo-wireframes.md`**: decisões tomadas depois da spec (login com senha, sortear de novo seletivo, nome e avatar da pelada etc.).
 2. **`COPY.md`**: todos os textos da interface. Use a coluna **"Final"**. Nunca invente texto de botão.
 3. **`DESIGN.md`**: cores, tipografia, espaçamento, componentes, motion, ícones (Phosphor), som do apito.
@@ -32,15 +33,16 @@ Menu de baixo flutuante com 3 abas: **Times · Cronômetro · Ajustes**.
 | --- | --- | --- |
 | Login | E-mail + senha (com "Mostrar"), sem link mágico, sem cadastro | `db.auth.signInWithPassword` |
 | Times — antes do sorteio | Cabeçalho com avatar + nome da pelada; card com ilustração do estádio, "Próxima pelada", data, horário, local, botão "Sortear times"; link "Lista de jogadores" no fim (abre Ajustes → Jogadores) | `peladaAtual`, `lerConfiguracoes` |
-| 1/3 Cole a lista do WhatsApp | Texto de ajuda, área de colar, aviso se não achou jogadores; abaixo, "ou" + botão secundário "Selecionar jogadores" (adendo 21) | `lerLista` |
-| 1/3 Quem vai jogar? (selecionar jogadores) | Busca, jogadores ativos em ordem alfabética com check (todos desmarcados), goleiros em seção própria, "Selecionar todos / Limpar", "Continuar · N" (travado com 0); cadastro vazio leva a Ajustes → Jogadores. Segue para a 2/3 | `listarJogadores`, `confirmacaoDoCadastro` |
+| 1/3 Cole a lista do WhatsApp | Texto de ajuda, área de colar, aviso se a lista é de outra data ("Usar esta lista" / "Colar outra"), aviso se não achou jogadores; abaixo, "ou" + botão secundário "Selecionar do cadastro" (adendo 21) | `lerLista` |
+| 1/3 Quem vai jogar? (selecionar do cadastro) | Busca, jogadores ativos em ordem alfabética com check (todos desmarcados), goleiros em seção própria, "Selecionar todos / Limpar", "Continuar · N" (travado com 0); cadastro vazio leva a Ajustes → Jogadores. Segue para a 2/3 | `listarJogadores`, `confirmacaoDoCadastro` |
 | 2/3 Confira a lista | Substitui "Quem é quem?" e "Quem já chegou?" (adendo 17). Todos os nomes em ordem alfabética: check chegou/não chegou, selo de estrelas editável (salva no cadastro), jogador novo destacado com selo "Novo" e estrelas obrigatórias, nome parecido com "É ele / É novo" (salva apelido), "Não vem" no menu da linha e seção recolhida no fim; goleiros em seção própria; busca; "Adicionar". Grava tudo em "Continuar" | `montarConfirmacao`, `criarJogadores`, `adicionarApelido`, `atualizarJogador`, `salvarPresencasDaLista`, `adicionarNaHora` |
 | Adicionar jogador (sheet) | Um campo que busca no cadastro; se não achar, "Adicionar 'X' como jogador novo" com estrelas e "É goleiro" | `criarJogador`, `adicionarNaHora` |
 | 3/3 Como vai ser hoje? | Total de jogadores, "N times de 5 e 1 time com M", formato (Quem ganha fica / Estilo campeonato), tempo (8/10 min), botão "Sortear times"; menos de 10 → aviso | `sortearTimes`, `formatoPadrao` |
 | Sorteando… | Ilustração do calango sorteando + chips caindo nos times (~1,9 s, sem interação) | — |
-| Times — durante a pelada | Vira a tela inicial depois do sorteio. Link "Lista de jogadores" no fim. Índice discreto "Time 1 · 2 · 3…", carrossel de cards de time (soma de estrelas ou selo "Incompleto · 3/5" com vagas vazias), pontos, "Não chegaram" expansível com "Chegou" (só status não chegou; quem não vem fica fora), "Copiar lista dos times"; ↻ sortear de novo; ⋯ "Tentar novamente" | `salvarSorteio`, `adicionarAtrasado`, `salvarTimes`, `refazerSorteio`, `montarTextoWhatsApp` |
-| Sortear de novo (sheet) | Times marcados são misturados; desmarcados ficam iguais; mínimo 2 | `refazerSorteio` (desmarcados = travados) |
-| Cronômetro | Layout B1 · Anel clássico (`DESIGN.md` 7.15; o protótipo está desatualizado): calango no centro, anel de progresso com a bola na ponta, 8 · 10 · Outro (sheet de 1 a 30 min), Começar/Pausar/Continuar/Zerar, +1 min, último minuto em âmbar, pausado piscando, fim de jogo em tela laranja com apito | `src/logic/cronometro.ts`, `DESIGN.md` 12.3 (apito) |
+| Times — durante a pelada | **v2** (`docs/design/times-durante-v2.md`). Vira a tela inicial depois do sorteio. Cabeçalho só com ⋯; abas dos times com "Copiar times" na mesma linha; aviso "Time 5 está incompleto · 3/5 · Ver" só quando existe; card forte do time (faixa verde); "Sortear de novo" · "Editar times"; "Não chegaram" tracejado e recolhível (abre sozinho com até 3, lembra a escolha por pelada) com "Chegou"; "Adicionar jogador" sempre visível. Toda mudança nos times mostra "Os times mudaram. Copie a lista nova.". Menu ⋯ "Iniciar novo sorteio". Sem link "Lista de jogadores" | `salvarSorteio`, `adicionarAtrasado`, `salvarTimes`, `refazerSorteio`, `montarTextoWhatsApp`, `naoChegaramComecaAberta` |
+| Editar times (tela cheia, v2) | Busca sem acento, equilíbrio, times compactos; folha do jogador: mover (só para time com vaga; nenhum time passa de 5), trocar, tirar do time. Rascunho até o Concluir; ✕ descarta | `src/logic/edicao.ts`, `src/logic/busca.ts`, `marcarPresenca`, `salvarTimes` |
+| Sortear de novo (sheet) | v2: texto que explica, nomes de cada time, desmarcado apagado com "fica igual"; time incompleto sempre marcado; mínimo 2; "Sortear N times de novo" | `refazerSorteio` (desmarcados = travados) |
+| Cronômetro | Layout B1 · Anel clássico (`DESIGN.md` 7.15; o protótipo está desatualizado): calango no centro, anel de progresso com a bola na ponta, 8 · 10 · Outro (sheet de 1 a 30 min), Começar/Pausar/Continuar/Zerar, +1 min, último minuto em âmbar, pausado piscando, fim de jogo em tela laranja com apito. Em outra aba, o item Cronômetro da barra de baixo mostra anel e tempo (v2, item 9: `estadoNaBarra`) | `src/logic/cronometro.ts`, `DESIGN.md` 12.3 (apito) |
 | Ajustes → Jogadores | Busca, filtros, editar; "Adicionar jogadores" (um jogador ou vários de uma vez: colar, vírgulas ou ditado pelo teclado) com tela de confirmação (selos Novo / Já cadastrado / Parecido); "Selecionar" → "Selecionar todos / Limpar" e "Excluir (N)"; "Excluir todos" (= desativar) | `lerNomes`, `montarConfirmacao`, `criarJogadores`, `desativarJogadores` |
 | Ajustes | Nome e avatar da pelada; Jogadores; toda semana (dia/horário, local, mudar só a próxima); formato padrão; tempo de jogo; quem ganha fica até N jogos; craques (5★) por time; sair | `lerConfiguracoes`, `salvarConfiguracoes`, funções de jogadores |
 
@@ -71,7 +73,9 @@ O protótipo e o adendo pedem coisas que o código de hoje talvez ainda não fa�
 - Aba principal chama **Times**. Pelada vira para a próxima **à meia-noite**. Texto copiado usa **nome do cadastro**.
 - Ícones **Phosphor** (goleiro = `HandPalm`). Sem emoji na interface.
 - Apito **gerado no app** com Web Audio (sem arquivo de som).
-- Saída para lista errada: **"Tentar novamente"**; botão de sem internet: **"Recarregar"**.
+- Saída para lista errada: **"Iniciar novo sorteio"** (v2; antes "Tentar novamente"); botão de sem internet: **"Recarregar"**.
+- O voltar sempre retorna para a tela de onde a pessoa veio (v2, item 8): o Shell guarda a aba de origem.
+- Edição manual dos times: nenhum time passa de 5; a regra dos craques não bloqueia, só avisa (v2 + decisão de 20/11).
 - Estrelas se editam em Ajustes → Jogadores **e** na etapa "Confira a lista" (salvam no cadastro). Nos cards de time continuam só leitura. (Mudou em 19/11, adendo 18.)
 - Presença tem três estados: chegou, não chegou, não vem (adendo 16). "Excluir" jogador = desativar (adendo 20).
 - Calango não aparece em telas de erro.

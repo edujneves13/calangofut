@@ -1,23 +1,68 @@
+/* Card do time (docs/design/times-durante-v2.md, item 2): fundo forte, faixa verde, sombra */
 .card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 18px;
+  background: var(--team-card-bg);
+  border-radius: 24px;
+  box-shadow: var(--team-card-shadow);
+  overflow: hidden;
 }
-.incompleto { border: 1.5px dashed var(--border-strong); }
 
-.topo { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-2); }
-.nome { font: var(--type-display-m); letter-spacing: -0.015em; }
+.faixa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 14px 16px;
+  background: linear-gradient(90deg, var(--team-band-start), var(--team-band-end));
+  overflow: hidden;
+}
+.nome {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.faixa > :last-child { position: relative; }
+.meioCampo {
+  position: absolute;
+  right: -28px;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--team-band-mark);
+  stroke-width: 2;
+}
 
-.vaga {
+.lista { list-style: none; margin: 0; padding: var(--space-1) 16px var(--space-2); }
+.linha {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 52px;
-  color: var(--text-3);
-  border-bottom: 1px solid var(--border);
+  min-height: 44px;
+  border-bottom: 1px solid var(--border-strong);
 }
-.vaga:last-child { border-bottom: 0; }
-.circulo { width: 22px; height: 22px; border-radius: var(--radius-full); border: 1.5px dashed var(--border-strong); flex: none; }
+.linha:last-child { border-bottom: 0; }
+.icone { color: var(--brand); flex: none; }
+.jogador { flex: 1; min-width: 0; font: 600 0.9375rem/1.3 var(--font-text); overflow-wrap: anywhere; }
+.estrelas {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--surface-3);
+  color: var(--text-1);
+  font: var(--type-badge);
+  font-variant-numeric: tabular-nums;
+}
 
-.aviso { margin-top: var(--space-3); font: var(--type-body-s); color: var(--text-2); }
+.vaga { color: var(--text-3); }
+.circulo { width: 20px; height: 20px; border-radius: var(--radius-full); border: 1.5px dashed var(--border-strong); flex: none; }
+
+.alerta, .aviso { margin: 0 16px 14px; font: var(--type-body-s); color: var(--text-2); }
+.alerta { color: var(--warning); }

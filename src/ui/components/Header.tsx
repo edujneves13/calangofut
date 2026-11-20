@@ -1,4 +1,4 @@
-import { ArrowLeft } from '@phosphor-icons/react'
+import { ArrowLeft, X } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { Avatar } from './Avatar'
 import { IconButton } from './IconButton'
@@ -11,14 +11,16 @@ interface Props {
   avatar?: { nome: string; src?: string | null }
   /** Telas internas mostram voltar no lugar do avatar. */
   onVoltar?: () => void
+  /** Tela cheia de edição: ✕ no lugar da seta, e o voltar cancela (ex.: Editar times). */
+  fechar?: boolean
   acoes?: ReactNode
 }
 
-export function Header({ titulo, subtitulo, avatar, onVoltar, acoes }: Props) {
+export function Header({ titulo, subtitulo, avatar, onVoltar, fechar, acoes }: Props) {
   return (
     <header className={s.cabecalho}>
       {onVoltar ? (
-        <IconButton icone={ArrowLeft} rotulo="Voltar" onClick={onVoltar} semFundo />
+        <IconButton icone={fechar ? X : ArrowLeft} rotulo={fechar ? 'Cancelar' : 'Voltar'} onClick={onVoltar} semFundo />
       ) : (
         avatar && <Avatar nome={avatar.nome} src={avatar.src} borda />
       )}

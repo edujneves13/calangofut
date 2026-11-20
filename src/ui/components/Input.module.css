@@ -56,3 +56,6 @@
   padding: var(--space-2);
   margin-right: calc(-1 * var(--space-2));
 }
+
+/* O × nativo do navegador duplicava o botão "Limpar busca". */
+.input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

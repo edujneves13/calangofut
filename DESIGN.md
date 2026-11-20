@@ -76,6 +76,10 @@ Design system do app de sorteio da pelada. Fonte da verdade para tudo que é vis
 | `--danger-bg` | red-900 | Fundo de mensagem de erro |
 | `--focus` | orange-300 | Anel de foco de teclado |
 | `--scrim` | `rgba(6, 10, 14, 0.64)` | Fundo atrás de sheet e modal |
+| `--team-card-bg` | `surface-2` | Card do time durante a pelada (v2) |
+| `--team-card-shadow` | `0 14px 30px rgba(0,0,0,.45)` | Sombra do card do time (v2) |
+| `--team-band-start` / `--team-band-end` | `green-900` → `field-700` | Faixa no topo do card do time (v2) |
+| `--team-band-mark` | `rgba(255,255,255,.18)` | Desenho de meio-campo na faixa (v2) |
 
 ### 2.3 Regras de uso
 
@@ -283,6 +287,7 @@ Medidas para o tamanho padrão. Todo componente interativo tem estados: padrão,
 - Item ativo: pílula `--action` 48 px de altura, ícone 20 px + rótulo 14 px 700, `--on-action`.
 - Item inativo: só ícone 22 px `--text-2`, área de toque 52 × 48, com `aria-label`.
 - Troca de aba: a pílula ativa desliza até o novo item (motion `base`).
+- **Cronômetro em outra aba** (v2, `docs/design/times-durante-v2.md` item 9): rodando ou pausado, o item Cronômetro mostra um anel de 34 px em volta do ícone e o tempo em Montserrat 800 14 px `tabular-nums`. Rodando: `--action`. Último minuto: `--warning`. Pausado: ícone `Pause`, anel `--text-2` a 60%, texto "Pausado". Parado, ou na própria aba do cronômetro: item normal.
 
 ### 7.4 Card da próxima pelada
 
@@ -292,12 +297,19 @@ Medidas para o tamanho padrão. Todo componente interativo tem estados: padrão,
 
 ### 7.5 Card de time (carrossel)
 
-- `--surface-1`, raio `--radius-xl`, padding 18 px.
-- Topo: nome do time em `display-m` + selo de soma de estrelas (`--action`, `badge`, raio 10 px).
-- Lista de jogadores: linhas de 52 px, ícone chuteira 22 px `--brand`, nome em `body-l`, selo de nível à direita.
-- **Time incompleto:** borda tracejada `--border-strong`, selo âmbar "Incompleto · 3/5" no lugar da soma, vagas vazias como linhas com círculo tracejado e texto "vaga" em `--text-3`.
-- Índice discreto acima do carrossel: "Time 1 · 2 · 3 · 4 · 5", ativo em `--text-1` 700 com sublinhado 2 px `--action`; incompleto com sublinhado tracejado.
+Revisado em 20/11/2026: vale `docs/design/times-durante-v2.md` (itens 1 e 2). Resumo:
+
+- Card forte: `--team-card-bg` (`surface-2`), raio 24, sombra `--team-card-shadow`, sem borda.
+- Faixa no topo em degradê `--team-band-start` → `--team-band-end` (verde → campo), padding 14/16: nome em Montserrat 900 24 px e selo de soma (`--action`). Desenho de meio-campo em `--team-band-mark`, decorativo (`aria-hidden`).
+- Linhas de 44 px: chuteira `--brand`, nome Inter 600 15 px, estrelas em selo `surface-3` com `text-1`, divisória `--border-strong`.
+- **Time incompleto:** selo âmbar "Incompleto · 3/5" no lugar da soma e vagas vazias com círculo tracejado.
+- Mais de N craques (5★) no time: linha discreta em `--warning` no fim do card.
+- Abas acima do carrossel, com **Copiar times** na mesma linha (36 px, raio 12, borda 1,5 px `--border-strong`, fundo `surface-1`). Ativa em `--text-1` 700 com sublinhado `--action`; time incompleto com sublinhado tracejado `--warning`.
+- Aviso "Time 5 está incompleto · 3/5 · Ver": fundo `--warning-bg`, borda 1 px tracejada `--warning`, raio 14, ícone `WarningCircle`.
+- **Não chegaram** (o "banco"): sem fundo, borda 1,5 px tracejada `--border-strong`, raio 20. Cabeçalho-botão de 52 px com `Clock` âmbar, título Montserrat 800 15 px, contagem âmbar e `CaretDown` que gira 180°. Linhas de 50 px apagadas, botão **Chegou** laranja de 36 px.
+- Ações **Sortear de novo** (`Shuffle`) · **Editar times** (`PencilSimple`): secundários de 48 px, raio 16. **Adicionar jogador** (`UserPlus`): secundário de largura total em `--link`.
 - Pontos de paginação abaixo: ativo 18 × 6 px `--action`, inativos 6 × 6 px `--border`.
+- **Editar times** (tela cheia): ✕ · título · **Concluir**; busca; linha de equilíbrio; times em cards compactos `surface-1`; folha do jogador com Mover para / Trocar com alguém / Tirar do time.
 
 ### 7.6 Linha de jogador
 
@@ -508,6 +520,11 @@ Com `prefers-reduced-motion: reduce`:
   --warning: var(--amber-400); --warning-bg: var(--amber-900);
   --danger: var(--red-400); --danger-bg: var(--red-900);
   --scrim: rgba(6, 10, 14, 0.64);
+  /* card do time durante a pelada (docs/design/times-durante-v2.md, item 2) */
+  --team-card-bg: var(--surface-2);
+  --team-card-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  --team-band-start: var(--green-900); --team-band-end: var(--field-700);
+  --team-band-mark: rgba(255, 255, 255, 0.18);
 
   /* tipografia */
   --font-display: "Montserrat", system-ui, sans-serif;

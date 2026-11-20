@@ -28,12 +28,14 @@ type Folha = 'horario' | 'local' | 'proxima' | 'formato' | 'tempo' | 'jogosSegui
 interface Props {
   tela: TelaAjustes
   setTela: (tela: TelaAjustes) => void
+  /** Voltar das telas internas: o Shell leva para a tela de onde a pessoa veio. */
+  onVoltar: () => void
 }
 
 /** Aba Ajustes (COPY 6.1). */
-export function Ajustes({ tela, setTela }: Props) {
-  if (tela === 'jogadores') return <Jogadores onVoltar={() => setTela('inicio')} />
-  if (tela === 'pelada') return <NomeAvatar onVoltar={() => setTela('inicio')} />
+export function Ajustes({ tela, setTela, onVoltar }: Props) {
+  if (tela === 'jogadores') return <Jogadores onVoltar={onVoltar} />
+  if (tela === 'pelada') return <NomeAvatar onVoltar={onVoltar} />
   return <Inicio onAbrir={setTela} />
 }
 
