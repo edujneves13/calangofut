@@ -58,7 +58,7 @@ export function Toggle({ rotulo, ligado, onMudar }: PropsToggle) {
 
 interface PropsSegmentado<T extends string | number> {
   rotulo: string
-  opcoes: { valor: T; texto: string }[]
+  opcoes: { valor: T; texto: ReactNode; rotulo?: string }[]
   valor: T
   onMudar: (valor: T) => void
 }
@@ -72,6 +72,7 @@ export function Segmented<T extends string | number>({ rotulo, opcoes, valor, on
           type="button"
           role="radio"
           aria-checked={o.valor === valor}
+          aria-label={o.rotulo}
           className={`${s.opcao} ${o.valor === valor ? s.opcaoAtiva : ''}`}
           onClick={() => onMudar(o.valor)}
         >

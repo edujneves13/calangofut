@@ -1,0 +1,12 @@
+.contador { display: flex; align-items: center; justify-content: center; gap: var(--space-6); padding: var(--space-2) 0; }
+.numero {
+  font: var(--type-display-l);
+  font-variant-numeric: tabular-nums;
+  min-width: 5ch;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.unidade { font: var(--type-body-s); color: var(--text-2); }
+.atalhos { justify-content: center; }
