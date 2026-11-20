@@ -55,7 +55,7 @@ export function linhasDaLista(lista: ListaLida, ativos: Jogador[]): Linha[] {
   return semRepetidos([...jogadores, ...goleiros])
 }
 
-/** "Selecionar do cadastro": todos já cadastrados e como chegou. */
+/** "Selecionar jogadores": todos já cadastrados e como chegou. */
 export function linhasDoCadastro(escolhidos: Jogador[]): Linha[] {
   return confirmacaoDoCadastro(escolhidos).map((item) => deItem(item, false, 'chegou'))
 }

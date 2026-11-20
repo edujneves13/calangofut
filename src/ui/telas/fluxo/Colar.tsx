@@ -5,7 +5,6 @@ import { Button } from '../../components/Button'
 import { Notice, Stepper } from '../../components/Controls'
 import { Header } from '../../components/Header'
 import { Textarea } from '../../components/Input'
-import { ddmm } from '../../util'
 import { useApp } from '../contexto'
 import { linhasDaLista, type Linha } from './linhas'
 import t from '../Telas.module.css'
@@ -20,25 +19,18 @@ interface Props {
   onContinuar: (linhas: Linha[]) => void
 }
 
-/** 1/3 Cole a lista do WhatsApp (COPY 2.2), com "Selecionar do cadastro" como alternativa (9.8). */
+/** 1/3 Cole a lista do WhatsApp (COPY 2.2), com "Selecionar jogadores" como alternativa (9.8). */
 export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: Props) {
   const { dados } = useApp()
   const [semJogadores, setSemJogadores] = useState(false)
-  const [outraData, setOutraData] = useState<string | null>(null)
 
-  function continuar(aceitarOutraData = false) {
+  function continuar() {
     const lista = lerLista(texto)
-    setSemJogadores(false)
     if (lista.jogadores.length === 0 && lista.goleiros.length === 0) {
-      setOutraData(null)
       setSemJogadores(true)
       return
     }
-    if (lista.data && lista.data !== dados.pelada.data && !aceitarOutraData) {
-      setOutraData(ddmm(lista.data))
-      return
-    }
-    setOutraData(null)
+    setSemJogadores(false)
     onContinuar(linhasDaLista(lista, dados.jogadores.filter((j) => j.ativo)))
   }
 
@@ -48,7 +40,6 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
       if (colado) {
         setTexto(colado)
         setSemJogadores(false)
-        setOutraData(null)
       }
     } catch {
       document.querySelector<HTMLTextAreaElement>('textarea')?.focus()
@@ -71,42 +62,20 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
         onChange={(e) => {
           setTexto(e.target.value)
           setSemJogadores(false)
-          setOutraData(null)
         }}
       />
       {semJogadores && (
         <Notice>Não encontrei jogadores nesse texto. Copie a mensagem da lista de presença inteira e cole de novo.</Notice>
-      )}
-      {outraData && (
-        <Notice>
-          <div className={t.coluna}>
-            <span>Essa lista é de {outraData}. Usar mesmo assim?</span>
-            <div className={t.linhaBotoes}>
-              <Button variante="pequeno" onClick={() => continuar(true)}>
-                Usar esta lista
-              </Button>
-              <Button
-                variante="pequeno-secundario"
-                onClick={() => {
-                  setTexto('')
-                  setOutraData(null)
-                }}
-              >
-                Colar outra
-              </Button>
-            </div>
-          </div>
-        </Notice>
       )}
       <Button variante="secundario" icone={ClipboardText} onClick={colarDoWhatsApp}>
         Colar do WhatsApp
       </Button>
       <div className={t.ou}>ou</div>
       <Button variante="secundario" icone={UsersThree} onClick={onSelecionar}>
-        Selecionar do cadastro
+        Selecionar jogadores
       </Button>
       <div className={t.rodape}>
-        <Button disabled={!texto.trim()} onClick={() => continuar()}>
+        <Button disabled={!texto.trim()} onClick={continuar}>
           Continuar
         </Button>
       </div>

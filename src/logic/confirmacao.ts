@@ -21,7 +21,7 @@ export function montarConfirmacao(nomes: string[], jogadores: Jogador[]): ItemCo
 }
 
 /**
- * Caminho "Selecionar do cadastro" na etapa 1/3: os jogadores escolhidos chegam à "Confira a lista"
+ * Caminho "Selecionar jogadores" na etapa 1/3: os jogadores escolhidos chegam à "Confira a lista"
  * já como existentes, sem passar pelo leitor nem pelo casamento de nomes.
  */
 export function confirmacaoDoCadastro(jogadores: Jogador[]): ItemConfirmacao[] {

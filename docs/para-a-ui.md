@@ -45,8 +45,7 @@ Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'ap
 
 ### Pelada do dia — 1. Colar lista e 2. Confira a lista
 - `lerLista(texto)` → `{ data, jogadores, goleiros }`, cada um com `nome` e `presente` (`src/logic/leitor.ts`).
-- Aviso de outra data: compare `lista.data` com `pelada.data`.
-- "Selecionar do cadastro": `listarJogadores(db)` para a lista; os escolhidos viram itens com `confirmacaoDoCadastro(escolhidos)` (todos `existente`, status inicial `'chegou'`) e vão para a mesma "Confira a lista". Sem aviso de data.
+- "Selecionar jogadores": `listarJogadores(db)` para a lista; os escolhidos viram itens com `confirmacaoDoCadastro(escolhidos)` (todos `existente`, status inicial `'chegou'`) e vão para a mesma "Confira a lista".
 - Classificar os nomes: `montarConfirmacao(nomes, jogadores)` (usa `casarNome`, que casa por nome ou apelido). Parecido sempre pede escolha.
 - Status inicial: `presente` da linha lida → `'chegou'`; ❌ → `'ausente'` ("Não vem" na tela).
 - Em "Continuar": `criarJogadores(db, novos)`, `adicionarApelido(db, jogador.id, nomeDaLista)` para cada "É ele", `atualizarJogador(db, id, { estrelas })` para estrelas mudadas, e `salvarPresencasDaLista(db, peladaId, [{ jogadorId, status }])` (`src/data/presencas.ts`).

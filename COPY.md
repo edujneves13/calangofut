@@ -99,7 +99,6 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Botão secundário | Colar | Colar do WhatsApp | Diz de onde vem. |
 | Botão | Continuar | = | |
 | Lista sem jogadores reconhecidos | — | Não encontrei jogadores nesse texto. Copie a mensagem da lista de presença inteira e cole de novo. | Faltava. |
-| Data diferente da pelada | — | Essa lista é de 18/11. Usar mesmo assim? · [Usar esta lista] [Colar outra] | Evita sortear com a lista da semana passada. |
 
 ### 2.3 Confirmar nomes
 
@@ -465,14 +464,14 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 | --- | --- | --- |
 | Regra | Quem "não vem" † não aparece aqui. | Lista só com quem pode chegar. |
 
-### 9.8 Selecionar do cadastro (etapa 1/3, ação secundária)
+### 9.8 Selecionar jogadores (etapa 1/3, ação secundária)
 
 Caminho para quando não tem lista no WhatsApp: escolher direto do cadastro. Depois segue para "Confira a lista" (9.6), com todos como chegou.
 
 | Elemento | Proposta | Motivo |
 | --- | --- | --- |
 | Separador (abaixo da área de colar) | ou † | Mostra que é um caminho alternativo. |
-| Botão secundário (1/3) | Selecionar do cadastro † | Diz de onde vêm os nomes. |
+| Botão secundário (1/3) | Selecionar jogadores † | Diz o que a pessoa vai fazer. |
 | Título | Quem vai jogar? † | Pergunta direta, uma ação. |
 | Busca | Buscar jogador | = 2.4. |
 | Ação de texto | Selecionar todos † · Limpar † | Atalho para pelada com quase todo mundo. |
