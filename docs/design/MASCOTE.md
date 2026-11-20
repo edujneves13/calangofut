@@ -34,6 +34,8 @@ Prompts prontos para gerar as imagens do calango. Cada cena tem **ângulo de câ
 | 7 | Esperando a galera | Perfil lateral, sentado | Transparente (só o banco) | 1:1 · 600 px | Baixa |
 | 8 | Todo mundo chegou | De frente, câmera de cima, pulando | Transparente | 1:1 · 600 px | Baixa |
 | 9 | Prancheta vazia | De costas, olhando por cima do ombro | Transparente | 1:1 · 600 px | Baixa |
+| 10 | Cronômetro (B1) | Busto, 3/4, olhando para o cronômetro na mão | Transparente | 1:1 · 1024 px | **Alta** |
+| 10b | Fim de jogo (B1) | Busto, de frente, apitando e mostrando o cronômetro | Transparente | 1:1 · 1024 px | **Alta** |
 
 **Por que algumas sem fundo:** as cenas 7, 8 e 9 aparecem pequenas (cerca de 120 px) dentro de telas do app. Com cenário, viram uma mancha. A 2 é recortada em círculo.
 
@@ -153,6 +155,38 @@ Só o personagem, sem cenário, com uma sombra suave no chão. Formas grandes e 
 Arte vetorial limpa sem contornos pretos, degradês suaves estilo cel-shading, bordas nítidas, sem textos, sem logos ou marcas reais, sem botões, sem mockup de celular e sem elementos de interface.
 ```
 
+### Cena 10 — Cronômetro (centro do anel, direção B1)
+
+Fica num círculo de 200 px no centro do anel do cronômetro. O app coloca o fundo `#222D39` atrás e recorta em círculo, então o calango precisa caber inteiro no **círculo central** da imagem.
+
+```
+Ilustração vetorial flat quadrada 1:1 com fundo transparente, seguindo estritamente o mesmo design de personagem, proporções, estilo de arte e paleta de cores da imagem de referência anexada: um mascote calango brasileiro antropomórfico verde com expressão confiante, competitiva e levemente marrenta, olhos angulados, crista pontiaguda verde-esmeralda na cabeça e nas costas, sombreado verde-limão claro na mandíbula e barriga. Ele veste a camisa esportiva cinza-carvão escura com gola e punhos laranja-queimado vibrante e um apito metálico prateado pendurado em um cordão preto no pescoço.
+
+Enquadramento: busto (do peito para cima), corpo em 3/4 virado para a direita, câmera na altura dos olhos. Com a mão direita ele segura um cronômetro esportivo de mão, prateado e redondo, com botão no topo e mostrador branco limpo com ponteiro (sem números escritos), erguido na altura do rosto, ao lado da bochecha. Ele olha de canto de olho para o cronômetro, uma sobrancelha erguida e sorriso de canto, como quem está controlando o tempo do jogo. O polegar está apoiado no botão do cronômetro.
+
+Composição para recorte circular: cabeça, crista, mão e cronômetro inteiros dentro de um círculo central que ocupa 85% da imagem; nada importante perto dos cantos. O cronômetro não pode encostar na borda.
+
+Fundo totalmente transparente, sem chão e sem sombra projetada.
+
+Arte vetorial limpa sem contornos pretos, degradês suaves estilo cel-shading, bordas nítidas, sem textos, sem números no mostrador, sem logos ou marcas reais, sem botões, sem mockup de celular e sem elementos de interface.
+```
+
+### Cena 10b — Fim de jogo (centro do anel, tela laranja)
+
+Mesmo círculo de 200 px, agora sobre a tela laranja do fim de jogo (`#C24B17`), com borda branca. Arquivo: `cronometro-fim.png`.
+
+```
+Ilustração vetorial flat quadrada 1:1 com fundo transparente, seguindo estritamente o mesmo design de personagem, proporções, estilo de arte e paleta de cores da imagem de referência anexada: um mascote calango brasileiro antropomórfico verde com expressão confiante, competitiva e levemente marrenta, olhos angulados, crista pontiaguda verde-esmeralda na cabeça e nas costas, sombreado verde-limão claro na mandíbula e barriga. Ele veste a camisa esportiva cinza-carvão escura com gola e punhos laranja-queimado vibrante e um apito metálico prateado pendurado em um cordão preto no pescoço.
+
+Enquadramento: busto (do peito para cima), corpo de frente levemente virado para a esquerda, câmera um pouco abaixo da linha dos olhos. Ele está apitando com força: o apito prateado na boca, bochechas cheias de ar, olhos fechados de esforço e sobrancelhas franzidas. Com a mão esquerda ele estica o braço e mostra para quem vê o mesmo cronômetro esportivo de mão, prateado e redondo, com o mostrador branco limpo virado para frente e o ponteiro no topo (sem números escritos). Três pequenas linhas curvas de som saem do apito.
+
+Composição para recorte circular: cabeça, crista, apito, linhas de som, mão e cronômetro inteiros dentro de um círculo central que ocupa 85% da imagem; nada importante perto dos cantos.
+
+Fundo totalmente transparente, sem chão e sem sombra projetada. O personagem precisa ter bom contraste sobre um fundo laranja intenso: nada de contornos ou brilhos laranja nas bordas do personagem.
+
+Arte vetorial limpa sem contornos pretos, degradês suaves estilo cel-shading, bordas nítidas, sem textos, sem números no mostrador, sem logos ou marcas reais, sem botões, sem mockup de celular e sem elementos de interface.
+```
+
 ---
 
 ## 4. Checklist de cada imagem gerada
@@ -170,7 +204,7 @@ Arte vetorial limpa sem contornos pretos, degradês suaves estilo cel-shading, b
 ## 5. Entrega dos arquivos
 
 - Coloque em `public/mascote/` no projeto, com estes nomes:
-  `icone-1024.png`, `avatar.png`, `proxima-pelada.png` (ou `cena-estadio.png` + `calango-pe-na-bola.png`), `login.png`, `sorteando.png` (+ `sorteando-a.png`, `sorteando-b.png`), `fim-de-jogo.png`, `esperando.png`, `todo-mundo-chegou.png`, `prancheta-vazia.png`.
+  `icone-1024.png`, `avatar.png`, `proxima-pelada.png` (ou `cena-estadio.png` + `calango-pe-na-bola.png`), `login.png`, `sorteando.png` (+ `sorteando-a.png`, `sorteando-b.png`), `fim-de-jogo.png`, `cronometro.png` (+ `cronometro-fim.png`), `esperando.png`, `todo-mundo-chegou.png`, `prancheta-vazia.png`.
 - Depois de gerar, converter para **WebP** para o app (mais leve) e guardar os PNG originais fora do app.
 - Peso alvo: até 150 KB por cena com fundo, até 60 KB para as pequenas.
 - Quando o ícone 1024 estiver pronto, ele vira os arquivos do app: `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png` (180) e `favicon-32.png`.

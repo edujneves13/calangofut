@@ -7,7 +7,7 @@ O que já existe e o que cada tela chama. Toda regra (sorteio, leitura da lista,
 1. Abra o Docker Desktop.
 2. `npm run db:start` (liga o banco local).
 3. `npm run dev` e abra http://localhost:5173.
-4. Login local: `admin@teste.local` / `senha-de-teste`.
+4. Login local: código de acesso `senha-de-teste` (usuário `acesso@calangofut.app`, criado pelo `supabase/seed.sql`).
 
 O `.env.local` já aponta para o banco local. Quando o projeto real existir (veja `docs/supabase.md`), troque os dois valores.
 
@@ -27,7 +27,7 @@ Erros do banco chegam como `ErroDados` com um `codigo`: `'nome-duplicado'`, `'ap
 ## Por tela
 
 ### Login
-- `db.auth.signInWithPassword({ email, password })`. Só senha: sem link mágico e sem cadastro.
+- Fase de teste: só o código de acesso. `db.auth.signInWithPassword({ email: 'acesso@calangofut.app', password: codigo })`. Sem link mágico e sem cadastro.
 - `lerIdentidade(db)` → `{ nomePelada, avatarUrl }`, funciona sem login (`src/data/configuracoes.ts`).
 - `db.auth.getSession()` e `db.auth.onAuthStateChange(...)` para saber se está logado.
 

@@ -8,12 +8,13 @@ import s from './Login.module.css'
 import t from './Telas.module.css'
 
 const NOME_PADRAO = 'Pelada dos Brabos'
+/** Fase de teste: um usuário só. O código de acesso é a senha dele; o e-mail nunca aparece na tela. */
+const EMAIL_ACESSO = 'acesso@calangofut.app'
 
-/** Login só com senha: sem link mágico e sem cadastro (adendo). */
+/** Login com código de acesso (fase de teste): um campo só, sem e-mail, sem cadastro. */
 export function Login({ sessaoExpirou }: { sessaoExpirou?: boolean }) {
   const [nome, setNome] = useState(NOME_PADRAO)
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
+  const [codigo, setCodigo] = useState('')
   const [entrando, setEntrando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
 
@@ -31,9 +32,9 @@ export function Login({ sessaoExpirou }: { sessaoExpirou?: boolean }) {
       return
     }
     setEntrando(true)
-    const { error } = await db.auth.signInWithPassword({ email: email.trim(), password: senha })
+    const { error } = await db.auth.signInWithPassword({ email: EMAIL_ACESSO, password: codigo.trim() })
     setEntrando(false)
-    if (error) setErro('E-mail ou senha não conferem. Esqueceu? Peça para outro organizador trocar sua senha.')
+    if (error) setErro('Código não confere.')
   }
 
   return (
@@ -44,32 +45,23 @@ export function Login({ sessaoExpirou }: { sessaoExpirou?: boolean }) {
       <div className={s.conteudo}>
         <div>
           <h1 className={s.nome}>{nome}</h1>
-          <p className={t.texto2}>Entrada dos organizadores</p>
+          <p className={t.texto2}>Digite o código de acesso</p>
         </div>
         {sessaoExpirou && <Notice>Sua sessão acabou. Entre de novo.</Notice>}
         <form className={t.coluna} onSubmit={entrar} noValidate>
           <Input
-            rotulo="E-mail"
-            type="email"
-            inputMode="email"
-            autoComplete="username"
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Input
-            rotulo="Senha"
+            rotulo="Código de acesso"
             mostrarSenha={{ mostrar: 'Mostrar', esconder: 'Esconder' }}
             autoComplete="current-password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            value={codigo}
+            onChange={(e) => setCodigo(e.target.value)}
           />
           {erro && (
             <p className={s.erro} role="alert">
               {erro}
             </p>
           )}
-          <Button type="submit" carregando={entrando} disabled={!email.trim() || !senha}>
+          <Button type="submit" carregando={entrando} disabled={!codigo.trim()}>
             Entrar
           </Button>
         </form>

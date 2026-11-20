@@ -379,10 +379,15 @@ Linha de jogador novo em "Confira a lista" e na confirmação do lote: fundo `--
 
 ### 7.15 Cronômetro
 
+**Direção escolhida: B1 · Anel clássico** (canvas "Variações da B"). Ilustração do calango segurando um cronômetro (`docs/design/MASCOTE.md`, cena 10) num círculo de 200 px no centro; anel de 12 px com marcações de relógio em volta, esvaziando em `--action` (âmbar no último minuto); bola de 32 px correndo na ponta do anel; números em `display-xl` (80 px) abaixo. Parado: escolha **8 min · 10 min · Outro** acima de "Começar" ("Outro" abre sheet com −/+ de 1 a 30 min e atalhos 5, 6, 7, 12, 15; vale só para hoje). Rodando: a escolha some; fica "+1 min".
+
+**Tela acesa:** não mostrar indicador quando funciona. Só quando o celular não permite manter a tela acesa, mostrar o aviso do `COPY.md`.
+
+
 | Estado | Número | Fundo | Extras |
 | --- | --- | --- | --- |
 | Parado | `display-xl` `--text-1` | `--bg` | Segmentado 8/10 min, botão "Começar" grande (76 px); pausado: "Continuar" e "Zerar", −1/+1 min |
-| Rodando | `display-xl` `--text-1` | `--bg` | Barra de progresso 6 px (`--action` sobre `--surface-2`) com a bola rolando; "Pausar"; indicador "tela acesa" |
+| Rodando | `display-xl` `--text-1` | `--bg` | Anel de progresso (`--action` sobre `--surface-2`) com a bola correndo na ponta; "Pausar" |
 | Último minuto | `display-xl` `--warning` | `--bg` | Rótulo "ÚLTIMO MINUTO" em `label` âmbar; vibração curta ao entrar |
 | Fim | `display-xl` `--on-action` | `--action` (tela toda) | "Fim de jogo" + botões "Zerar para o próximo" (branco) e "Parar apito" |
 

@@ -67,6 +67,15 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Erro | E-mail ou senha incorretos. Fale com outro organizador se esqueceu. | E-mail ou senha não conferem. Esqueceu? Peça para outro organizador trocar sua senha. | Diz o caminho concreto. |
 | Sem internet | — | Sem internet. Conecte e tente de novo. | Faltava. |
 
+**Fase de teste (proposta, 19/11):** login com um código só, sem e-mail. Quando os 3 organizadores tiverem conta, volta a tabela acima.
+
+| Elemento | Proposta |
+| --- | --- |
+| Subtítulo | Digite o código de acesso |
+| Label do campo | Código de acesso + botão "Mostrar" |
+| Botão | Entrar |
+| Erro | Código não confere. |
+
 ### 2.1 Times — antes do sorteio
 
 | Elemento | Atual | Final | Motivo |
@@ -220,18 +229,19 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
 | Título | Cronômetro | = | |
-| Segmentado | 8 min · 10 min | = | |
+| Segmentado | 8 min · 10 min | 8 min · 10 min · Outro | "Outro" abre o tempo personalizado; depois mostra o tempo escolhido ("12 min") com um lápis. | |
 | Parado | Iniciar | Começar | Mais falado. |
 | Rodando | Pausar | = | |
 | **Pausado** | — | **Continuar** · Zerar | Faltava o estado inteiro. |
 | Ajuste | −1 min · +1 min | = | |
-| Indicador | ☀ tela acesa | Tela fica acesa | Sem emoji (DESIGN.md). |
+| Indicador | ☀ tela acesa | (remover) | Quando funciona, não precisa avisar. Só aparece o aviso de "sem suporte" abaixo. |
 | Último minuto | ÚLTIMO MINUTO | = | |
 | Fim — título | Fim de jogo | = | |
 | Fim — subtítulo | Apito tocando | (remover) | Óbvio pelo som. |
 | Fim — botão | Próximo jogo | **Zerar para o próximo** | Diz o que acontece. |
 | Fim — secundário | Parar apito | = | |
 | Sem suporte a tela acesa | — | Seu celular pode apagar a tela durante o jogo. O tempo continua contando. | Faltava (alguns navegadores). |
+| Tempo personalizado (sheet) | — | Título "Tempo de jogo" · número + "minutos" · atalhos 5, 6, 7, 12, 15 min · ajuda "De 1 a 30 minutos. Vale só para hoje; o padrão muda em Ajustes." · botão "Usar 12 min" | Faltava. |
 | Primeiro uso do som | — | Toque em Começar para liberar o apito. | iOS só toca som após um toque. |
 
 ### 6.1 Ajustes
