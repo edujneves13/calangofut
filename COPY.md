@@ -89,6 +89,9 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 
 ### 2.2 Lista do WhatsApp (etapa 1/3)
 
+Revisado em 20/11/2026: vale `docs/design/fluxo-sorteio-v2-20-novembro.md` (seção 8). Em conflito, vale ele.
+
+
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
 | Título | Lista do WhatsApp | Cole a lista do WhatsApp | Título vira a instrução. |
@@ -146,6 +149,9 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 
 ### 2.6 Sortear (etapa 3/3)
 
+Revisado em 20/11/2026: vale `docs/design/fluxo-sorteio-v2-20-novembro.md` (seção 8). Em conflito, vale ele.
+
+
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
 | Título | Sortear | Como vai ser hoje? | Título pergunta o que a tela decide. |
@@ -199,6 +205,9 @@ Removidos (v2): "Todos os times completos", "Todo mundo chegou", "Tentar novamen
 
 ### 3.3b Editar times (tela nova, v2)
 
+Revisado em 20/11/2026: vale `docs/design/fluxo-sorteio-v2-20-novembro.md` (seção 8). Em conflito, vale ele.
+
+
 | Elemento | Final |
 | --- | --- |
 | Cabeçalho | ✕ (aria-label "Cancelar") · Editar times · Concluir |
@@ -207,7 +216,7 @@ Removidos (v2): "Todos os times completos", "Todo mundo chegou", "Tentar novamen
 | Equilíbrio | Equilíbrio: diferença de X★ entre os times completos |
 | Etiqueta na busca | Time 1 · Não chegou |
 | Time com vaga | Adicionar jogador · N vagas (1 vaga) |
-| Folha do jogador | MOVER PARA · Time 5 · 3/5 → 4/5 · 12★ · Trocar com alguém · Tirar do time · Tirar do time leva o [nome] para "Não chegaram". |
+| Folha do jogador | MOVER PARA · Time 5 · 3/5 → 4/5 · 12★ · Trocar com outro jogador · Tirar do time · Tirar do time leva o [nome] para "Não chegaram". |
 | Trocar | Trocar [nome] com… · Cada nome mostra como fica o equilíbrio depois da troca. · mantém o equilíbrio · Time 1 +1★ · Time 2 −1★ · Trocar [A] e [B] |
 
 Nenhum time passa de 5 (decisão de 20/11): "Mover para" só lista times com vaga.
@@ -461,6 +470,9 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 | Toast | 9 jogadores adicionados. | |
 
 ### 9.6 Confira a lista (etapa 2/3, substitui 2.3 e 2.4)
+
+Revisado em 20/11/2026: vale `docs/design/fluxo-sorteio-v2-20-novembro.md` (seção 8). Em conflito, vale ele.
+
 
 | Elemento | Proposta | Motivo |
 | --- | --- | --- |
