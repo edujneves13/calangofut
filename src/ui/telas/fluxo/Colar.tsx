@@ -1,16 +1,17 @@
-import { ClipboardText, UsersThree } from '@phosphor-icons/react'
+import { CheckCircle, ClipboardText, UsersThree } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { lerLista } from '../../../logic/leitor'
+import { contarEncontrados, lerLista } from '../../../logic/leitor'
 import { Button } from '../../components/Button'
 import { Notice, Stepper } from '../../components/Controls'
 import { Header } from '../../components/Header'
+import { Icon } from '../../components/Icon'
 import { Textarea } from '../../components/Input'
 import { ddmm } from '../../util'
 import { useApp } from '../contexto'
 import { linhasDaLista, type Linha } from '../../../logic/quemVai'
 import t from '../Telas.module.css'
 
-export const ETAPAS: [string, string, string] = ['Lista', 'Conferir', 'Sortear']
+export const ETAPAS: [string, string, string] = ['Lista', 'Sorteio', 'Regras']
 
 interface Props {
   texto: string
@@ -20,14 +21,15 @@ interface Props {
   onContinuar: (linhas: Linha[]) => void
 }
 
-/** 1/3 Cole a lista do WhatsApp (COPY 2.2), com "Selecionar do cadastro" como alternativa (9.8). */
+/** 1/3 Lista de jogadores (docs/design/fluxo-sorteio-v2-20-novembro.md §2): colar, digitar ou selecionar do cadastro. */
 export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: Props) {
   const { dados } = useApp()
   const [semJogadores, setSemJogadores] = useState(false)
   const [outraData, setOutraData] = useState<string | null>(null)
+  const encontrados = contarEncontrados(lerLista(texto, dados.pelada.data))
 
   function continuar(aceitarOutraData = false) {
-    const lista = lerLista(texto)
+    const lista = lerLista(texto, dados.pelada.data)
     setSemJogadores(false)
     if (lista.jogadores.length === 0 && lista.goleiros.length === 0) {
       setOutraData(null)
@@ -42,7 +44,7 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
     onContinuar(linhasDaLista(lista, dados.jogadores.filter((j) => j.ativo)))
   }
 
-  async function colarDoWhatsApp() {
+  async function colar() {
     try {
       const colado = await navigator.clipboard.readText()
       if (colado) {
@@ -57,15 +59,17 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
 
   return (
     <main className={`${t.tela} ${t.semMenu} ${t.entrar}`}>
-      <Header titulo="Cole a lista do WhatsApp" onVoltar={onVoltar} />
+      <Header titulo="Lista de jogadores" onVoltar={onVoltar} />
       <Stepper atual={1} rotulos={ETAPAS} />
       <p className={t.texto2}>
-        No WhatsApp, segure a mensagem da lista e toque em Copiar. Pode colar inteira: o app separa jogadores e goleiros e
-        ignora a lista de espera.
+        Cole a lista do WhatsApp inteira ou digite os nomes, você também pode selecionar jogadores existentes
       </p>
+      <Button variante="secundario" icone={UsersThree} onClick={onSelecionar}>
+        Selecionar jogadores existentes
+      </Button>
+      <div className={t.ou}>ou</div>
       <Textarea
-        rotulo="Lista do WhatsApp"
-        placeholder="Cole a mensagem aqui"
+        rotulo="Cole sua lista ou digite os nomes"
         rows={8}
         value={texto}
         onChange={(e) => {
@@ -74,6 +78,12 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
           setOutraData(null)
         }}
       />
+      {encontrados && (
+        <p className={t.encontrados} aria-live="polite">
+          <Icon icon={CheckCircle} size={18} weight="fill" />
+          {encontrados}
+        </p>
+      )}
       {semJogadores && (
         <Notice>Não encontrei jogadores nesse texto. Copie a mensagem da lista de presença inteira e cole de novo.</Notice>
       )}
@@ -98,12 +108,8 @@ export function Colar({ texto, setTexto, onVoltar, onSelecionar, onContinuar }: 
           </div>
         </Notice>
       )}
-      <Button variante="secundario" icone={ClipboardText} onClick={colarDoWhatsApp}>
-        Colar do WhatsApp
-      </Button>
-      <div className={t.ou}>ou</div>
-      <Button variante="secundario" icone={UsersThree} onClick={onSelecionar}>
-        Selecionar do cadastro
+      <Button variante="secundario" icone={ClipboardText} onClick={colar}>
+        Colar
       </Button>
       <div className={t.rodape}>
         <Button disabled={!texto.trim()} onClick={() => continuar()}>
