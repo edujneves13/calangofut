@@ -1,4 +1,4 @@
-import { ArrowsClockwise, CaretDown, Check, Clock, Copy, DotsThree, Shuffle, UserPlus, WarningCircle } from '@phosphor-icons/react'
+import { ArrowsClockwise, CaretDown, Check, Clock, Copy, DotsThree, PencilSimple, Shuffle, UserPlus, WarningCircle } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { adicionarNaHora, chegouDepois, marcarPresenca } from '../../data/presencas'
 import { criarJogador } from '../../data/jogadores'
@@ -20,6 +20,7 @@ import { useToast } from '../components/Toast'
 import { db } from '../db'
 import { dataCurta, mensagemDeErro, porNome } from '../util'
 import { AdicionarJogador, type NovoNaHora } from './AdicionarJogador'
+import { EditarTimes, type ResultadoEdicao } from './EditarTimes'
 import { juntarJogadores, useApp } from './contexto'
 import { participantesDe } from './fluxo/Sortear'
 import { AVATAR_PADRAO } from './Times'
@@ -28,7 +29,7 @@ import t from './Telas.module.css'
 
 /** Times — durante a pelada (docs/design/times-durante-v2.md). */
 export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
-  const { dados, atualizar, recarregar } = useApp()
+  const { dados, atualizar, recarregar, setFluxoAberto } = useApp()
   const mostrarToast = useToast()
   const { config, pelada, jogadores, presencas } = dados
   const salvos = pelada.times!
@@ -40,6 +41,7 @@ export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
   const [confirmarRecomecar, setConfirmarRecomecar] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
   const [textoManual, setTextoManual] = useState<string | null>(null)
+  const [editando, setEditando] = useState(false)
   const carrossel = useRef<HTMLDivElement>(null)
 
   const porId = new Map(jogadores.map((j) => [j.id, j]))
@@ -171,6 +173,28 @@ export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
 
   copiarRef.current = copiarLista
 
+  // Editar times é tela cheia: esconde o menu de baixo e não recarrega por cima do rascunho.
+  useEffect(() => {
+    setFluxoAberto(editando)
+  }, [editando, setFluxoAberto])
+
+  /** Concluir do Editar times: presenças de quem saiu ou entrou, depois os times. */
+  async function concluirEdicao({ times: novos, tirados, colocados }: ResultadoEdicao) {
+    try {
+      const mudancas = await Promise.all([
+        ...tirados.map((id) => marcarPresenca(db, pelada.id, id, 'nao-chegou')),
+        ...colocados.map((id) => marcarPresenca(db, pelada.id, id, 'chegou')),
+      ])
+      const porJogador = new Map(mudancas.map((p) => [p.jogadorId, p]))
+      atualizar({ presencas: presencas.map((p) => porJogador.get(p.jogadorId) ?? p) })
+      await gravarTimes(novos)
+      setEditando(false)
+      avisarQueMudou()
+    } catch (e) {
+      mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })
+    }
+  }
+
   async function recomecar() {
     try {
       const limpa = await recomecarPelada(db, pelada.id)
@@ -209,6 +233,19 @@ export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
       </div>
     )
   })
+
+  if (editando) {
+    return (
+      <EditarTimes
+        times={times}
+        naoChegaram={naoChegaram}
+        porId={porId}
+        maxCincoEstrelas={config.maxCincoEstrelas}
+        onCancelar={() => setEditando(false)}
+        onConcluir={concluirEdicao}
+      />
+    )
+  }
 
   const incompletos = times.flatMap((tm, i) => (tm.completo ? [] : [{ i, tamanho: tm.jogadorIds.length }]))
 
@@ -266,6 +303,9 @@ export function Durante({ onNovoSorteio }: { onNovoSorteio: () => void }) {
       <div className={s.acoes}>
         <Button variante="secundario" icone={Shuffle} className={s.acao} onClick={() => setRefazerAberto(true)}>
           Sortear de novo
+        </Button>
+        <Button variante="secundario" icone={PencilSimple} className={s.acao} onClick={() => setEditando(true)}>
+          Editar times
         </Button>
       </div>
 
