@@ -1,18 +1,30 @@
-import { CaretDown, CaretRight, DotsThree, Plus } from '@phosphor-icons/react'
+import { CheckCircle, Clock, HandPalm, Plus, WarningCircle } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { adicionarApelido, atualizarJogador, criarJogadores } from '../../../data/jogadores'
 import { recomecarPelada } from '../../../data/peladas'
 import { salvarPresencasDaLista, type StatusPresenca } from '../../../data/presencas'
+import {
+  contagem,
+  ehNova,
+  faltaEscolha,
+  ignorarTudo,
+  nomeDaLinha,
+  novaLinha,
+  pendencias,
+  secoes,
+  textoIgnorarTudo,
+  type Linha,
+  type Ordem,
+} from '../../../logic/quemVai'
 import type { Estrelas, Jogador } from '../../../logic/tipos'
 import { Badge, BadgeEstrelas } from '../../components/Badge'
 import { Button } from '../../components/Button'
-import { Notice, SectionLabel, Stepper } from '../../components/Controls'
+import { Card } from '../../components/Card'
+import { Notice, SectionLabel, Segmented, Stepper } from '../../components/Controls'
 import { Header } from '../../components/Header'
 import { Icon } from '../../components/Icon'
-import { IconButton } from '../../components/IconButton'
 import { SearchInput } from '../../components/Input'
 import { PlayerRow } from '../../components/PlayerRow'
-import { Sheet } from '../../components/Sheet'
 import { useToast } from '../../components/Toast'
 import { db } from '../../db'
 import { combina, mensagemDeErro, plural } from '../../util'
@@ -20,7 +32,7 @@ import { AdicionarJogador } from '../AdicionarJogador'
 import { juntarJogadores, useApp } from '../contexto'
 import { EstrelasSheet } from '../EstrelasSheet'
 import { ETAPAS } from './Colar'
-import { ehNova, faltaEscolha, faltaEstrelas, nomeDaLinha, novaLinha, type Linha } from '../../../logic/quemVai'
+import c from './Conferir.module.css'
 import t from '../Telas.module.css'
 
 interface Props {
@@ -32,16 +44,13 @@ interface Props {
   onContinuar: () => void
 }
 
-const ordem = (a: Linha, b: Linha) => nomeDaLinha(a).localeCompare(nomeDaLinha(b), 'pt-BR')
-
-/** 2/3 Confira a lista (COPY 9.6): novos destacados, parecidos, estrelas, chegou / não chegou / não vem. */
+/** 2/3 Quem vai pro sorteio? (docs/design/fluxo-sorteio-v2-20-novembro.md §3). */
 export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto, onVoltar, onContinuar }: Props) {
   const { dados, atualizar } = useApp()
   const mostrarToast = useToast()
   const [busca, setBusca] = useState('')
+  const [ordem, setOrdem] = useState<Ordem>('az')
   const [estrelasDe, setEstrelasDe] = useState<string | null>(null)
-  const [menuDe, setMenuDe] = useState<string | null>(null)
-  const [naoVemAberto, setNaoVemAberto] = useState(false)
   const [adicionando, setAdicionando] = useState(false)
   const [salvando, setSalvando] = useState(false)
 
@@ -55,21 +64,18 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
   const mudar = (chave: string, m: Partial<Linha>) =>
     setLinhas((ls) => ls.map((l) => (l.chave === chave ? { ...l, ...m } : l)))
 
-  const visiveis = linhas.filter((l) => combina({ nome: nomeDaLinha(l), apelidos: [l.texto] }, busca)).sort(ordem)
-  const deLinha = visiveis.filter((l) => !l.goleiro)
-  const ativos = deLinha
-  const naoVem: Linha[] = []
-  const goleiros = visiveis.filter((l) => l.goleiro)
-
-  const todosDeLinha = linhas.filter((l) => !l.goleiro)
-  const chegaram = todosDeLinha.filter((l) => l.status === 'chegou').length
-  const naoChegaram = todosDeLinha.filter((l) => l.status === 'nao-chegou').length
-  const naoVem_ = naoVem.length
-  const semEstrelas = linhas.filter(faltaEstrelas).length
-  const semEscolha = linhas.filter(faltaEscolha).length
-
+  const visiveis = linhas.filter((l) => combina({ nome: nomeDaLinha(l), apelidos: [l.texto] }, busca))
+  const sec = secoes(visiveis, ordem)
+  const conta = contagem(linhas)
+  const pendentes = pendencias(linhas)
   const linhaEstrelas = linhas.find((l) => l.chave === estrelasDe) ?? null
-  const linhaMenu = linhas.find((l) => l.chave === menuDe) ?? null
+
+  function ignorar() {
+    const antes = linhas
+    const r = ignorarTudo(linhas)
+    setLinhas(() => r.linhas)
+    mostrarToast({ texto: textoIgnorarTudo(r), tom: 'sucesso', acoes: [{ texto: 'Desfazer', onClick: () => setLinhas(() => antes) }] })
+  }
 
   async function mudarEstrelas(l: Linha, estrelas: number) {
     if (!l.jogador) {
@@ -93,15 +99,14 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
   async function continuar() {
     setSalvando(true)
     try {
-      const gravar = linhas
-      const novas = gravar.filter((l) => !l.jogador)
+            const novas = linhas.filter((l) => !l.jogador)
       const criados = await criarJogadores(
         db,
         novas.map((l) => ({ nome: l.texto, estrelas: (l.estrelas || 3) as Estrelas, goleiro: l.goleiro })),
       )
       const idDe = new Map<string, Jogador>(novas.map((l, i) => [l.chave, criados[i]!]))
 
-      for (const l of gravar) {
+      for (const l of linhas) {
         if (l.escolha === 'ele' && l.jogador) {
           // "Stênio" vira apelido do Stenio Araújo; se já for apelido de alguém, segue sem ele.
           await adicionarApelido(db, l.jogador.id, l.texto).catch(() => {})
@@ -113,7 +118,7 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
 
       const vistos = new Set<string>()
       const itens: { jogadorId: string; status: StatusPresenca }[] = []
-      for (const l of gravar) {
+      for (const l of linhas) {
         const jogador = l.jogador ?? idDe.get(l.chave)!
         if (vistos.has(jogador.id)) continue
         vistos.add(jogador.id)
@@ -133,26 +138,27 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
 
   function linhaDeJogador(l: Linha) {
     const nome = nomeDaLinha(l)
-    if (faltaEscolha(l) || (l.tipo === 'parecido' && l.escolha === null)) {
+    if (faltaEscolha(l)) {
+      // Sem o selo Novo, para não confundir com o botão Novo; a linha mantém o fundo de novo.
       return (
         <li key={l.chave}>
           <PlayerRow
             nome={l.texto}
             goleiro={l.goleiro}
             novo
-            sub={`Parece o ${l.sugestao?.nome ?? ''}`}
+            sub={l.sugestao ? `Parece o ${l.sugestao.nome}` : undefined}
             direita={
               <>
-                <Button
-                  variante="pequeno"
-                  onClick={() =>
-                    mudar(l.chave, { escolha: 'ele', jogador: l.sugestao, estrelas: l.sugestao?.estrelas ?? 0 })
-                  }
-                >
-                  É ele
-                </Button>
+                {l.sugestao && (
+                  <Button
+                    variante="pequeno"
+                    onClick={() => mudar(l.chave, { escolha: 'ele', jogador: l.sugestao, estrelas: l.sugestao?.estrelas ?? 0 })}
+                  >
+                    É ele
+                  </Button>
+                )}
                 <Button variante="pequeno-secundario" onClick={() => mudar(l.chave, { escolha: 'novo' })}>
-                  É novo
+                  Novo
                 </Button>
               </>
             }
@@ -173,18 +179,11 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
           novo={ehNova(l)}
           sub={sub}
           chegou={l.goleiro ? undefined : l.status === 'chegou'}
+          apagado={!l.goleiro && l.status !== 'chegou'}
           onTrocarChegou={() => mudar(l.chave, { status: l.status === 'chegou' ? 'nao-chegou' : 'chegou' })}
           direita={
             l.goleiro ? undefined : (
-              <>
-                <BadgeEstrelas
-                  estrelas={l.estrelas}
-                  nome={nome}
-                  textoVazio="Dar estrelas"
-                  onClick={() => setEstrelasDe(l.chave)}
-                />
-                <IconButton icone={DotsThree} rotulo={`Mais opções: ${nome}`} semFundo onClick={() => setMenuDe(l.chave)} />
-              </>
+              <BadgeEstrelas estrelas={l.estrelas} nome={nome} textoVazio="Dar estrelas" onClick={() => setEstrelasDe(l.chave)} />
             )
           }
         />
@@ -192,76 +191,104 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
     )
   }
 
-  const travado = semEstrelas > 0 || semEscolha > 0
-  const textoBotao = [
-    semEstrelas > 0 && `Falta dar estrelas a ${plural(semEstrelas, 'jogador', 'jogadores')}`,
-    semEscolha > 0 && `Falta escolher ${plural(semEscolha, 'nome', 'nomes')}`,
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  const botaoIgnorar = (
+    <button type="button" className={`${t.botaoTexto} ${c.ignorar}`} onClick={ignorar}>
+      Ignorar tudo
+    </button>
+  )
+  const ajudaIgnorar = (
+    <p className={c.ajuda}>"Ignorar tudo" dá 3★ para os novos e trata nomes parecidos como o mesmo jogador.</p>
+  )
+  // Ignorar tudo fica na primeira seção de pendência que aparece.
+  const ignorarEmEstrelas = sec.faltamEstrelas.length > 0
 
   return (
     <main className={`${t.tela} ${t.semMenu} ${t.entrar}`}>
-      <Header titulo="Confira a lista" onVoltar={onVoltar} />
+      <Header titulo="Quem vai pro sorteio?" onVoltar={onVoltar} />
       <Stepper atual={2} rotulos={ETAPAS} />
-      <div className={t.coluna}>
-        <p className={t.texto}>Desmarque quem ainda não chegou.</p>
-        <p className={t.pequeno}>Toque nas estrelas para mudar. Quem chegar depois entra no último time.</p>
-        <p className={t.pequeno}>
-          <b className={t.forte}>{chegaram}</b> {chegaram === 1 ? 'chegou' : 'chegaram'} · <b className={t.forte}>{naoChegaram}</b>{' '}
-          {naoChegaram === 1 ? 'não chegou' : 'não chegaram'} · <b className={t.forte}>{naoVem_}</b>{' '}
-          {naoVem_ === 1 ? 'não vem' : 'não vêm'}
-        </p>
+      <p className={t.texto2}>Marcados entram no sorteio agora. Quem ainda não chegou fica desmarcado e entra depois, no último time.</p>
+      <div className={c.buscaLinha}>
+        <SearchInput valor={busca} onMudar={setBusca} placeholder="Buscar jogador" />
+        <Segmented
+          rotulo="Ordenar"
+          valor={ordem}
+          onMudar={setOrdem}
+          opcoes={[
+            { valor: 'az', texto: 'A–Z', rotulo: 'Ordem alfabética' },
+            { valor: 'estrelas', texto: '★', rotulo: 'Por estrelas' },
+          ]}
+        />
       </div>
-      <SearchInput valor={busca} onMudar={setBusca} placeholder="Buscar jogador" />
-      {chegaram === 0 && todosDeLinha.length > 0 && <Notice>Ninguém marcado. Marque quem já chegou.</Notice>}
 
-      <ul className={t.lista}>{ativos.map(linhaDeJogador)}</ul>
+      <Card className={c.contagem}>
+        <div className={c.principal}>
+          <span className={c.numero}>{conta.noSorteio}</span>
+          <span className={c.noSorteio}>
+            <Icon icon={CheckCircle} size={18} weight="fill" className={c.verde} />
+            no sorteio
+          </span>
+          <span className={c.de}>de {plural(conta.total, 'jogador', 'jogadores')}</span>
+        </div>
+        <div className={c.divisoria} />
+        <ul className={c.extras}>
+          <li>
+            <Icon icon={Clock} size={18} />
+            <b>{conta.chegamDepois}</b> {conta.chegamDepois === 1 ? 'chega depois' : 'chegam depois'}
+          </li>
+          <li>
+            <Icon icon={HandPalm} size={18} />
+            <b>{conta.goleiros}</b> {conta.goleiros === 1 ? 'goleiro' : 'goleiros'}
+          </li>
+        </ul>
+      </Card>
 
-      {goleiros.length > 0 && (
-        <>
-          <SectionLabel>Goleiros · fora do sorteio</SectionLabel>
-          <ul className={t.lista}>{goleiros.map(linhaDeJogador)}</ul>
-        </>
+      {conta.noSorteio === 0 && conta.total > 0 && <Notice>Ninguém marcado. Marque quem já chegou.</Notice>}
+
+      {sec.faltamEstrelas.length > 0 && (
+        <section className={c.secao}>
+          <SectionLabel icone={WarningCircle} tom="aviso" acao={botaoIgnorar}>
+            Faltam estrelas · {sec.faltamEstrelas.length}
+          </SectionLabel>
+          {ajudaIgnorar}
+          <ul className={t.lista}>{sec.faltamEstrelas.map(linhaDeJogador)}</ul>
+        </section>
       )}
-
-      {naoVem.length > 0 && (
-        <>
-          <button
-            type="button"
-            className={t.expansor}
-            aria-expanded={naoVemAberto}
-            onClick={() => setNaoVemAberto((a) => !a)}
-          >
-            Não vêm · {naoVem.length}
-            <Icon icon={naoVemAberto ? CaretDown : CaretRight} size={20} />
-          </button>
-          {naoVemAberto && (
-            <ul className={t.lista}>
-              {naoVem.map((l) => (
-                <li key={l.chave}>
-                  <PlayerRow
-                    nome={nomeDaLinha(l)}
-                    novo={ehNova(l) || l.tipo === 'parecido'}
-                    direita={
-                      <Button variante="pequeno-secundario" onClick={() => mudar(l.chave, { status: 'nao-chegou' })}>
-                        Vem sim
-                      </Button>
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
+      {sec.confirmarNome.length > 0 && (
+        <section className={c.secao}>
+          <SectionLabel icone={WarningCircle} tom="aviso" acao={ignorarEmEstrelas ? undefined : botaoIgnorar}>
+            Confirmar nome · {sec.confirmarNome.length}
+          </SectionLabel>
+          {!ignorarEmEstrelas && ajudaIgnorar}
+          <ul className={t.lista}>{sec.confirmarNome.map(linhaDeJogador)}</ul>
+        </section>
+      )}
+      {sec.noSorteio.length > 0 && (
+        <section className={c.secao}>
+          <SectionLabel icone={CheckCircle} tom="dentro">
+            No sorteio · {sec.noSorteio.length}
+          </SectionLabel>
+          <ul className={t.lista}>{sec.noSorteio.map(linhaDeJogador)}</ul>
+        </section>
+      )}
+      {sec.chegamDepois.length > 0 && (
+        <section className={c.secao}>
+          <SectionLabel icone={Clock}>Chegam depois · fora do sorteio · {sec.chegamDepois.length}</SectionLabel>
+          <ul className={t.lista}>{sec.chegamDepois.map(linhaDeJogador)}</ul>
+        </section>
+      )}
+      {sec.goleiros.length > 0 && (
+        <section className={c.secao}>
+          <SectionLabel icone={HandPalm}>Goleiros · fora do sorteio · {sec.goleiros.length}</SectionLabel>
+          <ul className={t.lista}>{sec.goleiros.map(linhaDeJogador)}</ul>
+        </section>
       )}
 
       <div className={t.rodape}>
         <Button variante="secundario" icone={Plus} style={{ width: 'auto', flex: 'none', padding: '0 18px' }} onClick={() => setAdicionando(true)}>
-          Adicionar
+          Novo jogador
         </Button>
-        <Button disabled={travado} carregando={salvando} onClick={continuar}>
-          {travado ? textoBotao : 'Continuar'}
+        <Button disabled={pendentes > 0} carregando={salvando} onClick={continuar}>
+          {pendentes > 0 ? `Confirme ${plural(pendentes, 'jogador', 'jogadores')}` : `Continuar com ${conta.noSorteio}`}
         </Button>
       </div>
 
@@ -270,20 +297,9 @@ export function Conferir({ linhas, setLinhas, abrirAdicionar, onAdicionarAberto,
         onFechar={() => setEstrelasDe(null)}
         nome={linhaEstrelas ? nomeDaLinha(linhaEstrelas) : ''}
         estrelas={linhaEstrelas?.estrelas ?? 0}
+        nota={linhaEstrelas?.jogador ? 'Muda também no cadastro' : undefined}
         onMudar={(e) => linhaEstrelas && void mudarEstrelas(linhaEstrelas, e)}
       />
-
-      <Sheet aberto={linhaMenu !== null} onFechar={() => setMenuDe(null)} titulo={linhaMenu ? nomeDaLinha(linhaMenu) : ''}>
-        <Button
-          variante="secundario"
-          onClick={() => {
-            if (linhaMenu) mudar(linhaMenu.chave, { status: 'nao-chegou' })
-            setMenuDe(null)
-          }}
-        >
-          Não vem
-        </Button>
-      </Sheet>
 
       <AdicionarJogador
         aberto={adicionando}
