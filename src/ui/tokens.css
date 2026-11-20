@@ -21,6 +21,11 @@
   --warning: var(--amber-400); --warning-bg: var(--amber-900);
   --danger: var(--red-400); --danger-bg: var(--red-900);
   --scrim: rgba(6, 10, 14, 0.64);
+  /* card do time durante a pelada (docs/design/times-durante-v2.md, item 2) */
+  --team-card-bg: var(--surface-2);
+  --team-card-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  --team-band-start: var(--green-900); --team-band-end: var(--field-700);
+  --team-band-mark: rgba(255, 255, 255, 0.18);
 
   /* tipografia */
   --font-display: "Montserrat", system-ui, sans-serif;

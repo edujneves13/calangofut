@@ -5,6 +5,9 @@ import {
   continuar,
   criarCronometro,
   ehUltimoMinuto,
+  estadoNaBarra,
+  falarTempo,
+  formatarTempo,
   limitarMinutos,
   maisUmMinuto,
   minutosValidos,
@@ -106,5 +109,51 @@ describe('cronômetro', () => {
     expect(limitarMinutos(0)).toBe(1)
     expect(limitarMinutos(45)).toBe(30)
     expect(limitarMinutos(7.6)).toBe(8)
+  })
+})
+
+describe('formatarTempo e falarTempo', () => {
+  it('mm:ss arredondando o segundo para cima', () => {
+    expect(formatarTempo(7 * MIN + 12_000)).toBe('07:12')
+    expect(formatarTempo(7 * MIN + 11_001)).toBe('07:12')
+    expect(formatarTempo(0)).toBe('00:00')
+  })
+
+  it('por extenso para o leitor de tela', () => {
+    expect(falarTempo(7 * MIN + 12_000)).toBe('7 minutos e 12 segundos')
+    expect(falarTempo(1 * MIN + 1_000)).toBe('1 minuto e 1 segundo')
+    expect(falarTempo(10 * MIN)).toBe('10 minutos')
+    expect(falarTempo(45_000)).toBe('45 segundos')
+  })
+})
+
+describe('estadoNaBarra', () => {
+  it('parado ou fim: nada na barra', () => {
+    expect(estadoNaBarra(criarCronometro(10), T0)).toBeNull()
+    const fim = atualizar(comecar(criarCronometro(1), T0), T0 + MIN)
+    expect(estadoNaBarra(fim, T0 + MIN)).toBeNull()
+  })
+
+  it('rodando: tempo restante, progresso e rótulo acessível', () => {
+    const c = comecar(criarCronometro(10), T0)
+    expect(estadoNaBarra(c, T0 + 2 * MIN + 48_000)).toEqual({
+      tom: 'rodando',
+      texto: '07:12',
+      progresso: progresso(c, T0 + 2 * MIN + 48_000),
+      rotulo: 'Cronômetro, 7 minutos e 12 segundos restantes',
+    })
+  })
+
+  it('último minuto: tom âmbar', () => {
+    const c = comecar(criarCronometro(10), T0)
+    expect(estadoNaBarra(c, T0 + 9 * MIN + 30_000)?.tom).toBe('ultimo')
+  })
+
+  it('pausado vence o último minuto e mostra "Pausado"', () => {
+    const c = pausar(comecar(criarCronometro(10), T0), T0 + 9 * MIN + 30_000)
+    const b = estadoNaBarra(c, T0 + 9 * MIN + 40_000)!
+    expect(b.tom).toBe('pausado')
+    expect(b.texto).toBe('Pausado')
+    expect(b.rotulo).toBe('Cronômetro, pausado')
   })
 })

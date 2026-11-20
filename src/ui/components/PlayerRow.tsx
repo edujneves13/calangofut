@@ -19,12 +19,14 @@ interface Props {
   onClick?: () => void
   /** Check de seleção (escolher do cadastro, excluir vários): desmarcado não fica riscado. */
   selecao?: boolean
+  /** Ícone e nome em cinza (ex.: "Não chegaram"). */
+  apagado?: boolean
 }
 
 /** Linha de jogador (DESIGN.md 7.6). Ordem alfabética é responsabilidade de quem lista. */
-export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, direita, onClick, selecao }: Props) {
+export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, direita, onClick, selecao, apagado }: Props) {
   const temCheck = chegou !== undefined
-  const classes = [s.linha, novo && s.novo, temCheck && !chegou && !selecao && s.riscado, onClick && s.tocavel]
+  const classes = [s.linha, apagado && s.apagado, novo && s.novo, temCheck && !chegou && !selecao && s.riscado, onClick && s.tocavel]
   return (
     <div
       className={classes.filter(Boolean).join(' ')}
@@ -48,6 +50,7 @@ export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, di
           aria-checked={chegou}
           aria-label={selecao ? nome : chegou ? `Chegou: ${nome}` : `Não chegou: ${nome}`}
           className={s.check}
+          disabled={!onTrocarChegou}
           onClick={(e) => {
             e.stopPropagation()
             onTrocarChegou?.()

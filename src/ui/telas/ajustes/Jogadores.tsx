@@ -65,18 +65,20 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
       sairDaSelecao()
       mostrarToast({
         texto: `${plural(ids.length, 'jogador excluído', 'jogadores excluídos')}.`,
-        acao: {
-          texto: 'Desfazer',
-          onClick: async () => {
-            try {
-              const voltaram = await Promise.all(ids.map((id) => atualizarJogador(db, id, { ativo: true })))
-              atualizar({ jogadores: juntarJogadores(dados.jogadores, voltaram) })
-            } catch {
-              // Alguém cadastrou um nome igual enquanto isso: recarrega para mostrar o que ficou.
-              await recarregar()
-            }
+        acoes: [
+          {
+            texto: 'Desfazer',
+            onClick: async () => {
+              try {
+                const voltaram = await Promise.all(ids.map((id) => atualizarJogador(db, id, { ativo: true })))
+                atualizar({ jogadores: juntarJogadores(dados.jogadores, voltaram) })
+              } catch {
+                // Alguém cadastrou um nome igual enquanto isso: recarrega para mostrar o que ficou.
+                await recarregar()
+              }
+            },
           },
-        },
+        ],
       })
     } catch (e) {
       mostrarToast({ texto: mensagemDeErro(e), tom: 'erro' })

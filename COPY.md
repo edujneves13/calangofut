@@ -168,45 +168,68 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 
 ### 3.1 / 3.1b Times — durante a pelada
 
+Revisado em 20/11/2026: vale `docs/design/times-durante-v2.md` (seção 10). Em conflito, vale ele.
+
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
-| Cabeçalho | Pelada dos Brabos / Qua 25/11 · 20:30 | = | |
-| Botão ícone | ↻ | aria-label "Sortear de novo" | |
+| Cabeçalho | Pelada dos Brabos / Qua 25/11 · 20:30 | = (só o botão ⋯ à direita) | v2: o Copiar sai do cabeçalho. |
 | Índice | Time 1 · 2 · 3 · 4 · 5 | = | |
+| Linha das abas | Copiar lista dos times (botão grande) | Copiar times | v2: botão pequeno na linha das abas. |
+| Aviso | — | Time 5 está incompleto · 3/5 · Ver | v2. Só aparece quando existe. |
 | Selo soma | 16★ | = (aria-label "16 estrelas") | |
 | Selo incompleto | Incompleto · 3/5 | = | |
 | Vaga vazia | vaga | Vaga | |
-| Expansor | Jogadores que não chegaram · 2 | Não chegaram · 2 | Mais curto, mesmo sentido. |
-| Botão | Copiar lista dos times | = | |
-| Menu extra (novo) | — | ⋯ → Tentar novamente | Saída para lista errada. Volta para "Cole a lista do WhatsApp". |
+| Alerta no card | — | 3 craques neste time | v2: a edição manual pode passar do limite; só avisa. |
+| Ações | ↻ | Sortear de novo · Editar times | v2. |
+| Botão | Adicionar quem não estava na lista / Adicionar alguém | Adicionar jogador | v2. Sempre visível. |
+| Aviso que some sozinho | — | Os times mudaram. Copie a lista nova. · Copiar times | v2. Sempre que os times mudam. |
+| Menu ⋯ | Tentar novamente | Iniciar novo sorteio · Cola outra lista e sorteia do zero | v2. |
+| Confirmação | Começar de novo com outra lista? | **Iniciar um novo sorteio?** A lista e os times de hoje serão apagados. Você vai colar a lista do WhatsApp de novo. · [Iniciar novo sorteio] [Cancelar] | v2. |
+
+Removidos (v2): "Todos os times completos", "Todo mundo chegou", "Tentar novamente", o link "Lista de jogadores" nesta tela, o ↻ sozinho e o botão "Copiar lista dos times".
 
 ### 3.2 / 3.3 Não chegaram
 
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
+| Seção | Não chegaram · 2 | Não chegaram · N (fechada: primeiros nomes, ex.: "Matheus, João, Caio, Renan…") | v2. Abre sozinha com até 3; fecha com 4 ou mais. |
 | Botão da linha | Chegou agora | Chegou | Mais curto, cabe em 360 px. |
-| Ajuda | Entra direto no último time incompleto. | Entra no último time. | |
-| Toast | Matheus Rei entrou no Time 5 · Desfazer | = | |
-| Toast novo time | João Vitor abriu o Time 6 · Desfazer | João Vitor começou o Time 6 · Desfazer | "Abriu" soa estranho. |
-| Lista vazia | — | Todo mundo chegou. | Faltava. |
+| Toast | Matheus Rei entrou no Time 5 · Desfazer | Matheus Rei entrou no Time 5 · Desfazer · Copiar times | v2: o aviso de "times mudaram" vai junto, num toast só. |
+| Toast novo time | João Vitor abriu o Time 6 · Desfazer | João Vitor começou o Time 6 · Desfazer · Copiar times | |
+
+### 3.3b Editar times (tela nova, v2)
+
+| Elemento | Final |
+| --- | --- |
+| Cabeçalho | ✕ (aria-label "Cancelar") · Editar times · Concluir |
+| Busca | Buscar jogador |
+| Ajuda | Toque num jogador para mover, trocar ou tirar do time. |
+| Equilíbrio | Equilíbrio: diferença de X★ entre os times completos |
+| Etiqueta na busca | Time 1 · Não chegou |
+| Time com vaga | Adicionar jogador · N vagas (1 vaga) |
+| Folha do jogador | MOVER PARA · Time 5 · 3/5 → 4/5 · 12★ · Trocar com alguém · Tirar do time · Tirar do time leva o [nome] para "Não chegaram". |
+| Trocar | Trocar [nome] com… · Cada nome mostra como fica o equilíbrio depois da troca. · mantém o equilíbrio · Time 1 +1★ · Time 2 −1★ · Trocar [A] e [B] |
+
+Nenhum time passa de 5 (decisão de 20/11): "Mover para" só lista times com vaga.
 
 ### 3.4 Sortear de novo (sheet)
 
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
 | Título | Sortear de novo | = | |
-| Instrução | Só os times marcados são misturados de novo. Os desmarcados ficam como estão. | Marque os times que vão ser misturados. Os outros ficam iguais. | Ação primeiro. |
-| Item desmarcado | mantém | fica igual | |
-| Botão | Sortear 4 times | = (dinâmico) | |
-| 1 time marcado | — | Botão desabilitado + "Marque pelo menos 2 times." | Faltava. |
+| Instrução | Marque os times que vão ser misturados. Os outros ficam iguais. | Os jogadores dos times marcados são sorteados de novo entre eles. Desmarque quem já está jogando: esse time não muda. | v2: explica o que faz. |
+| Item | Time 1 · 16★ | Time 1 · 16★ (ou 3/5) + nomes resumidos embaixo | v2. |
+| Item desmarcado | mantém | fica igual (linha apagada) | |
+| Botão | Sortear 4 times | Sortear 4 times de novo (dinâmico) | v2. |
+| 1 time marcado | — | Botão desabilitado + "Marque pelo menos 2 times." | |
 | Secundário | Cancelar | = | |
-| Toast depois | — | Times 1, 2, 4 e 5 sorteados de novo. Copie a lista nova. | Lembra de mandar de novo no grupo. |
+| Toast depois | Times 1, 2, 4 e 5 sorteados de novo. Copie a lista nova. | Os times mudaram. Copie a lista nova. · Copiar times | v2: mesmo aviso de toda mudança. |
 
 ### 3.5 Lista copiada
 
 | Elemento | Atual | Final | Motivo |
 | --- | --- | --- | --- |
-| Toast | ✓ Copiado. Cole no grupo do WhatsApp | Lista copiada. É só colar no grupo. | Mais natural. |
+| Toast | ✓ Copiado. Cole no grupo do WhatsApp | Lista copiada | v2: mais curto. |
 | Falha ao copiar | — | Não deu para copiar. Toque e segure o texto para copiar manualmente. (mostra o texto selecionável) | Faltava (navegadores bloqueiam às vezes). |
 
 ### 4.1 Menos de 10
@@ -313,7 +336,7 @@ Formato: **Atual** (wireframe v3) → **Final** (o que implementar). "=" quando 
 | Sem internet, sem dados | Tela | Sem internet. Conecte para carregar a pelada. · [Recarregar] |
 | Erro ao salvar | Toast erro | Não deu para salvar. O app tenta de novo sozinho. |
 | Sessão expirou | Login | Sua sessão acabou. Entre de novo. |
-| Tentar novamente (confirmação) | Modal | **Começar de novo com outra lista?** A lista e os times de hoje serão apagados. · [Tentar novamente] [Cancelar] |
+| Iniciar novo sorteio (confirmação) | Modal | Ver 3.1 (v2). |
 | Pelada acabou | Times, à meia-noite do dia da pelada | Troca sozinha para a próxima pelada. Faixa no dia seguinte: "Pelada de 25/11 encerrada." |
 | Desativar jogador | Confirmação | **Desativar Kauã?** Ele some da busca, mas continua nas peladas antigas. · [Desativar] [Cancelar] |
 | Sair | Confirmação | **Sair do app neste celular?** · [Sair] [Cancelar] |
@@ -368,7 +391,7 @@ Regras:
 - Aba principal: **Times**.
 - Texto copiado usa o **nome do cadastro**.
 - A pelada vira para a próxima **à meia-noite** do dia.
-- Saída para lista errada: **"Tentar novamente"**. Por isso, o botão de recarregar sem internet se chama **"Recarregar"** (evita dois "tentar" com sentidos diferentes).
+- Saída para lista errada: **"Iniciar novo sorteio"** (era "Tentar novamente" até a v2 de 20/11). O botão de recarregar sem internet continua **"Recarregar"**.
 
 ---
 
@@ -378,7 +401,7 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 
 **Ponto para decidir:** o glossário (seção 2) proíbe "ausente". Para o terceiro estado, a proposta é **"Não vem"** (avisou que não vem). Se preferir "Ausente", troque nas linhas marcadas com †.
 
-### 9.1 Times — link para a lista de jogadores (antes e durante a pelada)
+### 9.1 Times — link para a lista de jogadores (só antes do sorteio; v2 tirou da tela durante a pelada)
 
 | Elemento | Proposta | Motivo |
 | --- | --- | --- |
