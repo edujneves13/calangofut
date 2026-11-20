@@ -51,6 +51,18 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
       return novo
     })
 
+  /** Marca ou desmarca de uma vez quem aparece na lista (respeita busca e filtro). */
+  const todosSelecionados = lista.length > 0 && lista.every((j) => selecionados.has(j.id))
+  const trocarTodos = () =>
+    setSelecionados((s) => {
+      const novo = new Set(s)
+      for (const j of lista) {
+        if (todosSelecionados) novo.delete(j.id)
+        else novo.add(j.id)
+      }
+      return novo
+    })
+
   function sairDaSelecao() {
     setSelecionando(false)
     setSelecionados(new Set())
@@ -133,9 +145,9 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
                 </button>
               ))}
             </div>
-            {!selecionando && filtro !== 'inativos' && lista.length > 0 && (
-              <button type="button" className={t.botaoTexto} onClick={() => setSelecionando(true)}>
-                Selecionar
+            {filtro !== 'inativos' && lista.length > 0 && (
+              <button type="button" className={t.botaoTexto} onClick={selecionando ? trocarTodos : () => setSelecionando(true)}>
+                {!selecionando ? 'Selecionar' : todosSelecionados ? 'Limpar' : 'Selecionar todos'}
               </button>
             )}
           </div>

@@ -391,6 +391,7 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 | Botão de texto | Selecionar | Entra no modo de excluir vários. |
 | Menu ⋯ | Excluir todos | |
 | Modo seleção — título | 3 selecionados | Número concreto. |
+| Modo seleção — ação de texto | Selecionar todos † · Limpar † | = 9.8. Age sobre quem aparece na lista (busca e filtro). |
 | Modo seleção — botão | Excluir (3) | |
 | Modo seleção — secundário | Cancelar | |
 | Confirmação — título | **Excluir 3 jogadores?** | |
