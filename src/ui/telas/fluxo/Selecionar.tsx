@@ -19,7 +19,7 @@ interface Props {
 
 /** 1/3 Quem vai jogar? — escolher direto do cadastro (COPY 9.8). */
 export function Selecionar({ onVoltar, onContinuar }: Props) {
-  const { dados, irParaAjustes } = useApp()
+  const { dados, irParaJogadores } = useApp()
   const [busca, setBusca] = useState('')
   const [marcados, setMarcados] = useState<Set<string>>(new Set())
 
@@ -66,7 +66,7 @@ export function Selecionar({ onVoltar, onContinuar }: Props) {
         <EmptyState
           icone={UserPlus}
           titulo="Nenhum jogador no cadastro ainda."
-          acao={<Button onClick={() => irParaAjustes('jogadores')}>Adicionar jogadores</Button>}
+          acao={<Button onClick={irParaJogadores}>Adicionar jogadores</Button>}
         />
       ) : (
         <>

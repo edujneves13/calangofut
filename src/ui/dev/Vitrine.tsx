@@ -325,7 +325,8 @@ function Conteudo() {
         onCancelar={() => setModal(false)}
       />
 
-      <TabBar ativa={aba} onTrocar={setAba} />
+      {/* Caso mais largo: cronômetro rodando em outra aba (conferir em 360 px). */}
+      <TabBar ativa={aba} onTrocar={setAba} cronometro={{ tom: 'rodando', texto: '07:12', progresso: 0.3, rotulo: 'Cronômetro, faltam 07:12' }} />
     </main>
   )
 }

@@ -18,20 +18,20 @@ export interface EstadoCronometro {
   restanteMs: number
 }
 
+/** Sem máximo: cada pelada decide o tempo de jogo (navegacao-ajustes-v3, item 5). */
 export const MIN_MINUTOS = 1
-export const MAX_MINUTOS = 30
 const MINUTO = 60_000
 
 export function minutosValidos(n: number): boolean {
-  return Number.isInteger(n) && n >= MIN_MINUTOS && n <= MAX_MINUTOS
+  return Number.isInteger(n) && n >= MIN_MINUTOS
 }
 
 export function limitarMinutos(n: number): number {
-  return Math.min(MAX_MINUTOS, Math.max(MIN_MINUTOS, Math.round(n)))
+  return Math.max(MIN_MINUTOS, Math.round(n))
 }
 
 function exigirValido(minutos: number) {
-  if (!minutosValidos(minutos)) throw new RangeError(`Tempo de jogo fora de 1 a 30 minutos: ${minutos}`)
+  if (!minutosValidos(minutos)) throw new RangeError(`Tempo de jogo precisa ser de 1 minuto ou mais: ${minutos}`)
 }
 
 export function criarCronometro(minutos: number): EstadoCronometro {

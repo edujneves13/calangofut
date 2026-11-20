@@ -1,11 +1,10 @@
-import { CaretRight, Minus, Plus, SignOut, UsersThree } from '@phosphor-icons/react'
+import { CaretRight, Minus, Plus, SignOut } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { salvarConfiguracoes, type Configuracoes } from '../../../data/configuracoes'
 import { atualizarPelada } from '../../../data/peladas'
 import { proximoDia } from '../../../logic/datas'
 import { FORMATOS } from '../../../logic/formatos'
 import type { FormatoId } from '../../../logic/formatos/tipos'
-import { TAMANHO_TIME } from '../../../logic/tipos'
 import { Avatar } from '../../components/Avatar'
 import { Button } from '../../components/Button'
 import { SectionLabel, Segmented } from '../../components/Controls'
@@ -19,7 +18,7 @@ import { db } from '../../db'
 import { DIAS_CURTOS, ddmm, mensagemDeErro, nomeDoDia } from '../../util'
 import { useApp, type TelaAjustes } from '../contexto'
 import { AVATAR_PADRAO } from '../Times'
-import { Jogadores } from './Jogadores'
+import { EscolhaTempo } from '../cronometro/EscolhaTempo'
 import { NomeAvatar } from './NomeAvatar'
 import t from '../Telas.module.css'
 
@@ -28,14 +27,11 @@ type Folha = 'horario' | 'local' | 'proxima' | 'formato' | 'tempo' | 'jogosSegui
 interface Props {
   tela: TelaAjustes
   setTela: (tela: TelaAjustes) => void
-  /** Voltar das telas internas: o Shell leva para a tela de onde a pessoa veio. */
-  onVoltar: () => void
 }
 
-/** Aba Ajustes (COPY 6.1). */
-export function Ajustes({ tela, setTela, onVoltar }: Props) {
-  if (tela === 'jogadores') return <Jogadores onVoltar={onVoltar} />
-  if (tela === 'pelada') return <NomeAvatar onVoltar={onVoltar} />
+/** Aba Ajustes: os padrões da pelada (COPY 6.1; navegacao-ajustes-v3, item 3). */
+export function Ajustes({ tela, setTela }: Props) {
+  if (tela === 'pelada') return <NomeAvatar onVoltar={() => setTela('inicio')} />
   return <Inicio onAbrir={setTela} />
 }
 
@@ -55,10 +51,9 @@ function Linha({ rotulo, valor, onClick, icone }: { rotulo: ReactNode; valor?: R
 function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
   const { dados, atualizar } = useApp()
   const mostrarToast = useToast()
-  const { config, pelada, jogadores } = dados
+  const { config, pelada } = dados
   const [folha, setFolha] = useState<Folha>(null)
   const [sair, setSair] = useState(false)
-  const ativos = jogadores.filter((j) => j.ativo).length
 
   /** Salva os ajustes; mudar dia, horário ou local também muda a próxima pelada se ela ainda não começou. */
   async function salvar(mudancas: Partial<Configuracoes>) {
@@ -103,16 +98,6 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
           </span>
           <Icon icon={CaretRight} size={18} />
         </button>
-        <Linha
-          icone={
-            <span className={t.ajusteIcone}>
-              <Icon icon={UsersThree} />
-            </span>
-          }
-          rotulo={<b>Jogadores</b>}
-          valor={ativos}
-          onClick={() => onAbrir('jogadores')}
-        />
       </div>
 
       <div>
@@ -123,7 +108,7 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
       </div>
 
       <div>
-        <SectionLabel>Jogo</SectionLabel>
+        <SectionLabel>Regras padrão</SectionLabel>
         <Linha rotulo="Formato padrão" valor={FORMATOS[config.formatoPadrao].nome} onClick={() => setFolha('formato')} />
         <Linha rotulo="Tempo de jogo" valor={`${config.tempoJogo} min`} onClick={() => setFolha('tempo')} />
         <Linha
@@ -131,12 +116,10 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
           valor={`${config.maxJogosSeguidos} ${config.maxJogosSeguidos === 1 ? 'jogo' : 'jogos'}`}
           onClick={() => setFolha('jogosSeguidos')}
         />
-      </div>
-
-      <div>
-        <SectionLabel>Sorteio</SectionLabel>
         <Linha rotulo="Craques (5★) por time" valor={`até ${config.maxCincoEstrelas}`} onClick={() => setFolha('craques')} />
-        <Linha rotulo="Jogadores por time" valor={TAMANHO_TIME} />
+        <p className={t.pequeno} style={{ marginTop: 'var(--space-2)' }}>
+          Dá para mudar no dia, na hora do sorteio.
+        </p>
       </div>
 
       <button type="button" className={`${t.ajuste} ${t.perigo}`} onClick={() => setSair(true)}>
@@ -171,11 +154,9 @@ function Inicio({ onAbrir }: { onAbrir: (tela: TelaAjustes) => void }) {
         onFechar={() => setFolha(null)}
         onSalvar={(formatoPadrao) => salvar({ formatoPadrao })}
       />
-      <FolhaEscolha
+      <FolhaTempo
         key={folha ?? ''}
         aberto={folha === 'tempo'}
-        titulo="Tempo de jogo"
-        opcoes={[...new Set([8, 10, config.tempoJogo])].sort((a, b) => a - b).map((m) => ({ valor: m, texto: `${m} min` }))}
         valor={config.tempoJogo}
         onFechar={() => setFolha(null)}
         onSalvar={(tempoJogo) => salvar({ tempoJogo })}
@@ -311,6 +292,28 @@ function FolhaProxima({
             Voltar para {diaDaRegra}
           </Button>
         )}
+      </div>
+    </Sheet>
+  )
+}
+
+function FolhaTempo({
+  aberto,
+  valor,
+  onFechar,
+  onSalvar,
+}: {
+  aberto: boolean
+  valor: number
+  onFechar: () => void
+  onSalvar: (v: number) => Promise<void>
+}) {
+  const [minutos, setMinutos] = useState(valor)
+  return (
+    <Sheet aberto={aberto} onFechar={onFechar} titulo="Tempo de jogo">
+      <div className={t.coluna}>
+        <EscolhaTempo minutos={minutos} onMudar={setMinutos} />
+        <Button onClick={() => onSalvar(minutos)}>Salvar</Button>
       </div>
     </Sheet>
   )
