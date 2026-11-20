@@ -292,7 +292,7 @@ function Conteudo() {
           onClick={() =>
             mostrarToast({
               texto: 'Matheus Rei entrou no Time 5',
-              acao: { texto: 'Desfazer', onClick: () => mostrarToast({ texto: 'Desfeito.' }) },
+              acoes: [{ texto: 'Desfazer', onClick: () => mostrarToast({ texto: 'Desfeito.' }) }],
             })
           }
         >

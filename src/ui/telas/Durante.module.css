@@ -1,5 +1,6 @@
-/* Índice discreto "Time 1 · 2 · 3" (DESIGN.md 7.5) */
-.indice { display: flex; gap: var(--space-3); overflow-x: auto; scrollbar-width: none; }
+/* Abas dos times + Copiar times na mesma linha (times-durante-v2, itens 1 e 2) */
+.linhaAbas { display: flex; align-items: center; gap: var(--space-3); }
+.indice { flex: 1; min-width: 0; display: flex; gap: var(--space-3); overflow-x: auto; scrollbar-width: none; }
 .indice::-webkit-scrollbar { display: none; }
 .indiceItem {
   flex: none;
@@ -12,7 +13,7 @@
   color: var(--text-2);
 }
 .indiceAtivo { color: var(--text-1); font-weight: 700; border-bottom-color: var(--action); }
-.indiceIncompleto.indiceAtivo { border-bottom-style: dashed; }
+.indiceIncompleto { border-bottom: 2px dashed var(--warning); }
 
 /* Carrossel com o próximo card aparecendo (DESIGN.md 4.3) */
 .carrossel {
@@ -23,8 +24,9 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  margin: 0 calc(-1 * var(--screen-margin));
-  padding: 0 var(--screen-margin);
+  /* Espaço embaixo para a sombra do card não ser cortada pela rolagem. */
+  margin: 0 calc(-1 * var(--screen-margin)) -26px;
+  padding: 0 var(--screen-margin) 30px;
   scroll-padding: 0 var(--screen-margin);
 }
 .carrossel::-webkit-scrollbar { display: none; }
@@ -40,14 +42,103 @@
 }
 .pontos i.pontoAtivo { width: 18px; background: var(--action); }
 
-.expansor { justify-content: space-between; padding: 0 var(--space-4); }
-.cinza { color: var(--text-2); font-weight: 400; }
-.caixa {
-  border: 1.5px dashed var(--border-strong);
-  border-radius: var(--radius-xl);
-  padding: var(--space-1) var(--space-4) var(--space-3);
-  display: flex;
-  flex-direction: column;
+
+.copiar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
-  align-items: stretch;
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface-1);
+  color: var(--text-1);
+  font: 600 0.8125rem/1 var(--font-text);
+}
+.copiar:active { background: var(--surface-3); }
+
+/* "Time 5 está incompleto · 3/5 · Ver" */
+.avisoIncompleto {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 1px dashed var(--warning);
+  border-radius: 14px;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font: 600 0.875rem/1.3 var(--font-text);
+}
+.ver {
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--warning);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Sortear de novo · Editar times */
+.acoes { display: flex; gap: var(--space-3); }
+.acoes > * { flex: 1; }
+.acao { min-height: 48px; border-radius: 16px; padding: 0 var(--space-3); }
+
+/* Não chegaram: o "banco", sem fundo e tracejado (times-durante-v2, itens 2 e 3) */
+.banco {
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 20px;
+  padding: 0 16px;
+  animation: entrar var(--motion-base) var(--ease-standard);
+}
+.bancoSaindo { animation: sair 240ms var(--ease-standard) forwards; }
+@keyframes entrar { from { opacity: 0; } }
+@keyframes sair { to { opacity: 0; transform: scale(0.98); } }
+
+.bancoTopo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  background: transparent;
+  color: var(--text-1);
+  text-align: left;
+  padding: 0;
+}
+.relogio { color: var(--warning); flex: none; }
+.bancoTitulo { font: 800 0.9375rem/1 var(--font-display); flex: none; }
+.bancoConta { color: var(--warning); font: 800 0.9375rem/1 var(--font-display); flex: none; }
+.bancoResumo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-3);
+  font: var(--type-body-s);
+}
+.seta {
+  margin-left: auto;
+  flex: none;
+  color: var(--text-2);
+  transition: transform var(--motion-base) var(--ease-standard);
+}
+.setaAberta { transform: rotate(180deg); }
+
+.bancoLista { list-style: none; margin: 0; padding: 0 0 var(--space-2); }
+.bancoLinha { border-top: 1px dashed var(--border-strong); }
+.bancoLinha > * { min-height: 50px; border-bottom: 0; }
+.bancoEstrelas { color: var(--text-3); font: var(--type-badge); font-variant-numeric: tabular-nums; }
+.chegou { min-height: 36px; padding: 0 var(--space-3); gap: var(--space-1); }
+
+.adicionar { min-height: 48px; border-radius: 16px; color: var(--link); }
+
+@media (prefers-reduced-motion: reduce) {
+  .banco, .bancoSaindo { animation: none; }
+  .seta { transition: none; }
 }
