@@ -62,6 +62,8 @@
   gap: var(--space-1);
 }
 
+.resumoNota { display: flex; align-items: center; justify-content: center; gap: 6px; }
+
 /* Botão de texto (Selecionar, Limpar…) */
 .botaoTexto {
   border: 0;
