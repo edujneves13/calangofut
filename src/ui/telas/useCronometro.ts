@@ -1,40 +1,50 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  atualizar,
+  comecar,
+  continuar,
+  criarCronometro,
+  ehUltimoMinuto,
+  limitarMinutos,
+  maisUmMinuto,
+  mudarMinutos,
+  pausar,
+  zerar,
+  type EstadoCronometro,
+} from '../../logic/cronometro'
 import { apitoFinal, liberarSom, pararApito } from '../som/apito'
 
-export type FaseCronometro = 'parado' | 'rodando' | 'pausado' | 'fim'
-
 export interface Cronometro {
-  fase: FaseCronometro
-  /** Segundos */
-  duracao: number
-  restante: number
+  estado: EstadoCronometro
+  /** Relógio da última atualização da tela (ms). */
+  agora: number
+  /** null = ainda não tentou; false = o celular não deixa manter a tela acesa. */
   telaAcesa: boolean | null
   comecar: () => void
   pausar: () => void
   continuar: () => void
   zerar: () => void
-  ajustar: (minutos: number) => void
+  maisUmMinuto: () => void
   setMinutos: (minutos: number) => void
   pararApito: () => void
 }
 
 /**
- * Fica no Shell para continuar contando quando a pessoa troca de aba.
- * O tempo vem do relógio (fimEm), não de somar segundos: não atrasa se o celular travar um pouco.
+ * Estado do cronômetro + efeitos do celular (tela acesa, vibração, apito).
+ * A conta do tempo fica em src/logic/cronometro.ts. Mora no Shell para continuar contando em outra aba.
  */
 export function useCronometro(minutosPadrao: number): Cronometro {
-  const [fase, setFase] = useState<FaseCronometro>('parado')
-  const [duracao, setDuracao] = useState(minutosPadrao * 60)
-  const [restante, setRestante] = useState(minutosPadrao * 60)
+  const [estado, setEstado] = useState(() => criarCronometro(limitarMinutos(minutosPadrao)))
+  const [agora, setAgora] = useState(() => Date.now())
   const [telaAcesa, setTelaAcesa] = useState<boolean | null>(null)
-  const fimEm = useRef(0)
   const trava = useRef<WakeLockSentinel | null>(null)
   const vibrouUltimo = useRef(false)
 
   const acender = useCallback(async () => {
     try {
-      trava.current = (await navigator.wakeLock?.request('screen')) ?? null
-      setTelaAcesa(Boolean(trava.current))
+      if (!('wakeLock' in navigator)) throw new Error('sem suporte')
+      trava.current = await navigator.wakeLock.request('screen')
+      setTelaAcesa(true)
     } catch {
       setTelaAcesa(false)
     }
@@ -44,79 +54,78 @@ export function useCronometro(minutosPadrao: number): Cronometro {
     trava.current = null
   }, [])
 
+  const rodando = estado.fase === 'rodando'
+
   useEffect(() => {
-    if (fase !== 'rodando') return
-    const id = setInterval(() => {
-      const r = Math.max(0, (fimEm.current - Date.now()) / 1000)
-      setRestante(r)
-      if (r <= 60 && !vibrouUltimo.current) {
-        vibrouUltimo.current = true
-        navigator.vibrate?.(150)
-      }
-      if (r <= 0) {
-        setFase('fim')
-        apagar()
-        apitoFinal()
-      }
-    }, 200)
-    // O navegador solta a trava da tela quando o app vai para o fundo; pega de novo na volta.
+    if (!rodando) return
+    const passo = () => {
+      const t = Date.now()
+      setAgora(t)
+      setEstado((e) => {
+        const novo = atualizar(e, t)
+        if (!vibrouUltimo.current && ehUltimoMinuto(novo, t)) {
+          vibrouUltimo.current = true
+          navigator.vibrate?.(150)
+        }
+        if (novo.fase === 'fim' && e.fase !== 'fim') {
+          apagar()
+          apitoFinal()
+        }
+        return novo
+      })
+    }
+    passo()
+    const id = setInterval(passo, 200)
+    // O navegador solta a trava quando o app vai para o fundo; pega de novo na volta.
     const voltar = () => {
-      if (document.visibilityState === 'visible') void acender()
+      if (document.visibilityState === 'visible') {
+        passo()
+        void acender()
+      }
     }
     document.addEventListener('visibilitychange', voltar)
     return () => {
       clearInterval(id)
       document.removeEventListener('visibilitychange', voltar)
     }
-  }, [fase, acender, apagar])
+  }, [rodando, acender, apagar])
 
-  const rodarPor = (segundos: number) => {
-    fimEm.current = Date.now() + segundos * 1000
-    setFase('rodando')
-    void acender()
+  const agir = (f: (e: EstadoCronometro, t: number) => EstadoCronometro) => {
+    const t = Date.now()
+    setAgora(t)
+    setEstado((e) => f(e, t))
   }
 
   return {
-    fase,
-    duracao,
-    restante,
+    estado,
+    agora,
     telaAcesa,
     comecar: () => {
       liberarSom()
       vibrouUltimo.current = false
-      rodarPor(restante)
+      agir(comecar)
+      void acender()
     },
     pausar: () => {
-      setRestante(Math.max(0, (fimEm.current - Date.now()) / 1000))
-      setFase('pausado')
+      agir(pausar)
       apagar()
     },
     continuar: () => {
       liberarSom()
-      rodarPor(restante)
+      agir(continuar)
+      void acender()
     },
     zerar: () => {
       pararApito()
       apagar()
       vibrouUltimo.current = false
-      setRestante(duracao)
-      setFase('parado')
+      agir((e) => zerar(e))
     },
-    ajustar: (minutos) => {
-      if (fase === 'rodando') {
-        fimEm.current = Math.max(Date.now() + 1000, fimEm.current + minutos * 60_000)
-        setRestante((fimEm.current - Date.now()) / 1000)
-        if (minutos > 0) vibrouUltimo.current = false
-      } else {
-        const novo = Math.max(60, restante + minutos * 60)
-        setRestante(novo)
-        if (fase === 'parado') setDuracao(novo)
-      }
+    maisUmMinuto: () => {
+      vibrouUltimo.current = false
+      agir(maisUmMinuto)
     },
-    setMinutos: (minutos) => {
-      setDuracao(minutos * 60)
-      setRestante(minutos * 60)
-    },
+    setMinutos: (minutos) => agir((e) => mudarMinutos(e, limitarMinutos(minutos))),
     pararApito,
   }
 }

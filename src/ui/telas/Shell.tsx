@@ -58,7 +58,8 @@ export function Shell() {
 
   const cronometro = useCronometro(10)
   const tempoJogo = dados?.config.tempoJogo
-  const { fase, setMinutos } = cronometro
+  const { setMinutos } = cronometro
+  const fase = cronometro.estado.fase
   useEffect(() => {
     // Cronômetro parado começa no tempo de jogo dos Ajustes.
     if (tempoJogo && fase === 'parado') setMinutos(tempoJogo)
@@ -104,7 +105,7 @@ export function Shell() {
     )
   }
 
-  const mostrarMenu = !(aba === 'times' && fluxoAberto)
+  const mostrarMenu = !(aba === 'times' && fluxoAberto) && fase !== 'fim'
 
   return (
     <ContextoApp.Provider value={contexto}>
@@ -120,7 +121,7 @@ export function Shell() {
           }}
         />
       )}
-      {cronometro.fase === 'fim' && <FimDeJogo cronometro={cronometro} />}
+      {cronometro.estado.fase === 'fim' && <FimDeJogo cronometro={cronometro} />}
     </ContextoApp.Provider>
   )
 }
