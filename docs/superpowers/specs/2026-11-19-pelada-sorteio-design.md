@@ -95,7 +95,10 @@ Toda a lógica é código puro (sem tela, sem banco), coberto por testes automá
 ### Casamento de nomes
 
 - Compara sem acento, sem maiúsculas e sem espaços extras, contra o nome do cadastro.
-- Igualdade exata ganha. Sem match exato: sugere os nomes mais parecidos e pede confirmação; nunca casa sozinho por semelhança ("Junior" e "Juninho" são pessoas diferentes; "Eduardo" e "Eduardo Lucas" também).
+- Igualdade exata ganha ("Eduardo" casa com Eduardo, não com Eduardo Lucas).
+- Primeiro nome único também casa sozinho (decidido em 23/11/2026): o nome da lista é o começo do nome de um jogador ativo e nenhum outro ativo tem essas palavras no nome. "Adelson" casa com Adelson Júnior; "Junior" não casa se existem Júnior Kblinho e Adelson Júnior. O que vem entre parênteses no cadastro não conta.
+- Fora disso: sugere os nomes mais parecidos e pede confirmação. Letras parecidas sem nome em comum só viram sugestão com nota alta ("Léo" não sugere Clecio). "Junior" e "Juninho" continuam pessoas diferentes.
+- "Ignorar tudo" só aceita a sugestão quando é forte (nome contido no outro ou erro de digitação); o resto vira jogador novo.
 
 ### Sorteio balanceado
 
@@ -178,7 +181,7 @@ Escolhida: **React (Vite) + TypeScript + Supabase, publicado no Netlify**, sem s
 2. Com menos de 10 jogadores de linha presentes, o app não sorteia e avisa.
 3. Quem sobra da divisão por 5 forma o último time incompleto, escolhido pelo balanceamento.
 4. O sorteio pode ser refeito com confirmação, travando os times completos que o organizador quiser manter. Depois do sorteio, a tela mostra os times e, abaixo, a lista de ausentes com a ação "Presente", que coloca a pessoa direto no último time incompleto.
-5. Nome parecido nunca casa sozinho.
+5. Nome parecido nunca casa sozinho; só igualdade exata ou primeiro nome único.
 6. Soma de estrelas só no app.
 7. Alerta no último minuto do cronômetro.
 

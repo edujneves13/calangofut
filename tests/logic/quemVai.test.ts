@@ -35,13 +35,13 @@ describe('linhasDaLista', () => {
 })
 
 describe('secoes', () => {
-  const linhas = linhasDaLista(lerLista('Juninho\nHugo\nStenio\nZé\nGoleiros\nMárcio'), cadastro)
+  const linhas = linhasDaLista(lerLista('Juninho\nHugo\nAraújo\nZé\nGoleiros\nMárcio'), cadastro)
   const depois = linhas.map((l) => (l.texto === 'Hugo' ? { ...l, status: 'nao-chegou' as const } : l))
 
   it('separa pendências, no sorteio, chegam depois e goleiros', () => {
     const s = secoes(depois, 'az')
     expect(nomes(s.faltamEstrelas)).toEqual(['Zé'])
-    expect(s.confirmarNome.map((l) => l.texto)).toEqual(['Stenio'])
+    expect(s.confirmarNome.map((l) => l.texto)).toEqual(['Araújo'])
     expect(nomes(s.noSorteio)).toEqual(['Juninho'])
     expect(nomes(s.chegamDepois)).toEqual(['Hugo'])
     expect(nomes(s.goleiros)).toEqual(['Márcio'])
@@ -70,14 +70,14 @@ describe('contagem', () => {
 })
 
 describe('ignorarTudo', () => {
-  const linhas = linhasDaLista(lerLista('Stenio\nZé\nBia\nJuninho'), cadastro)
+  const linhas = linhasDaLista(lerLista('Araújo\nZé\nBia\nJuninho'), cadastro)
 
   it('novos ganham 3★ e parecidos viram "É ele"', () => {
     const r = ignorarTudo(linhas)
     expect(r.novos).toBe(2)
     expect(r.iguais).toBe(1)
     expect(pendencias(r.linhas)).toBe(0)
-    const st = r.linhas.find((l) => l.texto === 'Stenio')!
+    const st = r.linhas.find((l) => l.texto === 'Araújo')!
     expect(st).toMatchObject({ escolha: 'ele', jogador: stenio, estrelas: 4 })
     expect(r.linhas.find((l) => l.texto === 'Zé')!.estrelas).toBe(3)
   })
@@ -86,6 +86,14 @@ describe('ignorarTudo', () => {
     const r = ignorarTudo(linhas)
     expect(r.linhas.find((l) => l.texto === 'Juninho')).toBe(linhas.find((l) => l.texto === 'Juninho'))
     expect(pendencias(linhas)).toBe(3)
+  })
+
+  it('sugestão fraca (só letras parecidas) vira novo com 3★, sem juntar pessoas', () => {
+    const [marcinho] = linhasDaLista(lerLista('Marcinho'), cadastro)
+    expect(marcinho).toMatchObject({ tipo: 'parecido', sugestao: marcio })
+    const r = ignorarTudo([marcinho!])
+    expect(r).toMatchObject({ novos: 1, iguais: 0 })
+    expect(r.linhas[0]).toMatchObject({ escolha: 'novo', jogador: null, estrelas: 3 })
   })
 
   it('parecido sem sugestão vira novo com 3★', () => {
