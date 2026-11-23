@@ -19,12 +19,14 @@ interface Props {
   onClick?: () => void
   /** Check de seleção (escolher do cadastro, excluir vários): desmarcado não fica riscado. */
   selecao?: boolean
+  /** Nome vira campo de texto (confirmação do lote). `rotulo` = aria-label. */
+  editarNome?: { onMudar: (nome: string) => void; rotulo: string }
   /** Ícone e nome em cinza (ex.: "Não chegaram", "Chegam depois"). Nunca riscado: quem chega depois não está cancelado. */
   apagado?: boolean
 }
 
 /** Linha de jogador (DESIGN.md 7.6). Ordem alfabética é responsabilidade de quem lista. */
-export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, direita, onClick, selecao, apagado }: Props) {
+export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, direita, onClick, selecao, apagado, editarNome }: Props) {
   const temCheck = chegou !== undefined
   const classes = [s.linha, apagado && s.apagado, novo && s.novo, temCheck && !chegou && !selecao && !apagado && s.riscado, onClick && s.tocavel]
   return (
@@ -65,7 +67,19 @@ export function PlayerRow({ nome, goleiro, sub, chegou, onTrocarChegou, novo, di
         <Icon icon={goleiro ? HandPalm : SneakerMove} size={22} />
       </span>
       <div className={s.centro}>
-        <div className={s.nome}>{nome}</div>
+        {editarNome ? (
+          <input
+            className={`${s.nome} ${s.campoNome}`}
+            value={nome}
+            aria-label={editarNome.rotulo}
+            autoCapitalize="words"
+            autoComplete="off"
+            enterKeyHint="done"
+            onChange={(e) => editarNome.onMudar(e.target.value)}
+          />
+        ) : (
+          <div className={s.nome}>{nome}</div>
+        )}
         {sub && <div className={s.sub}>{sub}</div>}
       </div>
       {direita && (

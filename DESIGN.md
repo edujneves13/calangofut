@@ -347,7 +347,7 @@ Selos de nível nunca parecem editáveis: sem estrelas grandes, sem cor de açã
 | Nível editável ("4★", só em "Quem vai pro sorteio?") | `--surface-2` | `--text-2`, `badge` + ícone `CaretDown` 12 px | 1 px `--border-strong` |
 | Dar estrelas (novo sem estrelas) | transparente | `--link`, `badge` | 1 px tracejada `--border-strong` |
 
-Linha de jogador novo em "Quem vai pro sorteio?" e na confirmação do lote: fundo `--action-soft` a 40% e o selo "Novo". Tocar no selo de nível abre o seletor de estrelas (7.9) numa sheet pequena.
+Linha de jogador novo em "Quem vai pro sorteio?" e na confirmação do lote: fundo `--action-soft` a 40% e o selo "Novo". Em "Quem vai pro sorteio?", tocar no selo de nível abre o seletor de estrelas (7.9) numa sheet pequena. Na confirmação do lote (decisão de 23/11): o nome é um campo de texto com sublinhado tracejado, e o selo de estrelas é um dropdown nativo (`SeloEstrelasSelect`: Dar estrelas · 5★ a 1★ · Goleiro), com a mesma aparência do selo tocável.
 
 ### 7.8 Inputs e busca
 
