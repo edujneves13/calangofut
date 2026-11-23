@@ -5,11 +5,18 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
 }
-/* A ilustração já vem recortada na bolha, com fundo transparente: aparece inteira, sem corte (fluxo v2 §6). */
-.ilustracao { padding: var(--space-4) var(--space-4) 0; animation: subir var(--motion-slow) var(--ease-sheet); }
-.ilustracao img { display: block; width: 100%; height: auto; aspect-ratio: 1101 / 792; object-fit: contain; }
+/* Ilustração sem a bolha: ocupa o topo do card de ponta a ponta e some no fundo do card embaixo. */
+.ilustracao { position: relative; animation: subir var(--motion-slow) var(--ease-sheet); }
+.ilustracao img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 896; object-fit: cover; object-position: top; }
+.ilustracao::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, var(--surface-1) 100%);
+  pointer-events: none;
+}
 @keyframes subir { from { opacity: 0; transform: translateY(8px); } }
-@media (max-height: 700px) { .ilustracao img { max-height: 220px; } }
+@media (max-height: 700px) { .ilustracao img { max-height: 240px; } }
 
 .conteudo { padding: var(--space-1) 22px 22px; display: flex; flex-direction: column; gap: 6px; }
 .rotulo {

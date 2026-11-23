@@ -1,4 +1,4 @@
-import { CaretRight, Clock, MapPin, Shuffle, UsersThree } from '@phosphor-icons/react'
+import { Clock, MapPin, Shuffle } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Button } from '../components/Button'
 import { Header } from '../components/Header'
@@ -27,19 +27,6 @@ export function Times() {
   return <ProximaPelada onSortear={() => setFluxo(true)} />
 }
 
-/** Link discreto no fim da aba Times (COPY 9.1). */
-export function LinkJogadores() {
-  const { dados, irParaAjustes } = useApp()
-  const ativos = dados.jogadores.filter((j) => j.ativo).length
-  return (
-    <button type="button" className={t.linkRodape} onClick={() => irParaAjustes('jogadores')}>
-      <Icon icon={UsersThree} size={20} />
-      Lista de jogadores · {ativos}
-      <Icon icon={CaretRight} size={18} />
-    </button>
-  )
-}
-
 function ProximaPelada({ onSortear }: { onSortear: () => void }) {
   const { dados } = useApp()
   const { config, pelada } = dados
@@ -48,7 +35,7 @@ function ProximaPelada({ onSortear }: { onSortear: () => void }) {
       <Header titulo={config.nomePelada} avatar={{ nome: config.nomePelada, src: config.avatarUrl ?? AVATAR_PADRAO }} />
       <section className={s.hero} aria-label="Próxima pelada">
         <div className={s.ilustracao}>
-          <img src="/mascote/proxima-pelada-solta.webp" alt={`Calango, mascote da ${config.nomePelada}, no gramado`} />
+          <img src="/mascote/proxima-pelada-fill.webp" alt={`Calango, mascote da ${config.nomePelada}, no gramado`} />
         </div>
         <div className={s.conteudo}>
           <p className={s.rotulo}>Próxima pelada</p>
@@ -68,7 +55,6 @@ function ProximaPelada({ onSortear }: { onSortear: () => void }) {
           </Button>
         </div>
       </section>
-      <LinkJogadores />
     </main>
   )
 }

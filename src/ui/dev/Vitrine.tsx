@@ -153,7 +153,7 @@ function Conteudo() {
       <Bloco nome="Card da próxima pelada">
         <Card semPadding>
           <div className={s.ilustracao}>
-            <img src="/mascote/proxima-pelada-solta.webp" alt="Calango, mascote da Pelada dos Brabos, no gramado" />
+            <img src="/mascote/proxima-pelada-fill.webp" alt="Calango, mascote da Pelada dos Brabos, no gramado" />
           </div>
           <div className={s.conteudoCard}>
             <SectionLabel destaque>Próxima pelada</SectionLabel>
@@ -325,7 +325,8 @@ function Conteudo() {
         onCancelar={() => setModal(false)}
       />
 
-      <TabBar ativa={aba} onTrocar={setAba} />
+      {/* Caso mais largo: cronômetro rodando em outra aba (conferir em 360 px). */}
+      <TabBar ativa={aba} onTrocar={setAba} cronometro={{ tom: 'rodando', texto: '07:12', progresso: 0.3, rotulo: 'Cronômetro, faltam 07:12' }} />
     </main>
   )
 }

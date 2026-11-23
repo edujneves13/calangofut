@@ -12,7 +12,9 @@ export function Sorteando({ times }: { times: Time[] }) {
   let atraso = 0
   return (
     <main className={`${t.tela} ${t.semMenu} ${s.tela}`} aria-live="polite">
-      <img className={s.imagem} src="/mascote/sorteando.webp" alt="Calango sorteando os times" />
+      <div className={s.ilustracao}>
+        <img src="/mascote/sorteando-fill.webp" alt="Calango sorteando os times" />
+      </div>
       <div className={t.centro}>
         <p className={t.destaque}>Sorteando…</p>
         <p className={t.texto2}>Equilibrando os times</p>

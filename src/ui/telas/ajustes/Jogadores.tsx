@@ -1,4 +1,4 @@
-import { CaretRight, DotsThree, ListPlus, Trash, User, UserPlus, UsersThree } from '@phosphor-icons/react'
+import { CaretRight, ListPlus, Trash, User, UserPlus, UsersThree } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { atualizarJogador, desativarJogadores } from '../../../data/jogadores'
 import type { Jogador } from '../../../logic/tipos'
@@ -7,7 +7,6 @@ import { Button } from '../../components/Button'
 import { EmptyState } from '../../components/Controls'
 import { Header } from '../../components/Header'
 import { Icon } from '../../components/Icon'
-import { IconButton } from '../../components/IconButton'
 import { SearchInput } from '../../components/Input'
 import { PlayerRow } from '../../components/PlayerRow'
 import { ConfirmModal, Sheet } from '../../components/Sheet'
@@ -21,8 +20,8 @@ import t from '../Telas.module.css'
 
 type Filtro = 'todos' | 'linha' | 'goleiros' | 'inativos'
 
-/** Ajustes → Jogadores (COPY 6.2 e 9.2). */
-export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
+/** Aba Jogadores (COPY 6.2 e 9.2; navegacao-ajustes-v3, item 2). */
+export function Jogadores() {
   const { dados, atualizar, recarregar } = useApp()
   const mostrarToast = useToast()
   const [busca, setBusca] = useState('')
@@ -32,8 +31,7 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
   const [lote, setLote] = useState(false)
   const [selecionando, setSelecionando] = useState(false)
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
-  const [menu, setMenu] = useState(false)
-  const [excluir, setExcluir] = useState<'selecionados' | 'todos' | null>(null)
+  const [excluir, setExcluir] = useState(false)
 
   if (lote) return <Lote onVoltar={() => setLote(false)} />
 
@@ -42,6 +40,10 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
   if (filtro === 'linha') lista = lista.filter((j) => !j.goleiro)
   if (filtro === 'goleiros') lista = lista.filter((j) => j.goleiro)
   lista = lista.filter((j) => combina(j, busca)).sort(porNome)
+
+  const todosVisiveisMarcados = lista.length > 0 && lista.every((j) => selecionados.has(j.id))
+  // Seleção com todos os ativos: a confirmação diz "Excluir todos os N jogadores?".
+  const todosAtivos = ativos.length > 0 && ativos.every((j) => selecionados.has(j.id))
 
   const trocar = (id: string) =>
     setSelecionados((s) => {
@@ -57,8 +59,8 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
   }
 
   async function confirmarExcluir() {
-    const ids = excluir === 'todos' ? ativos.map((j) => j.id) : [...selecionados]
-    setExcluir(null)
+    const ids = [...selecionados]
+    setExcluir(false)
     try {
       await desativarJogadores(db, ids)
       atualizar({ jogadores: dados.jogadores.map((j) => (ids.includes(j.id) ? { ...j, ativo: false } : j)) })
@@ -94,17 +96,7 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
 
   return (
     <main className={`${t.tela} ${t.entrar}`}>
-      {selecionando ? (
-        <Header titulo={plural(selecionados.size, 'selecionado', 'selecionados')} onVoltar={sairDaSelecao} />
-      ) : (
-        <Header
-          titulo="Jogadores"
-          onVoltar={onVoltar}
-          acoes={
-            ativos.length > 0 ? <IconButton icone={DotsThree} rotulo="Mais opções" semFundo onClick={() => setMenu(true)} /> : undefined
-          }
-        />
-      )}
+      <Header titulo={selecionando ? plural(selecionados.size, 'selecionado', 'selecionados') : 'Jogadores'} />
 
       {!selecionando && (
         <Button icone={UserPlus} onClick={() => setOpcoesAdicionar(true)}>
@@ -138,6 +130,24 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
             {!selecionando && filtro !== 'inativos' && lista.length > 0 && (
               <button type="button" className={t.botaoTexto} onClick={() => setSelecionando(true)}>
                 Selecionar
+              </button>
+            )}
+            {selecionando && lista.length > 0 && (
+              <button
+                type="button"
+                className={t.botaoTexto}
+                onClick={() =>
+                  setSelecionados((s) => {
+                    const novo = new Set(s)
+                    for (const j of lista) {
+                      if (todosVisiveisMarcados) novo.delete(j.id)
+                      else novo.add(j.id)
+                    }
+                    return novo
+                  })
+                }
+              >
+                {todosVisiveisMarcados ? 'Limpar' : 'Selecionar todos'}
               </button>
             )}
           </div>
@@ -188,7 +198,7 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
           <Button variante="secundario" style={{ width: 'auto', flex: 'none', padding: '0 18px' }} onClick={sairDaSelecao}>
             Cancelar
           </Button>
-          <Button icone={Trash} disabled={selecionados.size === 0} onClick={() => setExcluir('selecionados')}>
+          <Button icone={Trash} disabled={selecionados.size === 0} onClick={() => setExcluir(true)}>
             Excluir ({selecionados.size})
           </Button>
         </div>
@@ -231,24 +241,10 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
         </div>
       </Sheet>
 
-      <Sheet aberto={menu} onFechar={() => setMenu(false)} titulo="Mais opções">
-        <button
-          type="button"
-          className={`${t.opcao} ${t.perigo}`}
-          onClick={() => {
-            setMenu(false)
-            setExcluir('todos')
-          }}
-        >
-          <Icon icon={Trash} />
-          <span className={t.opcaoTitulo}>Excluir todos</span>
-        </button>
-      </Sheet>
-
       <ConfirmModal
-        aberto={excluir !== null}
+        aberto={excluir}
         titulo={
-          excluir === 'todos'
+          todosAtivos && ativos.length > 1
             ? `Excluir todos os ${ativos.length} jogadores?`
             : `Excluir ${plural(selecionados.size, 'jogador', 'jogadores')}?`
         }
@@ -257,7 +253,7 @@ export function Jogadores({ onVoltar }: { onVoltar: () => void }) {
         cancelar="Cancelar"
         perigo
         onConfirmar={confirmarExcluir}
-        onCancelar={() => setExcluir(null)}
+        onCancelar={() => setExcluir(false)}
       />
 
       <EditarJogador
