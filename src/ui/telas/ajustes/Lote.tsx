@@ -4,7 +4,7 @@ import { adicionarApelido, criarJogadores } from '../../../data/jogadores'
 import { montarConfirmacao } from '../../../logic/confirmacao'
 import { lerNomes } from '../../../logic/leitor'
 import type { Estrelas, Jogador } from '../../../logic/tipos'
-import { Badge, BadgeEstrelas } from '../../components/Badge'
+import { Badge, SeloEstrelasSelect } from '../../components/Badge'
 import { Button } from '../../components/Button'
 import { Notice } from '../../components/Controls'
 import { Header } from '../../components/Header'
@@ -15,7 +15,6 @@ import { useToast } from '../../components/Toast'
 import { db } from '../../db'
 import { mensagemDeErro, plural } from '../../util'
 import { juntarJogadores, useApp } from '../contexto'
-import { EstrelasSheet } from '../EstrelasSheet'
 import t from '../Telas.module.css'
 
 /** Uma linha da confirmação do lote. */
@@ -39,7 +38,6 @@ export function Lote({ onVoltar }: { onVoltar: () => void }) {
   const [texto, setTexto] = useState('')
   const [semNomes, setSemNomes] = useState(false)
   const [itens, setItens] = useState<ItemLote[] | null>(null)
-  const [estrelasDe, setEstrelasDe] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
 
   function continuar() {
@@ -58,7 +56,7 @@ export function Lote({ onVoltar }: { onVoltar: () => void }) {
         chave: `${i}`,
         texto: c.texto,
         goleiro: nomes[i]!.goleiro,
-        estrelas: 0,
+        estrelas: nomes[i]!.estrelas ?? 0,
         tipo: c.tipo,
         jogador: c.tipo === 'existente' ? c.jogador : null,
         sugestao: c.tipo === 'parecido' ? (c.sugestoes[0] ?? null) : null,
@@ -111,15 +109,15 @@ export function Lote({ onVoltar }: { onVoltar: () => void }) {
   const novos = itens.filter(ehNovo)
   const semEstrelas = novos.filter((i) => !i.goleiro && i.estrelas === 0).length
   const semEscolha = itens.filter((i) => i.tipo === 'parecido' && i.escolha === null).length
-  const travado = semEstrelas > 0 || semEscolha > 0
-  const itemEstrelas = itens.find((i) => i.chave === estrelasDe) ?? null
+  const semNome = novos.some((i) => !i.texto.trim())
+  const travado = semEstrelas > 0 || semEscolha > 0 || semNome
 
   async function adicionar() {
     setSalvando(true)
     try {
       const criados = await criarJogadores(
         db,
-        novos.map((i) => ({ nome: i.texto, estrelas: (i.estrelas || 3) as Estrelas, goleiro: i.goleiro })),
+        novos.map((i) => ({ nome: i.texto.trim(), estrelas: (i.estrelas || 3) as Estrelas, goleiro: i.goleiro })),
       )
       for (const i of itens!) {
         if (i.escolha === 'ele' && i.sugestao) await adicionarApelido(db, i.sugestao.id, i.texto).catch(() => {})
@@ -176,21 +174,17 @@ export function Lote({ onVoltar }: { onVoltar: () => void }) {
                   nome={i.texto}
                   goleiro={i.goleiro}
                   novo
+                  editarNome={{ rotulo: 'Nome completo', onMudar: (texto) => mudar(i.chave, { texto }) }}
                   sub={<Badge variante="novo">Novo</Badge>}
                   direita={
                     <>
-                      {i.goleiro ? (
-                        <button type="button" className={t.botaoTexto} onClick={() => setEstrelasDe(i.chave)}>
-                          <Badge variante="goleiro">Goleiro</Badge>
-                        </button>
-                      ) : (
-                        <BadgeEstrelas
-                          estrelas={i.estrelas}
-                          nome={i.texto}
-                          textoVazio="Dar estrelas"
-                          onClick={() => setEstrelasDe(i.chave)}
-                        />
-                      )}
+                      <SeloEstrelasSelect
+                        estrelas={i.estrelas}
+                        goleiro={i.goleiro}
+                        rotulo={`Estrelas: ${i.texto}`}
+                        textoVazio="Dar estrelas"
+                        onMudar={(m) => mudar(i.chave, m)}
+                      />
                       {tirar}
                     </>
                   }
@@ -229,18 +223,6 @@ export function Lote({ onVoltar }: { onVoltar: () => void }) {
               : `Adicionar ${plural(novos.length, 'jogador', 'jogadores')}`}
         </Button>
       </div>
-      <EstrelasSheet
-        aberto={itemEstrelas !== null}
-        onFechar={() => setEstrelasDe(null)}
-        nome={itemEstrelas?.texto ?? ''}
-        estrelas={itemEstrelas?.estrelas ?? 0}
-        onMudar={(e) => itemEstrelas && mudar(itemEstrelas.chave, { estrelas: e })}
-        goleiro={
-          itemEstrelas
-            ? { valor: itemEstrelas.goleiro, onMudar: (g) => mudar(itemEstrelas.chave, { goleiro: g }) }
-            : undefined
-        }
-      />
     </main>
   )
 }

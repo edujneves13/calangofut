@@ -11,7 +11,7 @@ import {
 } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
 import { Avatar } from '../components/Avatar'
-import { Badge, BadgeEstrelas } from '../components/Badge'
+import { Badge, BadgeEstrelas, SeloEstrelasSelect } from '../components/Badge'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import {
@@ -180,6 +180,7 @@ function Conteudo() {
             direita={<BadgeEstrelas estrelas={5} nome="Juninho" textoVazio="Dar estrelas" onClick={() => {}} />}
           />
           <PlayerRow nome="Kauã Ferreira" chegou={false} onTrocarChegou={() => {}} direita={<Badge variante="nivel">3★</Badge>} />
+          <LinhaLote />
           <PlayerRow
             nome="Renê"
             novo
@@ -328,5 +329,21 @@ function Conteudo() {
       {/* Caso mais largo: cronômetro rodando em outra aba (conferir em 360 px). */}
       <TabBar ativa={aba} onTrocar={setAba} cronometro={{ tom: 'rodando', texto: '07:12', progresso: 0.3, rotulo: 'Cronômetro, faltam 07:12' }} />
     </main>
+  )
+}
+
+/** Linha de jogador novo na confirmação do lote: nome editável e estrelas no dropdown. */
+function LinhaLote() {
+  const [nome, setNome] = useState('Vinicius')
+  const [m, setM] = useState({ estrelas: 0, goleiro: false })
+  return (
+    <PlayerRow
+      nome={nome}
+      goleiro={m.goleiro}
+      novo
+      editarNome={{ rotulo: 'Nome completo', onMudar: setNome }}
+      sub={<Badge variante="novo">Novo</Badge>}
+      direita={<SeloEstrelasSelect {...m} rotulo={`Estrelas: ${nome}`} textoVazio="Dar estrelas" onMudar={setM} />}
+    />
   )
 }

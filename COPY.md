@@ -466,6 +466,8 @@ Decisões de 19/11: lista de jogadores com cadastro em lote, "Confira a lista" n
 | Ajuda após "É ele" | "Stênio" vai ser lembrado como apelido do Stenio Araújo. | = 2.3. |
 | Remover linha | aria-label "Tirar Pedro da lista" | |
 | Toggle | Goleiro | |
+| Nome do novo | Campo editável, aria-label "Nome completo" | Corrige o nome lido da lista (23/11). |
+| Dropdown de estrelas | Dar estrelas · 5★ · 4★ · 3★ · 2★ · 1★ · Goleiro (aria-label "Estrelas: Pedro") | Substitui a sheet; já vem preenchido quando a lista traz a nota (23/11). |
 | Botão | Adicionar 9 jogadores | Número de quem será criado. |
 | Botão travado | Falta dar estrelas a 2 jogadores | Diz por que está travado. |
 | Botão travado (parecidos) | Falta escolher 1 nome | = 2.3. |

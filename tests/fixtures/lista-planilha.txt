@@ -1,0 +1,41 @@
+1	Guilherme	⭐⭐⭐⭐⭐
+2	Derik	⭐⭐⭐⭐
+3	Josué	⭐⭐⭐⭐
+4	Leandro Costa	⭐⭐⭐⭐
+5	Juninho	⭐⭐⭐⭐
+6	Adelson Júnior	⭐⭐⭐⭐
+7	Jackson	⭐⭐⭐⭐
+8	Tayrone	⭐⭐⭐⭐
+9	Kauã	⭐⭐⭐⭐
+10	Vinicius Martins	⭐⭐⭐⭐
+11	Abrahão	⭐⭐⭐⭐
+12	Rafael	⭐⭐⭐
+13	Fabiano	⭐⭐⭐
+14	Cleyton	⭐⭐⭐
+15	Eduardo	⭐⭐⭐
+16	João Felipe	⭐⭐⭐
+17	Vinicius (Adelson)	⭐⭐⭐
+18	Stênio	⭐⭐⭐
+19	Marcio	⭐⭐⭐
+20	Murilo	⭐⭐⭐
+21	Michel	⭐⭐⭐
+22	Renê	⭐⭐⭐
+23	David	⭐⭐⭐
+24	Pablo	⭐⭐⭐
+25	Júnior Kblinho	⭐⭐⭐
+26	Felipe Gomes	⭐⭐⭐
+27	Eduardo Lucas	⭐⭐⭐
+28	João Pedro	⭐⭐⭐
+29	Hugo	⭐⭐⭐
+30	Yhan	⭐⭐⭐
+31	Paulinho	⭐⭐⭐
+32	Pedro	⭐⭐⭐
+33	Paulo	⭐⭐⭐*
+34	Matheus Rei	⭐⭐⭐
+37	Arllen	⭐⭐
+38	Isaac	⭐⭐
+39	Herlly	⭐⭐
+40	Clecio	⭐⭐
+41	Azineu	⭐⭐⭐
+42	Thiago	⭐⭐⭐
+43	Hagno	⭐⭐

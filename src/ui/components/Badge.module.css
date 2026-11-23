@@ -30,4 +30,16 @@
   border: 1px dashed var(--border-strong);
   min-height: 32px;
 }
+/* Dropdown: o <select> nativo fica invisível por cima do selo e recebe o toque. */
+.select { position: relative; }
+.select select {
+  position: absolute;
+  inset: -6px 0;
+  width: 100%;
+  opacity: 0;
+  font-size: 16px; /* evita zoom do iOS */
+  cursor: pointer;
+}
+.select:focus-within { box-shadow: 0 0 0 2px var(--focus); }
+.select:active { background: var(--surface-3); }
 button.selo:active { background: var(--surface-3); }

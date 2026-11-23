@@ -24,6 +24,18 @@
 
 .centro { flex: 1; min-width: 0; }
 .nome { font: var(--type-body-l); overflow-wrap: anywhere; }
+.campoNome {
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dashed var(--border-strong);
+  border-radius: 0;
+  background: transparent;
+  outline: 0;
+  font-size: 1rem; /* 16 px: evita zoom do iOS */
+}
+.campoNome:focus { border-bottom: 1.5px solid var(--focus); }
 .sub { font: var(--type-body-s); color: var(--text-2); }
 
 .riscado .nome {
