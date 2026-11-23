@@ -1,3 +1,4 @@
+import { sugestaoForte } from './casamento'
 import { confirmacaoDoCadastro, montarConfirmacao, type ItemConfirmacao } from './confirmacao'
 import type { ListaLida } from './leitor'
 import { normalizarNome } from './normalizar'
@@ -111,7 +112,8 @@ export function contagem(linhas: Linha[]) {
 const ESTRELAS_PADRAO = 3
 
 /**
- * "Ignorar tudo": novos sem estrelas ganham 3★ e nomes parecidos viram "É ele" com a sugestão.
+ * "Ignorar tudo": novos sem estrelas ganham 3★ e nomes parecidos viram "É ele" com a sugestão,
+ * só quando a sugestão é forte; com só algumas letras parecidas vira novo, para não juntar pessoas.
  * Devolve linhas novas (o array original fica intacto, para o Desfazer).
  */
 export function ignorarTudo(linhas: Linha[]): { linhas: Linha[]; novos: number; iguais: number } {
@@ -119,7 +121,7 @@ export function ignorarTudo(linhas: Linha[]): { linhas: Linha[]; novos: number; 
   let iguais = 0
   const resolvidas = linhas.map((l): Linha => {
     if (faltaEscolha(l)) {
-      if (l.sugestao) {
+      if (l.sugestao && sugestaoForte(l.texto, l.sugestao)) {
         iguais++
         return { ...l, escolha: 'ele', jogador: l.sugestao, estrelas: l.sugestao.estrelas }
       }
