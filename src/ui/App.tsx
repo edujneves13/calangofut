@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { ToastProvider } from './components/Toast'
 import { db } from './db'
 import { Login } from './telas/Login'
@@ -20,6 +21,7 @@ export function App() {
   return (
     <ToastProvider>
       <Entrada />
+      <Analytics />
     </ToastProvider>
   )
 }
